@@ -24,4 +24,6 @@ extern n_coord my_coord;
 
 extern lattice_user player;
 
+extern void (*gcallback)();
+
 #endif

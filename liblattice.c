@@ -32,6 +32,7 @@ struct message s_mestab[] = {
 //    { "serverack", s_serverack, 0 },
 //    { "kill", s_kill, 0 },
     { "ping", s_ping, 0 },
+    { "p", s_p, 0 },
     { (char *) NULL, (int (*)()) NULL, 0 }
 };
 
@@ -90,7 +91,7 @@ void strtoargv(char *line) {
 }
 
 
-int lattice_init(int in_sock) {
+int lattice_init(int in_sock, void (*callback)()) {
 
     int tab_size;
 	
@@ -106,6 +107,11 @@ int lattice_init(int in_sock) {
 		// limit from cstdlib
 		const int fdcount = 512;
 	#endif
+
+    if (!callback)
+        return -1;
+
+    gcallback = callback;
 
     tab_size = fdcount * sizeof(server_socket);
 

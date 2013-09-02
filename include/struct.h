@@ -45,4 +45,31 @@ struct message {
   uint32_t flags;
 };
 
+#define T_P   1
+
+#define MFLAG_FROM      0x00000001         // Is fromuid set
+
+#define TstFlagFrom(m) ((m)->flags & MFLAG_FROM)
+#define SetFlagFrom(m) ((m)->flags |= MFLAG_FROM)
+#define ClrFlagFrom(m) ((m)->flags &= (~MFLAG_FROM))
+
+
+typedef struct lattice_message {
+
+    int type;
+    int flags;
+    uint32_t fromuid;
+    void * args;
+
+} lattice_message;
+
+
+typedef struct lattice_p {
+
+    w_coord wcoord;
+    b_coord bcoord;
+
+} lattice_p;
+
+
 #endif
