@@ -25,6 +25,7 @@
 #include "send.h"
 #include "macros.h"
 #include "server_commands.h"
+#include "client_commands.h"
 
 struct message s_mestab[] = {
 //    { "whoson", s_whoson, FLAG_REG },
@@ -277,4 +278,21 @@ void lattice_process() {
 
     } // End for(fd = 0; fd <= fdmax; fd++)
     return;
+}
+
+int lattice_send(lattice_message *msg) {
+
+    if (!msg) return -1;
+
+    switch (msg->type) {
+
+        case T_P:
+            return c_p( ((lattice_p *)msg->args)->wcoord,
+                        ((lattice_p *)msg->args)->bcoord );
+        break;
+
+    }
+
+    return 0;
+
 }
