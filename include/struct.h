@@ -45,7 +45,8 @@ struct message {
   uint32_t flags;
 };
 
-#define T_P   1
+#define T_P      1
+#define T_QUIT   2
 
 #define MFLAG_FROM      0x00000001         // Is fromuid set
 
@@ -70,6 +71,13 @@ typedef struct lattice_p {
     b_coord bcoord;
 
 } lattice_p;
+
+typedef struct lattice_quit {
+
+    uint32_t numeric;
+    char desc[MTU];
+
+} lattice_quit;
 
 
 #endif

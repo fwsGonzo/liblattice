@@ -34,6 +34,7 @@ struct message s_mestab[] = {
 //    { "kill", s_kill, 0 },
     { "ping", s_ping, 0 },
     { "p", s_p, 0 },
+    { "quit", s_quit, 0 },
     { (char *) NULL, (int (*)()) NULL, 0 }
 };
 
@@ -150,6 +151,11 @@ int lattice_select(struct timeval *ptimeout) {
 
     return select(maxfd + 1, &rready_set, &wready_set, NULL, ptimeout);
 
+}
+
+void lattice_flush() {
+    flushall_write();
+    return;
 }
 
 void lattice_process() {
@@ -290,6 +296,12 @@ int lattice_send(lattice_message *msg) {
             return c_p( ((lattice_p *)msg->args)->wcoord,
                         ((lattice_p *)msg->args)->bcoord );
         break;
+
+        case T_QUIT:
+            return c_quit( (char *)msg->args );
+        break;
+
+
 
     }
 

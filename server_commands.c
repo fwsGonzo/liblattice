@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 
 #ifdef __linux__
         #include <sys/socket.h>
@@ -54,6 +55,37 @@ int s_p(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
     (*gcallback)(&mess);
 
     //if (sendto_one(src, "PONG\n")) return 1;
+
+    return 0;
+
+}
+
+
+int s_quit(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+
+    lattice_message mess;
+
+    lattice_quit submess;
+
+    if (!src) return 0;
+
+    if (!pfrom) return 0;
+
+    if (argc < 2) return 0;
+
+    mess.type = T_QUIT;
+
+    SetFlagFrom(&mess);
+
+    mess.fromuid = *pfrom;
+
+    mess.args = &submess;
+
+    submess.numeric = atoi(argv[0]);
+    strncpy(submess.desc, argv[1] , sizeof(submess.desc));
+    submess.desc[sizeof(submess.desc)-1]='\0';
+
+    (*gcallback)(&mess);
 
     return 0;
 
