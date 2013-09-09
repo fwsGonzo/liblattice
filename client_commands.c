@@ -30,3 +30,9 @@ int c_quit(char *reason) {
         return (sendto_one(neighbor_table[1][1][1], "QUIT\n"));
 
 }
+
+int c_pc(uint32_t color) {
+
+    return (sendto_one(neighbor_table[1][1][1], "PC %d\n", color));
+
+}

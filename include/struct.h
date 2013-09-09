@@ -47,6 +47,7 @@ struct message {
 
 #define T_P      1
 #define T_QUIT   2
+#define T_PC     3
 
 #define MFLAG_FROM      0x00000001         // Is fromuid set
 
@@ -78,6 +79,12 @@ typedef struct lattice_quit {
     char desc[MTU];
 
 } lattice_quit;
+
+typedef struct lattice_pc {
+
+    uint32_t color;
+
+} lattice_pc;
 
 
 #endif

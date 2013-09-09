@@ -35,6 +35,7 @@ struct message s_mestab[] = {
     { "ping", s_ping, 0 },
     { "p", s_p, 0 },
     { "quit", s_quit, 0 },
+    { "pc", s_pc, 0 },
     { (char *) NULL, (int (*)()) NULL, 0 }
 };
 
@@ -296,9 +297,17 @@ int lattice_send(lattice_message *msg) {
             return c_p( ((lattice_p *)msg->args)->wcoord,
                         ((lattice_p *)msg->args)->bcoord );
         break;
-
         case T_QUIT:
             return c_quit( (char *)msg->args );
+        break;
+
+        case T_PC:
+            return c_pc( ((lattice_pc *)msg->args)->color );
+        break;
+
+
+        default:
+            return -1;
         break;
 
 

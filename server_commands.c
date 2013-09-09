@@ -91,3 +91,32 @@ int s_quit(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
 }
 
+
+int s_pc(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+
+    lattice_message mess;
+
+    lattice_pc submess;
+
+    if (!src) return 0;
+
+    if (!pfrom) return 0;
+
+    if (argc < 1) return 0;
+
+    mess.type = T_PC;
+
+    SetFlagFrom(&mess);
+
+    mess.fromuid = *pfrom;
+
+    mess.args = &submess;
+
+    submess.color = (uint32_t)atoi(argv[0]);
+
+    (*gcallback)(&mess);
+
+    return 0;
+
+}
+
