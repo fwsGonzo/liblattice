@@ -150,3 +150,32 @@ int s_pr(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
 }
 
+int s_ph(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+
+    lattice_message mess;
+
+    lattice_ph submess;
+
+    if (!src) return 0;
+
+    if (!pfrom) return 0;
+
+    if (argc < 2) return 0;
+
+    mess.type = T_PH;
+
+    SetFlagFrom(&mess);
+
+    mess.fromuid = *pfrom;
+
+    mess.args = &submess;
+
+    submess.hand.item_id = (HAND_TYPE)atoi(argv[0]);
+    submess.hand.item_type = (HAND_TYPE)atoi(argv[1]);
+
+    (*gcallback)(&mess);
+
+    return 0;
+
+}
+
