@@ -36,3 +36,9 @@ int c_pc(uint32_t color) {
     return (sendto_one(neighbor_table[1][1][1], "PC %d\n", color));
 
 }
+
+int c_pr(head_rot rot) {
+
+    return (sendto_one(neighbor_table[1][1][1], "PR %d %d\n", rot.xrot, rot.yrot));
+
+}

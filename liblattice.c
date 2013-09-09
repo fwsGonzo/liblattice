@@ -36,6 +36,7 @@ struct message s_mestab[] = {
     { "p", s_p, 0 },
     { "quit", s_quit, 0 },
     { "pc", s_pc, 0 },
+    { "pr", s_pr, 0 },
     { (char *) NULL, (int (*)()) NULL, 0 }
 };
 
@@ -303,6 +304,10 @@ int lattice_send(lattice_message *msg) {
 
         case T_PC:
             return c_pc( ((lattice_pc *)msg->args)->color );
+        break;
+
+        case T_PR:
+            return c_pr( ((lattice_pr *)msg->args)->rot );
         break;
 
 

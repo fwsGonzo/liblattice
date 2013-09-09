@@ -120,3 +120,33 @@ int s_pc(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
 }
 
+
+int s_pr(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+
+    lattice_message mess;
+
+    lattice_pr submess;
+
+    if (!src) return 0;
+
+    if (!pfrom) return 0;
+
+    if (argc < 2) return 0;
+
+    mess.type = T_PR;
+
+    SetFlagFrom(&mess);
+
+    mess.fromuid = *pfrom;
+
+    mess.args = &submess;
+
+    submess.rot.xrot = (HEAD_TYPE)atoi(argv[0]);
+    submess.rot.yrot = (HEAD_TYPE)atoi(argv[1]);
+
+    (*gcallback)(&mess);
+
+    return 0;
+
+}
+
