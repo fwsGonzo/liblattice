@@ -1,27 +1,21 @@
-liblattice.so: liblattice.o globals.o socket.o send.o neighbors.o server_commands.o client_commands.o
-	ar rvs liblattice.a liblattice.o globals.o socket.o send.o neighbors.o server_commands.o client_commands.o
+# source files
+SOURCE = liblattice.c global.c socket.c send.c neighbors.c server_commands.c client_commands.c
+OUTPUT = liblattice.a
 
-liblattice.o: liblattice.c
-	gcc -Wall -I./include/ -c liblattice.c
+CC = gcc
+AR = ar rvs
+CCFLAGS = -c -Wall -I./include/
+LFLAGS  = -pthread -static
 
-globals.o: globals.c
-	gcc -Wall -I./include/ -c globals.c
+CMODS = $(SOURCE)
+COBJS = $(CMODS:.c=.o)
 
-socket.o: socket.c
-	gcc -Wall -I./include/ -c socket.c
+# compile each .c to .o
+.c.o:
+	$(CC) $(CCFLAGS) $< -o $@
 
-send.o: send.c
-	gcc -Wall -I./include/ -c send.c
-	
-neighbors.o: neighbors.c
-	gcc -Wall -I./include/ -c neighbors.c
-
-server_commands.o: server_commands.c
-	gcc -Wall -I./include/ -c server_commands.c
-
-client_commands.o: client_commands.c
-	gcc -Wall -I./include/ -c client_commands.c
+all: $(COBJS)
+	$(AR) $(OUTPUT) $(COBJS)
 
 clean:
-	rm -rf *.o liblattice.a
-
+	rm $(COBJS) $(OUTPUT)
