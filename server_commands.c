@@ -259,8 +259,8 @@ int s_s(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
     mess.args = &submess;
 
-    submess.a = (int32_t)atoi(argv[0]);
-    submess.b = (int32_t)atoi(argv[1]);
+    submess.mid = (int32_t)atoi(argv[0]);
+    submess.sid = (int32_t)atoi(argv[1]);
 
     (*gcallback)(&mess);
 

@@ -117,8 +117,8 @@ typedef struct lattice_action {
 
 typedef struct lattice_s {
 
-    int32_t a;
-    int32_t b;
+    int32_t mid;
+    int32_t sid;
 
 } lattice_s;
 

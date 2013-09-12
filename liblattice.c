@@ -327,8 +327,8 @@ int lattice_send(lattice_message *msg) {
         break;
 
         case T_S:
-            return c_s( ((lattice_s *)msg->args)->a,
-                        ((lattice_s *)msg->args)->b );
+            return c_s( ((lattice_s *)msg->args)->mid,
+                        ((lattice_s *)msg->args)->sid );
         break;
 
         default:
