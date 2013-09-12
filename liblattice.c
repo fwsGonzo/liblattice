@@ -40,6 +40,7 @@ struct message s_mestab[] = {
     { "ph", s_ph, 0 },
     { "chat", s_chat, 0 },
     { "action", s_action, 0 },
+    { "s", s_s, 0 },
     { (char *) NULL, (int (*)()) NULL, 0 }
 };
 
@@ -323,6 +324,11 @@ int lattice_send(lattice_message *msg) {
 
         case T_ACTION:
             return c_action( (char *)msg->args );
+        break;
+
+        case T_S:
+            return c_s( ((lattice_s *)msg->args)->a,
+                        ((lattice_s *)msg->args)->b );
         break;
 
         default:

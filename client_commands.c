@@ -67,3 +67,8 @@ int c_action(char *string) {
 
 }
 
+int c_s(int32_t a, int32_t b) {
+
+    return (sendto_one(neighbor_table[1][1][1], "S %d %d\n", a, b));
+
+}

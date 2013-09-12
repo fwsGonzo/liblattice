@@ -239,3 +239,31 @@ int s_action(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) 
 
 }
 
+int s_s(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+
+    lattice_message mess;
+
+    lattice_s submess;
+
+    if (!src) return 0;
+
+    if (!pfrom) return 0;
+
+    if (argc < 2) return 0;
+
+    mess.type = T_S;
+
+    SetFlagFrom(&mess);
+
+    mess.fromuid = *pfrom;
+
+    mess.args = &submess;
+
+    submess.a = (int32_t)atoi(argv[0]);
+    submess.b = (int32_t)atoi(argv[1]);
+
+    (*gcallback)(&mess);
+
+    return 0;
+
+}
