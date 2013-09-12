@@ -48,3 +48,13 @@ int c_ph(hand_hold hand) {
     return (sendto_one(neighbor_table[1][1][1], "PH %d %d\n", hand.item_id, hand.item_type));
 
 }
+
+int c_chat(char *string) {
+
+    if (string)
+        return (sendto_one(neighbor_table[1][1][1], "CHAT :%s\n", string));
+    else
+        return (sendto_one(neighbor_table[1][1][1], "CHAT :\n"));
+
+}
+
