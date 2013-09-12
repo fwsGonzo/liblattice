@@ -209,3 +209,33 @@ int s_chat(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
 }
 
+
+int s_action(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+
+    lattice_message mess;
+
+    lattice_action submess;
+
+    if (!src) return 0;
+
+    if (!pfrom) return 0;
+
+    if (argc < 1) return 0;
+
+    mess.type = T_ACTION;
+
+    SetFlagFrom(&mess);
+
+    mess.fromuid = *pfrom;
+
+    mess.args = &submess;
+
+    strncpy(submess.string, argv[0] , sizeof(submess.string));
+    submess.string[sizeof(submess.string)-1]='\0';
+
+    (*gcallback)(&mess);
+
+    return 0;
+
+}
+

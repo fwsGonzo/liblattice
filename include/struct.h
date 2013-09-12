@@ -45,12 +45,13 @@ struct message {
   uint32_t flags;
 };
 
-#define T_P      1
-#define T_QUIT   2
-#define T_PC     3
-#define T_PR     4
-#define T_PH     5
-#define T_CHAT   6
+#define T_P       1
+#define T_QUIT    2
+#define T_PC      3
+#define T_PR      4
+#define T_PH      5
+#define T_CHAT    6
+#define T_ACTION  7
 
 #define MFLAG_FROM      0x00000001         // Is fromuid set
 
@@ -106,6 +107,12 @@ typedef struct lattice_chat {
     char string[MTU];
 
 } lattice_chat;
+
+typedef struct lattice_action {
+
+    char string[MTU];
+
+} lattice_action;
 
 
 #endif

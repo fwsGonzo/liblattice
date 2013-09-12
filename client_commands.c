@@ -58,3 +58,12 @@ int c_chat(char *string) {
 
 }
 
+int c_action(char *string) {
+
+    if (string)
+        return (sendto_one(neighbor_table[1][1][1], "ACTION :%s\n", string));
+    else
+        return (sendto_one(neighbor_table[1][1][1], "ACTION :\n"));
+
+}
+
