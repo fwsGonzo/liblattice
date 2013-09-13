@@ -343,15 +343,17 @@ int s_mo(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
     if (!src) return 0;
 
-    if (!pfrom) return 0;
-
     if (argc < 8) return 0;
 
     mess.type = T_MO;
 
-    SetFlagFrom(&mess);
-
-    mess.fromuid = *pfrom;
+    if (pfrom) {
+        SetFlagFrom(&mess);
+        mess.fromuid = *pfrom;
+    } else {
+        ClrFlagFrom(&mess);
+        mess.fromuid = 0;
+    }
 
     mess.args = &submess;
 
@@ -381,15 +383,17 @@ int s_badd(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
     if (!src) return 0;
 
-    if (!pfrom) return 0;
-
     if (argc < 8) return 0;
 
     mess.type = T_BADD;
 
-    SetFlagFrom(&mess);
-
-    mess.fromuid = *pfrom;
+    if (pfrom) {
+        SetFlagFrom(&mess);
+        mess.fromuid = *pfrom;
+    } else {
+        ClrFlagFrom(&mess);
+        mess.fromuid = 0;
+    }
 
     mess.args = &submess;
 
@@ -420,15 +424,18 @@ int s_bset(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
     if (!src) return 0;
 
-    if (!pfrom) return 0;
 
     if (argc < 8) return 0;
 
     mess.type = T_BSET;
 
-    SetFlagFrom(&mess);
-
-    mess.fromuid = *pfrom;
+    if (pfrom) {
+        SetFlagFrom(&mess);
+        mess.fromuid = *pfrom;
+    } else {
+        ClrFlagFrom(&mess);
+        mess.fromuid = 0;
+    }
 
     mess.args = &submess;
 
@@ -459,15 +466,17 @@ int s_brem(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
     if (!src) return 0;
 
-    if (!pfrom) return 0;
-
     if (argc < 6) return 0;
 
     mess.type = T_BREM;
 
-    SetFlagFrom(&mess);
-
-    mess.fromuid = *pfrom;
+    if (pfrom) {
+        SetFlagFrom(&mess);
+        mess.fromuid = *pfrom;
+    } else {
+        ClrFlagFrom(&mess);
+        mess.fromuid = 0;
+    }
 
     mess.args = &submess;
 
