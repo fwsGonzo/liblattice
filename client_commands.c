@@ -97,4 +97,10 @@ int c_badd(w_coord wcoord, b_coord bcoord, block_t block) {
 
 }
 
+int c_bset(w_coord wcoord, b_coord bcoord, block_t block) {
+
+    return (sendto_one(neighbor_table[1][1][1], "BSET %d %d %d %d %d %d %d %d\n", wcoord.x, wcoord.y, wcoord.z, bcoord.x, bcoord.y, bcoord.z, block.id, block.bf));
+
+}
+
 

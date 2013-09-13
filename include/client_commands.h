@@ -10,3 +10,4 @@ extern int c_sc(int32_t csid);
 extern int c_bo(w_coord wcoord, b_coord bcoord, int32_t id);
 extern int c_mo(w_coord wcoord, b_coord bcoord, int32_t id, int32_t count);
 extern int c_badd(w_coord wcoord, b_coord bcoord, block_t block);
+extern int c_bset(w_coord wcoord, b_coord bcoord, block_t block);

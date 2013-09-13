@@ -62,6 +62,7 @@ struct message {
 #define T_BO      10
 #define T_MO      11
 #define T_BADD    12
+#define T_BSET    13
 
 #define MFLAG_FROM      0x00000001         // Is fromuid set
 
@@ -161,6 +162,14 @@ typedef struct lattice_badd {
     block_t block;
 
 } lattice_badd;
+
+typedef struct lattice_bset {
+
+    w_coord wcoord;
+    b_coord bcoord;
+    block_t block;
+
+} lattice_bset;
 
 
 #endif
