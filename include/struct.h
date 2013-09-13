@@ -55,6 +55,7 @@ struct message {
 #define T_S       8
 #define T_SC      9
 #define T_BO      10
+#define T_MO      11
 
 #define MFLAG_FROM      0x00000001         // Is fromuid set
 
@@ -137,6 +138,15 @@ typedef struct lattice_bo {
     int32_t id;
 
 } lattice_bo;
+
+typedef struct lattice_mo {
+
+    w_coord wcoord;
+    b_coord bcoord;
+    int32_t id;
+    int32_t count;
+
+} lattice_mo;
 
 
 #endif

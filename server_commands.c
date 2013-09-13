@@ -334,3 +334,42 @@ int s_bo(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
 }
 
+
+int s_mo(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+
+    lattice_message mess;
+
+    lattice_mo submess;
+
+    if (!src) return 0;
+
+    if (!pfrom) return 0;
+
+    if (argc < 8) return 0;
+
+    mess.type = T_MO;
+
+    SetFlagFrom(&mess);
+
+    mess.fromuid = *pfrom;
+
+    mess.args = &submess;
+
+    submess.wcoord.x = atoi(argv[0]);
+    submess.wcoord.y = atoi(argv[1]);
+    submess.wcoord.z = atoi(argv[2]);
+    submess.bcoord.x = atoi(argv[3]);
+    submess.bcoord.y = atoi(argv[4]);
+    submess.bcoord.z = atoi(argv[5]);
+    submess.id = atoi(argv[6]);
+    submess.count = atoi(argv[7]);
+
+
+    (*gcallback)(&mess);
+
+    //if (sendto_one(src, "PONG\n")) return 1;
+
+    return 0;
+
+}
+

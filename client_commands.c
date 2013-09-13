@@ -81,7 +81,13 @@ int c_sc(int32_t csid) {
 
 int c_bo(w_coord wcoord, b_coord bcoord, int32_t id) {
 
-    return (sendto_one(neighbor_table[1][1][1], "P %d %d %d %d %d %d $d\n", wcoord.x, wcoord.y, wcoord.z, bcoord.x, bcoord.y, bcoord.z, id));
+    return (sendto_one(neighbor_table[1][1][1], "BO %d %d %d %d %d %d $d\n", wcoord.x, wcoord.y, wcoord.z, bcoord.x, bcoord.y, bcoord.z, id));
+
+}
+
+int c_mo(w_coord wcoord, b_coord bcoord, int32_t id, int32_t count) {
+
+    return (sendto_one(neighbor_table[1][1][1], "MO %d %d %d %d %d %d $d %d\n", wcoord.x, wcoord.y, wcoord.z, bcoord.x, bcoord.y, bcoord.z, id, count));
 
 }
 

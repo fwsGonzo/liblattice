@@ -9,4 +9,5 @@ extern int s_action(struct server_socket *src, uint32_t *pfrom, int argc, char *
 extern int s_s(struct server_socket *src, uint32_t *pfrom, int argc, char **argv);
 extern int s_sc(struct server_socket *src, uint32_t *pfrom, int argc, char **argv);
 extern int s_bo(struct server_socket *src, uint32_t *pfrom, int argc, char **argv);
+extern int s_mo(struct server_socket *src, uint32_t *pfrom, int argc, char **argv);
 
