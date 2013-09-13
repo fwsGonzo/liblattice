@@ -42,6 +42,7 @@ struct message s_mestab[] = {
     { "action", s_action, 0 },
     { "s", s_s, 0 },
     { "sc", s_sc, 0 },
+    { "bo", s_bo, 0 },
     { (char *) NULL, (int (*)()) NULL, 0 }
 };
 
@@ -303,6 +304,7 @@ int lattice_send(lattice_message *msg) {
             return c_p( ((lattice_p *)msg->args)->wcoord,
                         ((lattice_p *)msg->args)->bcoord );
         break;
+
         case T_QUIT:
             return c_quit( (char *)msg->args );
         break;
@@ -334,6 +336,12 @@ int lattice_send(lattice_message *msg) {
 
         case T_SC:
             return c_sc( ((lattice_sc *)msg->args)->csid );
+        break;
+
+        case T_BO:
+            return c_bo( ((lattice_bo *)msg->args)->wcoord,
+                         ((lattice_bo *)msg->args)->bcoord,
+                         ((lattice_bo *)msg->args)->id );
         break;
 
         default:
