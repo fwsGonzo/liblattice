@@ -18,4 +18,4 @@ all: $(COBJS)
 	$(AR) $(OUTPUT) $(COBJS)
 
 clean:
-	rm $(COBJS) $(OUTPUT)
+	rm -f $(COBJS) $(OUTPUT)

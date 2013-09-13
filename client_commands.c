@@ -103,4 +103,10 @@ int c_bset(w_coord wcoord, b_coord bcoord, block_t block) {
 
 }
 
+int c_brem(w_coord wcoord, b_coord bcoord) {
+
+    return (sendto_one(neighbor_table[1][1][1], "BREM %d %d %d %d %d %d\n", wcoord.x, wcoord.y, wcoord.z, bcoord.x, bcoord.y, bcoord.z));
+
+}
+
 

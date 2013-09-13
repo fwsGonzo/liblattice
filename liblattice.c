@@ -46,6 +46,7 @@ struct message s_mestab[] = {
     { "mo", s_mo, 0 },
     { "badd", s_badd, 0 },
     { "bset", s_bset, 0 },
+    { "brem", s_brem, 0 },
     { (char *) NULL, (int (*)()) NULL, 0 }
 };
 
@@ -364,6 +365,11 @@ int lattice_send(lattice_message *msg) {
             return c_bset( ((lattice_bset *)msg->args)->wcoord,
                            ((lattice_bset *)msg->args)->bcoord,
                            ((lattice_bset *)msg->args)->block );
+        break;
+
+        case T_BREM:
+            return c_brem( ((lattice_brem *)msg->args)->wcoord,
+                           ((lattice_brem *)msg->args)->bcoord );
         break;
 
 
