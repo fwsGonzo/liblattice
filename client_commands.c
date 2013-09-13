@@ -91,4 +91,10 @@ int c_mo(w_coord wcoord, b_coord bcoord, int32_t id, int32_t count) {
 
 }
 
+int c_badd(w_coord wcoord, b_coord bcoord, block_t block) {
+
+    return (sendto_one(neighbor_table[1][1][1], "BADD %d %d %d %d %d %d %d %d\n", wcoord.x, wcoord.y, wcoord.z, bcoord.x, bcoord.y, bcoord.z, block.id, block.bf));
+
+}
+
 

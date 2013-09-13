@@ -5,6 +5,11 @@
 
 #include "coordinates.h"
 
+typedef struct block_t {
+    unsigned short id : 10;
+    unsigned short bf : 6;
+} block_t;
+
 #define HAND_TYPE uint16_t
 
 typedef struct hand_hold {
@@ -56,6 +61,7 @@ struct message {
 #define T_SC      9
 #define T_BO      10
 #define T_MO      11
+#define T_BADD    12
 
 #define MFLAG_FROM      0x00000001         // Is fromuid set
 
@@ -147,6 +153,14 @@ typedef struct lattice_mo {
     int32_t count;
 
 } lattice_mo;
+
+typedef struct lattice_badd {
+
+    w_coord wcoord;
+    b_coord bcoord;
+    block_t block;
+
+} lattice_badd;
 
 
 #endif

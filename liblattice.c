@@ -44,6 +44,7 @@ struct message s_mestab[] = {
     { "sc", s_sc, 0 },
     { "bo", s_bo, 0 },
     { "mo", s_mo, 0 },
+    { "badd", s_badd, 0 },
     { (char *) NULL, (int (*)()) NULL, 0 }
 };
 
@@ -351,6 +352,13 @@ int lattice_send(lattice_message *msg) {
                          ((lattice_mo *)msg->args)->id,
                          ((lattice_mo *)msg->args)->count );
         break;
+
+        case T_BADD:
+            return c_badd( ((lattice_badd *)msg->args)->wcoord,
+                           ((lattice_badd *)msg->args)->bcoord,
+                           ((lattice_badd *)msg->args)->block );
+        break;
+
 
         default:
             return -1;
