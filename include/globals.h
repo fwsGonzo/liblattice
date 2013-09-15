@@ -22,7 +22,7 @@ extern int reach;
 
 extern n_coord my_coord;
 
-extern lattice_user player;
+extern lattice_user lattice_player;
 
 extern void (*gcallback)();
 

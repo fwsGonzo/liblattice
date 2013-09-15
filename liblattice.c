@@ -390,9 +390,9 @@ int lattice_connect(struct in_addr ip, port_t port) {
 
     server_socket *p;
 
-    if (!player.nickname || !*player.nickname) return -1;
+    if (!lattice_player.nickname || !*lattice_player.nickname) return -1;
 
-    p = connect_server(player.centeredon, ip, port);
+    p = connect_server(lattice_player.centeredon, ip, port);
 
     if (!p) return -1;
 
@@ -401,23 +401,23 @@ int lattice_connect(struct in_addr ip, port_t port) {
     return (sendto_one(neighbor_table[1][1][1],
                        //                            wx wy wz bx by bz  HEAD  HAND
                        "CENTEREDINTRO %d %d %d %s %d %d %d %d %d %d %d %d %d %d %d %d %d\n",
-                       player.userid,
-                       player.model,
-                       player.color,
-                       player.nickname,
-                       player.burstdist,
-                       player.wpos.x,
-                       player.wpos.y,
-                       player.wpos.z,
-                       player.bpos.x,
-                       player.bpos.y,
-                       player.bpos.z,
-                       player.hrot.xrot,
-                       player.hrot.yrot,
-                       player.hhold.item_id,
-                       player.hhold.item_type,
-                       player.mining,
-                       player.usercolor
+                       lattice_player.userid,
+                       lattice_player.model,
+                       lattice_player.color,
+                       lattice_player.nickname,
+                       lattice_player.burstdist,
+                       lattice_player.wpos.x,
+                       lattice_player.wpos.y,
+                       lattice_player.wpos.z,
+                       lattice_player.bpos.x,
+                       lattice_player.bpos.y,
+                       lattice_player.bpos.z,
+                       lattice_player.hrot.xrot,
+                       lattice_player.hrot.yrot,
+                       lattice_player.hhold.item_id,
+                       lattice_player.hhold.item_type,
+                       lattice_player.mining,
+                       lattice_player.usercolor
                        ));
 
 

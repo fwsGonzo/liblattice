@@ -31,6 +31,6 @@ int reach=1; // dont change me
 
 n_coord my_coord = {0, 0, 0};
 
-lattice_user player;
+lattice_user lattice_player;
 
 void (*gcallback)();
