@@ -399,8 +399,8 @@ int lattice_connect(struct in_addr ip, port_t port) {
     neighbor_table[1][1][1]=p;
 
     return (sendto_one(neighbor_table[1][1][1],
-                       //                            wx wy wz bx by bz  HEAD  HAND
-                       "CENTEREDINTRO %d %d %d %s %d %d %d %d %d %d %d %d %d %d %d %d %d\n",
+                       //                              wx  wy  wz bx by bz  HEAD  HAND
+                       "CENTEREDINTRO %d %d %lu %s %d %lu %lu %lu %d %d %d %d %d %d %d %d %lu\n",
                        lattice_player.userid,
                        lattice_player.model,
                        lattice_player.color,

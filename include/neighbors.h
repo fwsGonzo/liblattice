@@ -26,6 +26,7 @@ extern n_coord wcoord_to_ncoord(w_coord wcoord);
 
 extern int serv_can_connect_to_me(n_coord coord);
 extern int serv_can_connect_to_serv(n_coord coord_a, n_coord coord_b);
+extern int serv_in_range_of_serv(n_coord center, n_coord side);
 
 extern void init_neighbor_table(void);
 extern server_socket *find_neighbor(n_coord coord);

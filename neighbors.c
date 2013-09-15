@@ -63,43 +63,41 @@ n_coord wcoord_to_ncoord(w_coord wcoord) {
 }
 
 
+int serv_in_range_of_serv(n_coord center, n_coord side) {
+
+    if (center.x < 0 || center.x > LATTICE_XMAX) return 0;
+    if (center.y < 0 || center.y > LATTICE_YMAX) return 0;
+    if (center.z < 0 || center.z > LATTICE_ZMAX) return 0;
+
+    if (side.x < 0 || side.x > LATTICE_XMAX) return 0;
+    if (side.y < 0 || side.y > LATTICE_YMAX) return 0;
+    if (side.z < 0 || side.z > LATTICE_ZMAX) return 0;
+
+    if ((side.x < center.x - reach) ||
+        (side.x > center.x + reach)) return 0;
+    if ((side.y < center.y - reach) ||
+        (side.y > center.y + reach)) return 0;
+    if ((side.z < center.z - reach) ||
+        (side.z > center.z + reach)) return 0;
+
+    return 1;
+
+
+}
+
+int serv_can_connect_to_serv(n_coord center, n_coord side) {
+
+    if (ncoord_is_equal(center, side)) return 0;
+
+    return serv_in_range_of_serv(center, side);
+
+}
+
 int serv_can_connect_to_me(n_coord coord) {
 
-    if ((coord.x == my_coord.x) && (coord.y == my_coord.y) && (coord.z == my_coord.z)) return 0;
-
-    if (coord.x > LATTICE_XMAX) return 0;
-    if (my_coord.x > reach && coord.x < my_coord.x - reach) return 0;
-    if (my_coord.x < LATTICE_XMAX - reach && coord.x > my_coord.x + reach) return 0;
-
-    if (coord.y > LATTICE_YMAX) return 0;
-    if (my_coord.y > reach && coord.y < my_coord.y - reach) return 0;
-    if (my_coord.y < LATTICE_YMAX - reach && coord.y > my_coord.y + reach) return 0;
-
-    if (coord.z > LATTICE_ZMAX) return 0;
-    if (my_coord.z > reach && coord.z < my_coord.z - reach) return 0;
-    if (my_coord.z < LATTICE_ZMAX - reach && coord.z > my_coord.z + reach) return 0;
-    
-    return 1;
+    return serv_can_connect_to_serv(my_coord, coord);
 }
 
-int serv_can_connect_to_serv(n_coord coord_a, n_coord coord_b) {
-
-    if ((coord_a.x == coord_b.x) && (coord_a.y == coord_b.y) && (coord_a.z == coord_b.z)) return 0;
-
-    if (coord_a.x > LATTICE_XMAX) return 0;
-    if (coord_b.x > reach && coord_a.x < coord_b.x - reach) return 0;
-    if (coord_b.x < LATTICE_XMAX - reach && coord_a.x > coord_b.x + reach) return 0;
-
-    if (coord_a.y > LATTICE_YMAX) return 0;
-    if (coord_b.y > reach && coord_a.y < coord_b.y - reach) return 0;
-    if (coord_b.y < LATTICE_YMAX - reach && coord_a.y > coord_b.y + reach) return 0;
-
-    if (coord_a.z > LATTICE_ZMAX) return 0;
-    if (coord_b.z > reach && coord_a.z < coord_b.z - reach) return 0;
-    if (coord_b.z < LATTICE_ZMAX - reach && coord_a.z > coord_b.z + reach) return 0;
-    
-    return 1;
-}
 
 void init_neighbor_table(void) {
 
@@ -168,12 +166,15 @@ server_socket *connect_server(n_coord coord, struct in_addr ip, port_t port) {
     struct sockaddr_in  serv_addr;
     //void *sub;
 
-    if (!serv_can_connect_to_me(coord)) return NULL;
+    if (!serv_in_range_of_serv(lattice_player.centeredon, coord)) {
+        return NULL;
+    }
 
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
-    if (sockfd < 0)
+    if (sockfd < 0) {
         return NULL;
+    }
 
     memset(&serv_addr, 0, sizeof serv_addr);
 
@@ -181,8 +182,9 @@ server_socket *connect_server(n_coord coord, struct in_addr ip, port_t port) {
     serv_addr.sin_port = htons(port);
     serv_addr.sin_addr.s_addr = ip.s_addr;
 
-    if (connect(sockfd, (struct sockaddr *) &serv_addr, sizeof serv_addr) < 0)
+    if (connect(sockfd, (struct sockaddr *) &serv_addr, sizeof serv_addr) < 0) {
         return NULL;
+    }
 
     #ifdef __linux__
 		int val = fcntl(sockfd, F_GETFL, 0);
