@@ -384,3 +384,45 @@ int lattice_send(lattice_message *msg) {
     return 0;
 
 }
+
+
+int lattice_connect(struct in_addr ip, port_t port) {
+
+    server_socket *p;
+
+    if (!player.nickname || !*player.nickname) return -1;
+
+    p = connect_server(player.centeredon, ip, port);
+
+    if (!p) return -1;
+
+    neighbor_table[1][1][1]=p;
+
+    return (sendto_one(neighbor_table[1][1][1],
+                       //                            wx wy wz bx by bz  HEAD  HAND
+                       "CENTEREDINTRO %d %d %d %s %d %d %d %d %d %d %d %d %d %d %d %d %d\n",
+                       player.userid,
+                       player.model,
+                       player.color,
+                       player.nickname,
+                       player.burstdist,
+                       player.wpos.x,
+                       player.wpos.y,
+                       player.wpos.z,
+                       player.bpos.x,
+                       player.bpos.y,
+                       player.bpos.z,
+                       player.hrot.xrot,
+                       player.hrot.yrot,
+                       player.hhold.item_id,
+                       player.hhold.item_type,
+                       player.mining,
+                       player.usercolor
+                       ));
+
+
+}
+
+
+
+

@@ -42,6 +42,8 @@ typedef struct lattice_user {
 
     uint16_t burstdist;
 
+    int mining;
+
 } lattice_user;
 
 struct message {
