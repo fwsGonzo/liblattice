@@ -382,6 +382,10 @@ int lattice_send(lattice_message *msg) {
             return c_schat( (char *)msg->args );
         break;
 
+        case T_LUSERS:
+            return c_lusers();
+        break;
+
         default:
             return -1;
         break;

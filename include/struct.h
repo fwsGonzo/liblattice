@@ -68,6 +68,7 @@ struct message {
 #define T_BREM    14
 #define T_PMINE   15
 #define T_SCHAT   16
+#define T_LUSERS  17
 
 #define MFLAG_FROM      0x00000001         // Is fromuid set
 

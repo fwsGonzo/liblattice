@@ -124,3 +124,10 @@ int c_schat(char *string) {
         return (sendto_one(neighbor_table[1][1][1], "SCHAT :\n"));
 
 }
+
+int c_lusers() {
+
+    return (sendto_one(neighbor_table[1][1][1], "LUSERS\n"));
+
+}
+
