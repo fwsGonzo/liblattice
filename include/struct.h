@@ -226,5 +226,23 @@ typedef struct lattice_fade {
 
 } lattice_fade;
 
+typedef struct lattice_user {
+
+    uint16_t model;
+    uint32_t color;
+    char nickname[MTU/2];
+
+    w_coord wpos;
+    b_coord bpos;
+
+    head_rot hrot;
+    hand_hold hhold;
+
+    int mining;
+
+    uint32_t usercolor;
+
+} lattice_user;
+
 
 #endif

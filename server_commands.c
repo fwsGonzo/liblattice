@@ -630,3 +630,53 @@ int s_fade(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
     return 0;
 
 }
+
+int s_user(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+
+    lattice_message mess;
+
+    lattice_user submess;
+
+    if (!src) return 0;
+
+    if (!pfrom) return 0;
+
+    if (argc < 15) return 0;
+
+    mess.type = T_USER;
+
+    SetFlagFrom(&mess);
+
+    mess.fromuid = *pfrom;
+
+    mess.args = &submess;
+
+    submess.model = (uint16_t) atoi(argv[0]);
+    submess.color = (uint32_t) atoi(argv[1]);
+
+    strncpy(submess.nickname, argv[2] , sizeof(submess.nickname));
+    submess.nickname[sizeof(submess.nickname)-1]='\0';
+
+    submess.wpos.x = atoi(argv[3]);
+    submess.wpos.y = atoi(argv[4]);
+    submess.wpos.z = atoi(argv[5]);
+
+    submess.bpos.x = atoi(argv[6]);
+    submess.bpos.y = atoi(argv[7]);
+    submess.bpos.z = atoi(argv[8]);
+
+    submess.hrot.xrot = atoi(argv[9]);
+    submess.hrot.yrot = atoi(argv[10]);
+
+    submess.hhold.item_id = atoi(argv[11]);
+    submess.hhold.item_type = atoi(argv[12]);
+
+    submess.mining = atoi(argv[13]);
+
+    submess.usercolor = (uint32_t) atoi(argv[14]);
+
+    (*gcallback)(&mess);
+
+    return 0;
+
+}
