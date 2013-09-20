@@ -378,6 +378,10 @@ int lattice_send(lattice_message *msg) {
             return c_pmine( ((lattice_pmine *)msg->args)->mining );
         break;
 
+        case T_SCHAT:
+            return c_schat( (char *)msg->args );
+        break;
+
         default:
             return -1;
         break;
