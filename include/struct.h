@@ -67,6 +67,7 @@ struct message {
 #define T_BSET    13
 #define T_BREM    14
 #define T_PMINE   15
+#define T_SCHAT   16
 
 #define MFLAG_FROM      0x00000001         // Is fromuid set
 
@@ -187,6 +188,14 @@ typedef struct lattice_pmine {
     int mining;  // 0 or 1
 
 } lattice_pmine;
+
+typedef struct lattice_schat {
+
+    char nickname[MTU/2];
+    uint32_t color;
+    char string[MTU];
+
+} lattice_schat;
 
 
 #endif

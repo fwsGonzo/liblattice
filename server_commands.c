@@ -520,3 +520,34 @@ int s_pmine(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
     return 0;
 
 }
+
+int s_schat(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+
+    lattice_message mess;
+
+    lattice_schat submess;
+
+    if (!src) return 0;
+
+    if (argc < 3) return 0;
+
+    mess.type = T_SCHAT;
+
+    ClrFlagFrom(&mess);
+
+    mess.fromuid = 0;
+
+    mess.args = &submess;
+
+    strncpy(submess.nickname, argv[0] , sizeof(submess.nickname));
+    submess.nickname[sizeof(submess.nickname)-1]='\0';
+    submess.color = (uint32_t)atoi(argv[1]);
+    strncpy(submess.string, argv[2] , sizeof(submess.string));
+    submess.string[sizeof(submess.string)-1]='\0';
+
+    (*gcallback)(&mess);
+
+    return 0;
+
+}
+

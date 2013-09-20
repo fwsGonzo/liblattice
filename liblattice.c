@@ -48,6 +48,7 @@ struct message s_mestab[] = {
     { "bset", s_bset, 0 },
     { "brem", s_brem, 0 },
     { "pmine", s_pmine, 0 },
+    { "schat", s_schat, 0 },
     { (char *) NULL, (int (*)()) NULL, 0 }
 };
 

@@ -115,3 +115,12 @@ int c_pmine(int mining) {
     return (sendto_one(neighbor_table[1][1][1], "PMINE %d\n", mining ? 1 : 0));
 
 }
+
+int c_schat(char *string) {
+
+    if (string)
+        return (sendto_one(neighbor_table[1][1][1], "SCHAT :%s\n", string));
+    else
+        return (sendto_one(neighbor_table[1][1][1], "SCHAT :\n"));
+
+}

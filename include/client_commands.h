@@ -13,3 +13,5 @@ extern int c_badd(w_coord wcoord, b_coord bcoord, block_t block);
 extern int c_bset(w_coord wcoord, b_coord bcoord, block_t block);
 extern int c_brem(w_coord wcoord, b_coord bcoord);
 extern int c_pmine(int mining);
+extern int c_schat(char *string);
+
