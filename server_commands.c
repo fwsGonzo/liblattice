@@ -578,17 +578,17 @@ int s_log(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
 }
 
-int s_satstep(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+int s_sat(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
     lattice_message mess;
 
-    lattice_satstep submess;
+    lattice_sat submess;
 
     if (!src) return 0;
 
     if (argc < 1) return 0;
 
-    mess.type = T_SATSTEP;
+    mess.type = T_SAT;
 
     ClrFlagFrom(&mess);
 
@@ -596,7 +596,7 @@ int s_satstep(struct server_socket *src, uint32_t *pfrom, int argc, char **argv)
 
     mess.args = &submess;
 
-    submess.satstep = (uint32_t)atoi(argv[0]);
+    submess.sat = (double)atof(argv[0]);
 
     (*gcallback)(&mess);
 
