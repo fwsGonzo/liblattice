@@ -72,6 +72,7 @@ struct message {
 #define T_LOG     18
 #define T_SATSTEP 19
 #define T_SAT     20
+#define T_FADE    21
 
 #define MFLAG_FROM      0x00000001         // Is fromuid set
 
@@ -218,5 +219,10 @@ typedef struct lattice_sat {
     double sat;
 
 } lattice_sat;
+
+
+typedef struct lattice_fade {
+
+} lattice_fade;
 
 #endif
