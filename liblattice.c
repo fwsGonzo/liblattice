@@ -50,6 +50,7 @@ struct message s_mestab[] = {
     { "pmine", s_pmine, 0 },
     { "schat", s_schat, 0 },
     { "log", s_log, 0 },
+    { "satstep", s_satstep, 0 },
     { (char *) NULL, (int (*)()) NULL, 0 }
 };
 

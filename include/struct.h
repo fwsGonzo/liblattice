@@ -70,6 +70,7 @@ struct message {
 #define T_SCHAT   16
 #define T_LUSERS  17
 #define T_LOG     18
+#define T_SATSTEP 19
 
 #define MFLAG_FROM      0x00000001         // Is fromuid set
 
@@ -204,5 +205,11 @@ typedef struct lattice_log {
     char string[MTU];
 
 } lattice_log;
+
+typedef struct lattice_satstep {
+
+    uint32_t satstep;
+
+} lattice_satstep;
 
 #endif

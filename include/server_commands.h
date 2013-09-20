@@ -16,4 +16,5 @@ extern int s_brem(struct server_socket *src, uint32_t *pfrom, int argc, char **a
 extern int s_pmine(struct server_socket *src, uint32_t *pfrom, int argc, char **argv);
 extern int s_schat(struct server_socket *src, uint32_t *pfrom, int argc, char **argv);
 extern int s_log(struct server_socket *src, uint32_t *pfrom, int argc, char **argv);
+extern int s_satstep(struct server_socket *src, uint32_t *pfrom, int argc, char **argv);
 
