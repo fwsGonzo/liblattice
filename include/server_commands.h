@@ -13,4 +13,5 @@ extern int s_mo(struct server_socket *src, uint32_t *pfrom, int argc, char **arg
 extern int s_badd(struct server_socket *src, uint32_t *pfrom, int argc, char **argv);
 extern int s_bset(struct server_socket *src, uint32_t *pfrom, int argc, char **argv);
 extern int s_brem(struct server_socket *src, uint32_t *pfrom, int argc, char **argv);
+extern int s_pmine(struct server_socket *src, uint32_t *pfrom, int argc, char **argv);
 

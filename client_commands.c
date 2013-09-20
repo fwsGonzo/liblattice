@@ -110,3 +110,8 @@ int c_brem(w_coord wcoord, b_coord bcoord) {
 }
 
 
+int c_pmine(int mining) {
+
+    return (sendto_one(neighbor_table[1][1][1], "PMINE %d\n", mining ? 1 : 0));
+
+}

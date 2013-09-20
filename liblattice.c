@@ -47,6 +47,7 @@ struct message s_mestab[] = {
     { "badd", s_badd, 0 },
     { "bset", s_bset, 0 },
     { "brem", s_brem, 0 },
+    { "pmine", s_pmine, 0 },
     { (char *) NULL, (int (*)()) NULL, 0 }
 };
 
@@ -372,6 +373,9 @@ int lattice_send(lattice_message *msg) {
                            ((lattice_brem *)msg->args)->bcoord );
         break;
 
+        case T_PMINE:
+            return c_pmine( ((lattice_pmine *)msg->args)->mining );
+        break;
 
         default:
             return -1;
