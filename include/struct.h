@@ -24,7 +24,7 @@ typedef struct head_rot {
     HEAD_TYPE yrot;
 } head_rot;
 
-typedef struct lattice_user {
+typedef struct lattice_player_t {
 
     uint32_t userid;
     uint32_t flags;
@@ -44,7 +44,7 @@ typedef struct lattice_user {
 
     int mining;
 
-} lattice_user;
+} lattice_player_t;
 
 struct message {
   char *cmd;
@@ -73,6 +73,7 @@ struct message {
 #define T_SATSTEP 19
 #define T_SAT     20
 #define T_FADE    21
+#define T_USER    22
 
 #define MFLAG_FROM      0x00000001         // Is fromuid set
 
@@ -224,5 +225,6 @@ typedef struct lattice_sat {
 typedef struct lattice_fade {
 
 } lattice_fade;
+
 
 #endif
