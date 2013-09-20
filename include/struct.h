@@ -69,6 +69,7 @@ struct message {
 #define T_PMINE   15
 #define T_SCHAT   16
 #define T_LUSERS  17
+#define T_LOG     18
 
 #define MFLAG_FROM      0x00000001         // Is fromuid set
 
@@ -198,5 +199,10 @@ typedef struct lattice_schat {
 
 } lattice_schat;
 
+typedef struct lattice_log {
+
+    char string[MTU];
+
+} lattice_log;
 
 #endif
