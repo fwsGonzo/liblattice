@@ -33,4 +33,4 @@ n_coord my_coord = {0, 0, 0};
 
 lattice_player_t lattice_player;
 
-void (*gcallback)();
+void (*gcallback)(lattice_message *mp);

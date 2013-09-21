@@ -112,7 +112,7 @@ void strtoargv(char *line) {
 }
 
 
-int lattice_init(int in_sock, void (*callback)()) {
+int lattice_init(int in_sock, void (*callback)(lattice_message *mp)) {
 
     int tab_size;
 	
