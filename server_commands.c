@@ -743,7 +743,42 @@ int s_server(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) 
 
     //(*gcallback)(&mess);
 
-    //if (sendto_one(src, "PONG\n")) return 1;
+    if (user_is_within_outer_border(lattice_player.wpos, submess.ncoord)) {
+        // close enogh to be tracked...
+        if (sendto_one(p, "SIDEDINTRO %d %d %u %s %d %u %u %u %u %u %u %d %d %d %d %d %d %d %d %u\n",
+                       lattice_player.userid,
+                       lattice_player.model,
+                       lattice_player.color,
+                       lattice_player.nickname,
+                       lattice_player.burstdist,
+                       lattice_player.centeredon.x,
+                       lattice_player.centeredon.y,
+                       lattice_player.centeredon.z,
+                       lattice_player.wpos.x,
+                       lattice_player.wpos.y,
+                       lattice_player.wpos.z,
+                       lattice_player.bpos.x,
+                       lattice_player.bpos.y,
+                       lattice_player.bpos.z,
+                       lattice_player.hrot.xrot,
+                       lattice_player.hrot.yrot,
+                       lattice_player.hhold.item_id,
+                       lattice_player.hhold.item_type,
+                       lattice_player.mining,
+                       lattice_player.usercolor)) return 1;
+
+    } else {
+        // too far to be tracked... just the basics....
+        if (sendto_one(p, "SIDEDINTRO %d %d %u %s %d %u %u %u\n",
+                       lattice_player.userid,
+                       lattice_player.model,
+                       lattice_player.color,
+                       lattice_player.nickname,
+                       lattice_player.burstdist,
+                       lattice_player.centeredon.x,
+                       lattice_player.centeredon.y,
+                       lattice_player.centeredon.z)) return 1;
+    }
 
     return 0;
 
