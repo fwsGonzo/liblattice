@@ -98,6 +98,89 @@ int serv_can_connect_to_me(n_coord coord) {
     return serv_can_connect_to_serv(lattice_player.centeredon, coord);
 }
 
+// -----------------------
+
+int user_is_within_server_border(w_coord wcoord, n_coord ncoord) {
+    w_coord min_wcoord;
+    w_coord max_wcoord;
+
+    min_wcoord.x = ncoord.x << 8;
+    min_wcoord.y = ncoord.y << 8;
+    min_wcoord.z = ncoord.z << 8;
+    max_wcoord.x = (ncoord.x << 8) | 0x000000FF;
+    max_wcoord.y = (ncoord.y << 8) | 0x000000FF;
+    max_wcoord.z = (ncoord.z << 8) | 0x000000FF;
+
+    if (wcoord.x < min_wcoord.x || wcoord.x > max_wcoord.x) return 0;
+    if (wcoord.y < min_wcoord.y || wcoord.y > max_wcoord.y) return 0;
+    if (wcoord.z < min_wcoord.z || wcoord.z > max_wcoord.z) return 0;
+
+    return 1;
+
+}
+
+int user_can_center_to_me(w_coord wcoord) {
+
+    if (wcoord.x < lattice_player.my_min_wcoord.x || wcoord.x > lattice_player.my_max_wcoord.x) return 0;
+    if (wcoord.y < lattice_player.my_min_wcoord.y || wcoord.y > lattice_player.my_max_wcoord.y) return 0;
+    if (wcoord.z < lattice_player.my_min_wcoord.z || wcoord.z > lattice_player.my_max_wcoord.z) return 0;
+
+    return 1;
+
+}
+
+int user_is_within_outer_border(w_coord wcoord, n_coord ncoord) {
+    w_coord min_wcoord;
+    w_coord max_wcoord;
+
+    min_wcoord.x = ncoord.x << 8;
+    min_wcoord.y = ncoord.y << 8;
+    min_wcoord.z = ncoord.z << 8;
+    max_wcoord.x = (ncoord.x << 8) | 0x000000FF;
+    max_wcoord.y = (ncoord.y << 8) | 0x000000FF;
+    max_wcoord.z = (ncoord.z << 8) | 0x000000FF;
+
+    if (wcoord.x < min_wcoord.x - VISUAL_UNIT || wcoord.x > max_wcoord.x + VISUAL_UNIT) return 0;
+    if (wcoord.y < min_wcoord.y - VISUAL_UNIT || wcoord.y > max_wcoord.y + VISUAL_UNIT) return 0;
+    if (wcoord.z < min_wcoord.z - VISUAL_UNIT || wcoord.z > max_wcoord.z + VISUAL_UNIT) return 0;
+
+    return 1;
+
+}
+
+
+int user_is_within_inner_border(w_coord wcoord, n_coord ncoord) {
+    w_coord min_wcoord;
+    w_coord max_wcoord;
+
+    min_wcoord.x = ncoord.x << 8;
+    min_wcoord.y = ncoord.y << 8;
+    min_wcoord.z = ncoord.z << 8;
+    max_wcoord.x = (ncoord.x << 8) | 0x000000FF;
+    max_wcoord.y = (ncoord.y << 8) | 0x000000FF;
+    max_wcoord.z = (ncoord.z << 8) | 0x000000FF;
+
+    if (wcoord.x < min_wcoord.x + VISUAL_UNIT || wcoord.x > max_wcoord.x - VISUAL_UNIT) return 0;
+    if (wcoord.y < min_wcoord.y + VISUAL_UNIT || wcoord.y > max_wcoord.y - VISUAL_UNIT) return 0;
+    if (wcoord.z < min_wcoord.z + VISUAL_UNIT || wcoord.z > max_wcoord.z - VISUAL_UNIT) return 0;
+
+    return 1;
+
+}
+
+int user_can_recenter_to_me(w_coord wcoord, n_coord from_ncoord) {
+
+    if (!serv_can_connect_to_me(from_ncoord)) return 0;
+
+    if (user_is_within_outer_border(wcoord, from_ncoord)) return 0;
+
+    return 1;
+
+}
+
+
+// -----------------------
+
 
 void init_neighbor_table(void) {
 
@@ -120,6 +203,25 @@ server_socket *find_neighbor(n_coord coord) {
     return neighbor_table[a][b][c];
 
 }
+
+
+int user_can_walk_on_me(w_coord wcoord) {
+
+    n_coord ncoord;
+
+    if (wcoord.x < lattice_player.my_min_wcoord.x - VISUAL_UNIT || wcoord.x > lattice_player.my_max_wcoord.x + VISUAL_UNIT) return 0;
+    if (wcoord.y < lattice_player.my_min_wcoord.y - VISUAL_UNIT || wcoord.y > lattice_player.my_max_wcoord.y + VISUAL_UNIT) return 0;
+    if (wcoord.z < lattice_player.my_min_wcoord.z - VISUAL_UNIT || wcoord.z > lattice_player.my_max_wcoord.z + VISUAL_UNIT) return 0;
+
+    ncoord = wcoord_to_ncoord(wcoord);
+
+    if ( !ncoord_is_equal(ncoord, lattice_player.centeredon) && !find_neighbor(ncoord) ) return 0;
+
+    return 1;
+
+}
+
+
 
 int add_neighbor(n_coord coord, server_socket *s) {
 

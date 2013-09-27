@@ -33,6 +33,10 @@ typedef struct lattice_player_t {
     char *nickname;
 
     n_coord centeredon;
+
+    w_coord my_min_wcoord;
+    w_coord my_max_wcoord;
+
     w_coord wpos;
     b_coord bpos;
     head_rot hrot;
