@@ -14,6 +14,7 @@
 #include "struct.h"
 #include "send.h"
 #include "globals.h"
+#include "neighbors.h"
 
 int s_ping(struct server_socket *src, int argc, char **argv) {
 
@@ -703,6 +704,46 @@ int s_user(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
     submess.usercolor = (uint32_t) atoi(argv[14]);
 
     (*gcallback)(&mess);
+
+    return 0;
+
+}
+
+int s_server(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+
+    lattice_message mess;
+
+    lattice_server submess;
+
+    server_socket *p;
+
+    if (!src) return 0;
+
+    if (argc < 5) return 0;
+
+    mess.type = T_SERVER;
+
+    ClrFlagFrom(&mess);
+
+    mess.fromuid = 0;
+
+    mess.args = &submess;
+
+    submess.ncoord.x = atoi(argv[0]);
+    submess.ncoord.y = atoi(argv[1]);
+    submess.ncoord.z = atoi(argv[2]);
+    submess.ip.s_addr = inet_addr(argv[3]);
+    submess.port = atoi(argv[4]);
+
+    p = connect_server(submess.ncoord, submess.ip, submess.port);
+
+    if (!p) return 0;
+
+    add_neighbor(submess.ncoord, p);
+
+    //(*gcallback)(&mess);
+
+    //if (sendto_one(src, "PONG\n")) return 1;
 
     return 0;
 

@@ -74,6 +74,7 @@ struct message {
 #define T_SAT     20
 #define T_FADE    21
 #define T_USER    22
+#define T_SERVER  23
 
 #define MFLAG_FROM      0x00000001         // Is fromuid set
 
@@ -243,6 +244,14 @@ typedef struct lattice_user {
     uint32_t usercolor;
 
 } lattice_user;
+
+typedef struct lattice_server {
+
+    n_coord ncoord;
+    struct in_addr ip;
+    uint16_t port;
+
+} lattice_server;
 
 
 #endif

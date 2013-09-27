@@ -20,4 +20,5 @@ extern int s_satstep(struct server_socket *src, uint32_t *pfrom, int argc, char 
 extern int s_sat(struct server_socket *src, uint32_t *pfrom, int argc, char **argv);
 extern int s_fade(struct server_socket *src, uint32_t *pfrom, int argc, char **argv);
 extern int s_user(struct server_socket *src, uint32_t *pfrom, int argc, char **argv);
+extern int s_server(struct server_socket *src, uint32_t *pfrom, int argc, char **argv);
 
