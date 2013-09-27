@@ -95,7 +95,7 @@ int serv_can_connect_to_serv(n_coord center, n_coord side) {
 
 int serv_can_connect_to_me(n_coord coord) {
 
-    return serv_can_connect_to_serv(my_coord, coord);
+    return serv_can_connect_to_serv(lattice_player.centeredon, coord);
 }
 
 
@@ -113,9 +113,9 @@ server_socket *find_neighbor(n_coord coord) {
 
     if (!serv_can_connect_to_me(coord)) return NULL;
 
-    a = coord.x - my_coord.x + reach;
-    b = coord.y - my_coord.y + reach;
-    c = coord.z - my_coord.z + reach;
+    a = coord.x - lattice_player.centeredon.x + reach;
+    b = coord.y - lattice_player.centeredon.y + reach;
+    c = coord.z - lattice_player.centeredon.z + reach;
 
     return neighbor_table[a][b][c];
 
@@ -129,9 +129,9 @@ int add_neighbor(n_coord coord, server_socket *s) {
 
     if (!serv_can_connect_to_me(coord)) return 0;
 
-    a = coord.x - my_coord.x + reach;
-    b = coord.y - my_coord.y + reach;
-    c = coord.z - my_coord.z + reach;
+    a = coord.x - lattice_player.centeredon.x + reach;
+    b = coord.y - lattice_player.centeredon.y + reach;
+    c = coord.z - lattice_player.centeredon.z + reach;
 
     if (neighbor_table[a][b][c]) return 0;
 
@@ -147,9 +147,9 @@ int del_neighbor(n_coord coord) {
 
     if (!serv_can_connect_to_me(coord)) return 0;
 
-    a = coord.x - my_coord.x + reach;
-    b = coord.y - my_coord.y + reach;
-    c = coord.z - my_coord.z + reach;
+    a = coord.x - lattice_player.centeredon.x + reach;
+    b = coord.y - lattice_player.centeredon.y + reach;
+    c = coord.z - lattice_player.centeredon.z + reach;
 
     if (!neighbor_table[a][b][c]) return 0;
 
@@ -236,7 +236,9 @@ server_socket *connect_server(n_coord coord, struct in_addr ip, port_t port) {
     socket_table[sockfd].coord.z = coord.z;
 
 /*
-    if (sendto_one(socket_table+sockfd, "SERVER %d %d %d %s %d %d\n", my_coord.x, my_coord.y, my_coord.z, 
+    if (sendto_one(socket_table+sockfd, "SERVER %d %d %d %s %d %d\n", lattice_player.centeredon.x,
+                                                                      lattice_player.centeredon.y,
+                                                                      lattice_player.centeredon.z,
                                                                   inet_ntoa(gip), gserverport, gclientport)) {
                  close(sockfd);
                  return NULL;

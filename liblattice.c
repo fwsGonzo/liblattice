@@ -280,7 +280,7 @@ void lattice_process() {
 
                     if (isalpha(*arg_v[0])) {
 
-                        if ((*find_command->func)(s, arg_c - 1, arg_v + 1)) break;
+                        if ((*find_command->func)(s, NULL, arg_c - 1, arg_v + 1)) break;
 
                     } else if (isdigit(*arg_v[0]) || (*arg_v[0]=='-')) {
 

@@ -29,8 +29,6 @@ struct timeval now;
 
 int reach=1; // dont change me
 
-n_coord my_coord = {0, 0, 0};
-
 lattice_player_t lattice_player;
 
 void (*gcallback)(lattice_message *mp);

@@ -20,8 +20,6 @@ extern struct timeval now;
 
 extern int reach;
 
-extern n_coord my_coord;
-
 extern lattice_player_t lattice_player;
 
 extern void (*gcallback)(lattice_message *mp);
