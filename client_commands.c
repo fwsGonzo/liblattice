@@ -17,6 +17,9 @@
 
 int c_p(w_coord wcoord, b_coord bcoord) {
 
+    lattice_player.wpos = wcoord;
+    lattice_player.bpos = bcoord;
+
     return (sendto_one(neighbor_table[1][1][1], "P %d %d %d %d %d %d\n", wcoord.x, wcoord.y, wcoord.z, bcoord.x, bcoord.y, bcoord.z));
 
 }
@@ -33,17 +36,23 @@ int c_quit(char *reason) {
 
 int c_pc(uint32_t color) {
 
+    lattice_player.usercolor = color;
+
     return (sendto_one(neighbor_table[1][1][1], "PC %d\n", color));
 
 }
 
 int c_pr(head_rot rot) {
 
+    lattice_player.hrot = rot;
+
     return (sendto_one(neighbor_table[1][1][1], "PR %d %d\n", rot.xrot, rot.yrot));
 
 }
 
 int c_ph(hand_hold hand) {
+
+    lattice_player.hhold = hand;
 
     return (sendto_one(neighbor_table[1][1][1], "PH %d %d\n", hand.item_id, hand.item_type));
 
@@ -111,6 +120,8 @@ int c_brem(w_coord wcoord, b_coord bcoord) {
 
 
 int c_pmine(int mining) {
+
+    lattice_player.mining = mining ? 1 : 0;
 
     return (sendto_one(neighbor_table[1][1][1], "PMINE %d\n", mining ? 1 : 0));
 
