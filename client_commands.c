@@ -13,7 +13,7 @@
 #include "struct.h"
 #include "send.h"
 #include "globals.h"
-
+#include "neighbors.h"
 
 int c_p(w_coord wcoord, b_coord bcoord) {
 
