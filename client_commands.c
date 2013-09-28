@@ -102,19 +102,49 @@ int c_mo(w_coord wcoord, b_coord bcoord, int32_t id, int32_t count) {
 
 int c_badd(w_coord wcoord, b_coord bcoord, block_t block) {
 
-    return (sendto_one(neighbor_table[1][1][1], "BADD %d %d %d %d %d %d %d %d\n", wcoord.x, wcoord.y, wcoord.z, bcoord.x, bcoord.y, bcoord.z, block.id, block.bf));
+    server_socket *p;
+
+    n_coord ncoord;
+
+    ncoord = wcoord_to_ncoord(wcoord);
+
+    p = find_neighbor(ncoord);
+
+    if (!p) return 0;
+
+    return (sendto_one(p, "BADD %d %d %d %d %d %d %d %d\n", wcoord.x, wcoord.y, wcoord.z, bcoord.x, bcoord.y, bcoord.z, block.id, block.bf));
 
 }
 
 int c_bset(w_coord wcoord, b_coord bcoord, block_t block) {
 
-    return (sendto_one(neighbor_table[1][1][1], "BSET %d %d %d %d %d %d %d %d\n", wcoord.x, wcoord.y, wcoord.z, bcoord.x, bcoord.y, bcoord.z, block.id, block.bf));
+    server_socket *p;
+
+    n_coord ncoord;
+
+    ncoord = wcoord_to_ncoord(wcoord);
+
+    p = find_neighbor(ncoord);
+
+    if (!p) return 0;
+
+    return (sendto_one(p, "BSET %d %d %d %d %d %d %d %d\n", wcoord.x, wcoord.y, wcoord.z, bcoord.x, bcoord.y, bcoord.z, block.id, block.bf));
 
 }
 
 int c_brem(w_coord wcoord, b_coord bcoord) {
 
-    return (sendto_one(neighbor_table[1][1][1], "BREM %d %d %d %d %d %d\n", wcoord.x, wcoord.y, wcoord.z, bcoord.x, bcoord.y, bcoord.z));
+    server_socket *p;
+
+    n_coord ncoord;
+
+    ncoord = wcoord_to_ncoord(wcoord);
+
+    p = find_neighbor(ncoord);
+
+    if (!p) return 0;
+
+    return (sendto_one(p, "BREM %d %d %d %d %d %d\n", wcoord.x, wcoord.y, wcoord.z, bcoord.x, bcoord.y, bcoord.z));
 
 }
 
