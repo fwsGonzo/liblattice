@@ -17,10 +17,39 @@
 
 int c_p(w_coord wcoord, b_coord bcoord) {
 
+    server_socket *s;
+    w_coord oldwcoord;
+    int x;
+    int y;
+    int z;
+
+    oldwcoord = lattice_player.wpos;
+
     lattice_player.wpos = wcoord;
     lattice_player.bpos = bcoord;
 
-    return (sendto_one(neighbor_table[1][1][1], "P %d %d %d %d %d %d\n", wcoord.x, wcoord.y, wcoord.z, bcoord.x, bcoord.y, bcoord.z));
+    if (user_is_within_outer_border(lattice_player.wpos, lattice_player.centeredon)) {
+        // we are within the centered servers outer border
+        for (x=0;x<3;x++)
+        for (y=0;y<3;y++)
+        for (z=0;z<3;z++) {
+            if ((s=neighbor_table[x][y][z])) {
+                if (user_is_within_outer_border(lattice_player.wpos, s->coord)) {
+                    // we need to relay the P
+                        sendto_one(s, "P %d %d %d %d %d %d\n", wcoord.x, wcoord.y, wcoord.z, bcoord.x, bcoord.y, bcoord.z);
+                } else {
+                    // need to ENDP if we are walking away
+                    if (user_is_within_outer_border(oldwcoord, s->coord)) {
+                        sendto_one(s, "ENDP\n");
+                    }
+                }
+            }
+        }
+    } else {
+        // we need to recenter to the neighboring server
+    }
+
+    return 0;
 
 }
 
