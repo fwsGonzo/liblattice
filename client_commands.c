@@ -22,6 +22,7 @@ int c_p(w_coord wcoord, b_coord bcoord) {
     int x;
     int y;
     int z;
+    n_coord newcenter;
 
     oldwcoord = lattice_player.wpos;
 
@@ -36,7 +37,7 @@ int c_p(w_coord wcoord, b_coord bcoord) {
             if ((s=neighbor_table[x][y][z])) {
                 if (user_is_within_outer_border(lattice_player.wpos, s->coord)) {
                     // we need to relay the P
-                        sendto_one(s, "P %d %d %d %d %d %d\n", wcoord.x, wcoord.y, wcoord.z, bcoord.x, bcoord.y, bcoord.z);
+                    sendto_one(s, "P %d %d %d %d %d %d\n", wcoord.x, wcoord.y, wcoord.z, bcoord.x, bcoord.y, bcoord.z);
                 } else {
                     // need to ENDP if we are walking away
                     if (user_is_within_outer_border(oldwcoord, s->coord)) {
@@ -47,6 +48,67 @@ int c_p(w_coord wcoord, b_coord bcoord) {
         }
     } else {
         // we need to recenter to the neighboring server
+
+        newcenter = wcoord_to_ncoord(lattice_player.wpos);
+
+        // get rid of the servers that are leaving us
+
+        for (x=0;x<3;x++)
+        for (y=0;y<3;y++)
+        for (z=0;z<3;z++) {
+            if ((s=neighbor_table[x][y][z])) {
+                if (!serv_in_range_of_serv(newcenter, s->coord)) {
+                    // we are falling off the edge of the neighbor table
+                    sendto_one(s, "SLIDEOVER\n");
+                    neighbor_table[x][y][z] = NULL;
+                }
+            }
+        }
+
+        // neighbor table matrix translation
+
+        // send out CENTERED AND SIDED MOVEs
+
+        for (x=0;x<3;x++)
+        for (y=0;y<3;y++)
+        for (z=0;z<3;z++) {
+            if ((s=neighbor_table[x][y][z])) {
+                if (s == neighbor_table[1][1][1]) {
+                    // this is a new center
+                    sendto_one(s,
+                               //                     wx wy wz bx by bz  HEAD  HAND
+                               "CENTEREDMOVE %u %u %u %u %u %u %d %d %d %d %d %d %d %d %u\n",
+                               lattice_player.centeredon.x,
+                               lattice_player.centeredon.y,
+                               lattice_player.centeredon.z,
+                               lattice_player.wpos.x,
+                               lattice_player.wpos.y,
+                               lattice_player.wpos.z,
+                               lattice_player.bpos.x,
+                               lattice_player.bpos.y,
+                               lattice_player.bpos.z,
+                               lattice_player.hrot.xrot,
+                               lattice_player.hrot.yrot,
+                               lattice_player.hhold.item_id,
+                               lattice_player.hhold.item_type,
+                               lattice_player.mining,
+                               lattice_player.usercolor);
+                } else {
+                    // this is a moved side
+                }
+            }
+        }
+
+        // update lattice_player
+
+        lattice_player.centeredon = neighbor_table[1][1][1]->coord;
+        lattice_player.my_min_wcoord.x = lattice_player.centeredon.x << 8;
+        lattice_player.my_min_wcoord.y = lattice_player.centeredon.y << 8;
+        lattice_player.my_min_wcoord.z = lattice_player.centeredon.z << 8;
+        lattice_player.my_max_wcoord.x = (lattice_player.centeredon.x << 8) | 0x000000FF;
+        lattice_player.my_max_wcoord.y = (lattice_player.centeredon.y << 8) | 0x000000FF;
+        lattice_player.my_max_wcoord.z = (lattice_player.centeredon.z << 8) | 0x000000FF;
+
     }
 
     return 0;
