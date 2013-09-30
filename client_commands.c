@@ -95,6 +95,33 @@ int c_p(w_coord wcoord, b_coord bcoord) {
                                lattice_player.usercolor);
                 } else {
                     // this is a moved side
+                    if (user_is_within_outer_border(lattice_player.wpos, s->coord)) {
+                        sendto_one(s,
+                                   //                  wx wy wz bx by bz  HEAD  HAND
+                                   "SIDEDMOVE %u %u %u %u %u %u %d %d %d %d %d %d %d %d %u\n",
+                                   newcenter.x,
+                                   newcenter.y,
+                                   newcenter.z,
+                                   lattice_player.wpos.x,
+                                   lattice_player.wpos.y,
+                                   lattice_player.wpos.z,
+                                   lattice_player.bpos.x,
+                                   lattice_player.bpos.y,
+                                   lattice_player.bpos.z,
+                                   lattice_player.hrot.xrot,
+                                   lattice_player.hrot.yrot,
+                                   lattice_player.hhold.item_id,
+                                   lattice_player.hhold.item_type,
+                                   lattice_player.mining,
+                                   lattice_player.usercolor);
+
+                    } else {
+                        sendto_one(s,
+                                   "SIDEDMOVE %u %u %u\n",
+                                   newcenter.x,
+                                   newcenter.y,
+                                   newcenter.z);
+                    }
                 }
             }
         }
