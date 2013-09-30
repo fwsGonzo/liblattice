@@ -67,6 +67,58 @@ int c_p(w_coord wcoord, b_coord bcoord) {
 
         // neighbor table matrix translation
 
+        if (serv_in_range_of_serv(lattice_player.centeredon, newcenter)) {
+
+            // X plane
+
+            if (newcenter.x > lattice_player.centeredon.x) {
+                for (x=1;x<=2;x++) for (y=0;y<=2;y++) for (z=0;z<=2;z++) {
+                    neighbor_table[x-1][y][z] = neighbor_table[x][y][z];
+                    neighbor_table[x][y][z] = NULL;
+                }
+            }
+            if (newcenter.x < lattice_player.centeredon.x) {
+                for (x=1;x>=0;x--) for (y=2;y>=0;y--) for (z=2;z>=0;z--) {
+                    neighbor_table[x+1][y][z] = neighbor_table[x][y][z];
+                    neighbor_table[x][y][z] = NULL;
+                }
+
+            }
+
+            // Y plane
+
+            if (newcenter.y > lattice_player.centeredon.y) {
+                for (x=0;x<=2;x++) for (y=1;y<=2;y++) for (z=0;z<=2;z++) {
+                    neighbor_table[x][y-1][z] = neighbor_table[x][y][z];
+                    neighbor_table[x][y][z] = NULL;
+                }
+            }
+            if (newcenter.y < lattice_player.centeredon.y) {
+                for (x=2;x>=0;x--) for (y=1;y>=0;y--) for (z=2;z>=0;z--) {
+                    neighbor_table[x][y+1][z] = neighbor_table[x][y][z];
+                    neighbor_table[x][y][z] = NULL;
+                }
+
+            }
+
+            // Z plane
+
+            if (newcenter.z > lattice_player.centeredon.z) {
+                for (x=0;x<=2;x++) for (y=0;y<=2;y++) for (z=1;z<=2;z++) {
+                    neighbor_table[x][y][z-1] = neighbor_table[x][y][z];
+                    neighbor_table[x][y][z] = NULL;
+                }
+            }
+            if (newcenter.z < lattice_player.centeredon.z) {
+                for (x=2;x>=0;x--) for (y=2;y>=0;y--) for (z=1;z>=0;z--) {
+                    neighbor_table[x][y][z+1] = neighbor_table[x][y][z];
+                    neighbor_table[x][y][z] = NULL;
+                }
+
+            }
+
+        }
+
         // send out CENTERED AND SIDED MOVEs
 
         for (x=0;x<3;x++)
