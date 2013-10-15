@@ -173,14 +173,16 @@ int c_p(w_coord wcoord, b_coord bcoord) {
                                    newcenter.x,
                                    newcenter.y,
                                    newcenter.z);
-                    }
-                }
-            }
-        }
+                    } // if (user_is_within_outer_border(lattice_player.wpos, s->coord))
+                } // if (s == neighbor_table[1][1][1])
+            } // if ((s=neighbor_table[x][y][z]))
+        } // for ()
 
         // update lattice_player
 
-        lattice_player.centeredon = neighbor_table[1][1][1]->coord;
+        lattice_player.centeredon.x = neighbor_table[1][1][1]->coord.x;
+        lattice_player.centeredon.y = neighbor_table[1][1][1]->coord.y;
+        lattice_player.centeredon.z = neighbor_table[1][1][1]->coord.z;
         lattice_player.my_min_wcoord.x = lattice_player.centeredon.x << 8;
         lattice_player.my_min_wcoord.y = lattice_player.centeredon.y << 8;
         lattice_player.my_min_wcoord.z = lattice_player.centeredon.z << 8;
