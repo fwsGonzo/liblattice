@@ -79,6 +79,7 @@ struct message {
 #define T_FADE    21
 #define T_USER    22
 #define T_SERVER  23
+#define T_BUMP    24
 
 #define MFLAG_FROM      0x00000001         // Is fromuid set
 
@@ -257,5 +258,11 @@ typedef struct lattice_server {
 
 } lattice_server;
 
+typedef struct lattice_bump {
+
+    w_coord wcoord;
+    b_coord bcoord;
+
+} lattice_bump;
 
 #endif

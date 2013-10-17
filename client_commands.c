@@ -24,7 +24,23 @@ int c_p(w_coord wcoord, b_coord bcoord) {
     int z;
     n_coord newcenter;
 
+    lattice_message mess;
+    lattice_bump submess;
+
     oldwcoord = lattice_player.wpos;
+
+    newcenter = wcoord_to_ncoord(wcoord);
+
+    if (!find_neighbor(newcenter)) {
+        mess.type = T_BUMP;
+        ClrFlagFrom(&mess);
+        mess.fromuid = 0;
+        mess.args = &submess;
+        submess.wcoord = lattice_player.wpos;
+        submess.bcoord = lattice_player.bpos;
+        (*gcallback)(&mess);
+        return 0;
+    }
 
     lattice_player.wpos = wcoord;
     lattice_player.bpos = bcoord;
@@ -48,8 +64,6 @@ int c_p(w_coord wcoord, b_coord bcoord) {
         }
     } else {
         // we need to recenter to the neighboring server
-
-        newcenter = wcoord_to_ncoord(lattice_player.wpos);
 
         // get rid of the servers that are leaving us
 
