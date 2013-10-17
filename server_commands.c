@@ -36,26 +36,23 @@ int s_p(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
     if (!pfrom) return 0;
 
-    if (argc < 6) return 0;
-
     mess.type = T_P;
-
     SetFlagFrom(&mess);
-
     mess.fromuid = *pfrom;
 
-    mess.args = &submess;
-
-    submess.wcoord.x = atoi(argv[0]);
-    submess.wcoord.y = atoi(argv[1]);
-    submess.wcoord.z = atoi(argv[2]);
-    submess.bcoord.x = atoi(argv[3]);
-    submess.bcoord.y = atoi(argv[4]);
-    submess.bcoord.z = atoi(argv[5]);
+    if (argc < 6) {
+        mess.args = NULL;
+    } else {
+        mess.args = &submess;
+        submess.wcoord.x = atoi(argv[0]);
+        submess.wcoord.y = atoi(argv[1]);
+        submess.wcoord.z = atoi(argv[2]);
+        submess.bcoord.x = atoi(argv[3]);
+        submess.bcoord.y = atoi(argv[4]);
+        submess.bcoord.z = atoi(argv[5]);
+    }
 
     (*gcallback)(&mess);
-
-    //if (sendto_one(src, "PONG\n")) return 1;
 
     return 0;
 
