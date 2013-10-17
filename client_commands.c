@@ -220,6 +220,12 @@ int c_quit(char *reason) {
 
 }
 
+int c_p_empty(void) {
+
+    return (sendto_one(neighbor_table[1][1][1], "P\n"));
+
+}
+
 int c_pc(uint32_t color) {
 
     lattice_player.usercolor = color;

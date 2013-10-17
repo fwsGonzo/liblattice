@@ -313,8 +313,13 @@ int lattice_send(lattice_message *msg) {
     switch (msg->type) {
 
         case T_P:
-            return c_p( ((lattice_p *)msg->args)->wcoord,
-                        ((lattice_p *)msg->args)->bcoord );
+
+            if (msg->args)
+                return c_p( ((lattice_p *)msg->args)->wcoord,
+                            ((lattice_p *)msg->args)->bcoord );
+            else
+                return c_p_empty();
+
         break;
 
         case T_QUIT:
