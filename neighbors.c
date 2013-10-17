@@ -194,7 +194,7 @@ server_socket *find_neighbor(n_coord coord) {
 
     int a,b,c;
 
-    if (!serv_can_connect_to_me(coord)) return NULL;
+    if (!serv_in_range_of_serv(lattice_player.centeredon, coord)) return NULL;
 
     a = coord.x - lattice_player.centeredon.x + reach;
     b = coord.y - lattice_player.centeredon.y + reach;
