@@ -129,7 +129,7 @@ int lattice_init(int in_sock, void (*callback)(lattice_message *mp)) {
         int fdcount = limit_info.rlim_cur;
     #else
         // limit from cstdlib
-        const int fdcount = 512;
+        const int fdcount = 16384;
     #endif
 
     #ifdef _WIN32
