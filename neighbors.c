@@ -271,13 +271,11 @@ server_socket *connect_server(n_coord coord, struct in_addr ip, port_t port) {
         unsigned long blocking;
     #endif
 
-    //void *sub;
-
     if (!serv_in_range_of_serv(lattice_player.centeredon, coord)) {
         return NULL;
     }
 
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
     if (sockfd < 0) {
         return NULL;
