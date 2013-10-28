@@ -34,7 +34,8 @@ typedef struct sendq_link {
 typedef struct server_socket {
     int socket;
 
-    char writebuf[WRITE_LENGTH]; //block buffer to fill up for outbounds....
+    //char writebuf[WRITE_LENGTH]; //block buffer to fill up for outbounds....
+    char *writebuf;
     int wlen;
 
     char rmsg[MTU + 1]; // +1 for \0

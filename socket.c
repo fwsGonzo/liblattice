@@ -98,6 +98,8 @@ void closesock(server_socket *s) {
     FD_CLR(s->socket, &wtest_set);
 
     s->socket = -1;
+    if (s->writebuf) free(s->writebuf);
+    s->writebuf = NULL;
     s->wlen = 0;
     s->rlen = 0;
     s->sendq_head = NULL;

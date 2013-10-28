@@ -314,6 +314,13 @@ server_socket *connect_server(n_coord coord, struct in_addr ip, port_t port) {
         return NULL;
     }
 */
+    if (!socket_table[sockfd].writebuf)
+        socket_table[sockfd].writebuf = malloc(WRITE_LENGTH);
+
+    if (!socket_table[sockfd].writebuf) {
+        close(sockfd);
+        return NULL;
+    }
 
     FD_SET(sockfd, &rtest_set);
 
@@ -321,6 +328,7 @@ server_socket *connect_server(n_coord coord, struct in_addr ip, port_t port) {
         maxfd = sockfd;
 
     socket_table[sockfd].socket = sockfd;
+
     socket_table[sockfd].wlen = 0;
     socket_table[sockfd].rlen = 0;
 
