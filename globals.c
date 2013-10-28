@@ -6,6 +6,7 @@
 	#include <arpa/inet.h>
 #else
 	#include <winsock2.h>
+	#include <Windows.h>
 #endif
 
 #include "lattice_config.h"

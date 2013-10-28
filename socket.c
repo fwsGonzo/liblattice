@@ -38,6 +38,7 @@
         #include <string.h>
 #else
     #include <winsock2.h>
+    #include <Windows.h>
 #endif
 
 #include "socket.h"
