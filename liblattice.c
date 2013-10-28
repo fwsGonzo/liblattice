@@ -416,15 +416,15 @@ int lattice_connect(char *ipstr, uint16_t port) {
 
     server_socket *p;
 
-    if (!ipstr || !*ipstr) return -1;
+    if (!ipstr || !*ipstr) return -2;
 
-    if (!lattice_player.nickname || !*lattice_player.nickname) return -1;
+    if (!lattice_player.nickname || !*lattice_player.nickname) return -3;
 
     ip.s_addr = inet_addr(ipstr);
 
     p = connect_server(lattice_player.centeredon, ip, port);
 
-    if (!p) return -1;
+    if (!p) return -4;
 
     neighbor_table[1][1][1]=p;
 
