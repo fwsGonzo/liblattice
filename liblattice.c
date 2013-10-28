@@ -223,7 +223,8 @@ void lattice_process() {
 
         if ((fd != input_sock) && (FD_ISSET(fd, &rready_set))) {
 
-            read_length = read(fd, read_block, READ_LENGTH);
+            //read_length = read(fd, read_block, READ_LENGTH);
+            read_length = recv(fd, read_block, READ_LENGTH, 0);
 
             if (read_length < 0) {
                 if (sock_ignoreError(sock_getError())) continue;

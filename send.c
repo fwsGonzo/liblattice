@@ -64,7 +64,8 @@ ssize_t flush_write(server_socket *s, int closing) {
     if (!FD_ISSET(s->socket, &rtest_set) && !FD_ISSET(s->socket, &wtest_set)) return(-1);
     if (s->wlen <= 0) return(-1);
 
-    ret = write(s->socket, s->writebuf, s->wlen);
+    //ret = write(s->socket, s->writebuf, s->wlen);
+    ret = send(s->socket, s->writebuf, s->wlen, 0);
 
     if (ret < 0) {
         if (!sock_ignoreError(sock_getError()) && !closing) {
