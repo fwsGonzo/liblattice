@@ -33,8 +33,9 @@
 	#include <arpa/inet.h>
 	#include <fcntl.h>
 #else
-	#include <winsock2.h>
-	#include <Windows.h>
+#include <windows.h>
+#include <winsock2.h>
+#include <ws2tcpip.h>
 #endif
 
 #include "lattice_config.h"

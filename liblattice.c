@@ -9,8 +9,10 @@
 	#include <errno.h>
 	#include <sys/resource.h>
 #else
-    #include <winsock2.h>
-    #include <Windows.h>
+#include <windows.h>
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <stdio.h>
 #endif
 
 #include <sys/time.h>

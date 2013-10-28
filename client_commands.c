@@ -5,8 +5,11 @@
         #include <netinet/in.h>
         #include <arpa/inet.h>
 #else
-        #include <winsock2.h>
-	#include <Windows.h>
+#include <windows.h>
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <stdlib.h>
+#include <stdio.h>
 #endif
 
 #include "lattice_config.h"

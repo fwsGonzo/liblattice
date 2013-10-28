@@ -37,8 +37,10 @@
 	#include <stdarg.h>
         #include <string.h>
 #else
-    #include <winsock2.h>
-    #include <Windows.h>
+#include <windows.h>
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <stdlib.h>
 #endif
 
 #include "socket.h"
