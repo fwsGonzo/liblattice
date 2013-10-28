@@ -116,19 +116,28 @@ void strtoargv(char *line) {
 int lattice_init(int in_sock, void (*callback)(lattice_message *mp)) {
 
     int tab_size;
-	
-	#ifdef __linux__
-		struct rlimit limit_info;
-		
-		if (getrlimit (RLIMIT_NOFILE, &limit_info) < 0)
-			return -1;
-		// FIXME
-		int fdcount = limit_info.rlim_cur;
-		
-	#else
-		// limit from cstdlib
-		const int fdcount = 512;
-	#endif
+
+    #ifdef __linux__
+        struct rlimit limit_info;
+
+        if (getrlimit (RLIMIT_NOFILE, &limit_info) < 0)
+            return -1;
+        // FIXME
+        int fdcount = limit_info.rlim_cur;
+    #else
+        // limit from cstdlib
+        const int fdcount = 512;
+    #endif
+
+    #ifdef _WIN32
+
+        WORD wversion = MAKEWORD(2, 2);
+        WSADATA wsaData;
+
+        if(WSAStartup(wversion, &wsaData) != 0)
+            return -1;
+
+    #endif
 
     if (!callback)
         return -1;
