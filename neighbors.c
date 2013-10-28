@@ -266,6 +266,11 @@ server_socket *connect_server(n_coord coord, struct in_addr ip, port_t port) {
 
     int sockfd;
     struct sockaddr_in  serv_addr;
+
+    #ifdef _WIN32
+        unsigned long blocking;
+    #endif
+
     //void *sub;
 
     if (!serv_in_range_of_serv(lattice_player.centeredon, coord)) {
@@ -285,7 +290,7 @@ server_socket *connect_server(n_coord coord, struct in_addr ip, port_t port) {
     serv_addr.sin_addr.s_addr = ip.s_addr;
 
     #ifdef _WIN32
-        unsigned long blocking = 1;
+        blocking = 1;
         ioctlsocket(sockfd, FIONBIO, &blocking);
     #endif
 
@@ -295,7 +300,7 @@ server_socket *connect_server(n_coord coord, struct in_addr ip, port_t port) {
     }
 
     #ifdef _WIN32
-        unsigned long blocking = 0;
+        blocking = 0;
         ioctlsocket(sockfd, FIONBIO, &blocking);
     #else
         int val = fcntl(sockfd, F_GETFL, 0);
