@@ -289,12 +289,6 @@ server_socket *connect_server(n_coord coord, struct in_addr ip, port_t port) {
     serv_addr.sin_port = htons(port);
     serv_addr.sin_addr.s_addr = ip.s_addr;
 
-    #ifdef _WIN32
-        blocking = 1;
-        ioctlsocket(sockfd, FIONBIO, &blocking);
-    #endif
-
-
     if (connect(sockfd, (struct sockaddr *) &serv_addr, sizeof serv_addr) < 0) {
         return NULL;
     }
