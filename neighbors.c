@@ -284,17 +284,23 @@ server_socket *connect_server(n_coord coord, struct in_addr ip, port_t port) {
     serv_addr.sin_port = htons(port);
     serv_addr.sin_addr.s_addr = ip.s_addr;
 
+    #ifdef _WIN32
+        unsigned long blocking = 1;
+        ioctlsocket(sockfd, FIONBIO, &blocking);
+    #endif
+
+
     if (connect(sockfd, (struct sockaddr *) &serv_addr, sizeof serv_addr) < 0) {
         return NULL;
     }
 
-    #ifdef __linux__
-		int val = fcntl(sockfd, F_GETFL, 0);
-		fcntl(sockfd, F_SETFL, val | O_NONBLOCK);
-	#else
-		unsigned long blocking = 0;
-		ioctlsocket(sockfd, FIONBIO, &blocking);
-	#endif
+    #ifdef _WIN32
+        unsigned long blocking = 0;
+        ioctlsocket(sockfd, FIONBIO, &blocking);
+    #else
+        int val = fcntl(sockfd, F_GETFL, 0);
+        fcntl(sockfd, F_SETFL, val | O_NONBLOCK);
+    #endif
 
 /*
     if (!add_neighbor(coord,socket_table+sockfd)) {
