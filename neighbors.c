@@ -344,7 +344,6 @@ server_socket *connect_server(n_coord coord, struct in_addr ip, port_t port) {
         #else
                 closesocket(sockfd);
         #endif
-        close(sockfd);
         return NULL;
     }
 
