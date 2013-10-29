@@ -38,7 +38,8 @@ typedef struct server_socket {
     char *writebuf;
     int wlen;
 
-    char rmsg[MTU + 1]; // +1 for \0
+    //char rmsg[MTU + 1]; // +1 for \0
+    char *rmsg;
     int rlen;
 
     sendq_link *sendq_head;

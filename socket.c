@@ -101,6 +101,8 @@ void closesock(server_socket *s) {
     if (s->writebuf) free(s->writebuf);
     s->writebuf = NULL;
     s->wlen = 0;
+    if (s->rmsg) free(r-rmsg);
+    s->rmsg = NULL;
     s->rlen = 0;
     s->sendq_head = NULL;
     s->sendq_tail = NULL;

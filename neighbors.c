@@ -290,6 +290,11 @@ server_socket *connect_server(n_coord coord, struct in_addr ip, port_t port) {
     serv_addr.sin_addr.s_addr = ip.s_addr;
 
     if (connect(sockfd, (struct sockaddr *) &serv_addr, sizeof serv_addr) < 0) {
+        #ifdef __linux__
+                close(sockfd);
+        #else
+                closesocket(sockfd);
+        #endif
         return NULL;
     }
 
@@ -318,9 +323,31 @@ server_socket *connect_server(n_coord coord, struct in_addr ip, port_t port) {
         socket_table[sockfd].writebuf = malloc(WRITE_LENGTH);
 
     if (!socket_table[sockfd].writebuf) {
+        #ifdef __linux__
+                close(sockfd);
+        #else
+                closesocket(sockfd);
+        #endif
+        return NULL;
+    }
+
+    if (!socket_table[sockfd].rmsg)
+        socket_table[sockfd].rmsg = malloc(MTU + 1);
+
+    if (!socket_table[sockfd].rmsg) {
+        if (socket_table[sockfd].writebuf) {
+            free (socket_table[sockfd].writebuf);
+            socket_table[sockfd].writebuf=NULL;
+        }
+        #ifdef __linux__
+                close(sockfd);
+        #else
+                closesocket(sockfd);
+        #endif
         close(sockfd);
         return NULL;
     }
+
 
     FD_SET(sockfd, &rtest_set);
 
