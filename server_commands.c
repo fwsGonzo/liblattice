@@ -721,6 +721,8 @@ int s_server(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) 
 
     if (argc < 5) return 0;
 
+    if (!ncoord_is_equal(src->coord, lattice_player.centeredon)) return 0;
+
     mess.type = T_SERVER;
 
     ClrFlagFrom(&mess);
@@ -779,6 +781,33 @@ int s_server(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) 
                        lattice_player.centeredon.y,
                        lattice_player.centeredon.z)) return 1;
     }
+
+    return 0;
+
+}
+
+
+int s_delserver(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+
+    server_socket *p;
+
+    n_coord coord;
+
+    if (!src) return 0;
+
+    if (argc < 3) return 0;
+
+    if (!ncoord_is_equal(src->coord, lattice_player.centeredon)) return 0;
+
+    coord.x = atoi(argv[0]);
+    coord.y = atoi(argv[1]);
+    coord.z = atoi(argv[2]);
+
+    p = find_neighbor(coord);
+
+    if (!p) return 0;
+
+    closesock(p);
 
     return 0;
 

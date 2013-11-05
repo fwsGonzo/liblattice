@@ -58,6 +58,7 @@ struct message s_mestab[] = {
     { "fade", s_fade, 0 },
     { "user", s_user, 0 },
     { "server", s_server, 0 },
+    { "delserver", s_delserver, 0 },
     { (char *) NULL, (int (*)()) NULL, 0 }
 };
 
