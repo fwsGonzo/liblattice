@@ -393,3 +393,27 @@ server_socket *connect_server(n_coord coord, struct in_addr ip, port_t port) {
 }
 
 
+void disconnect_servers(void) {
+
+    lattice_message mess;
+
+    closeallservers();
+
+    lattice_player.centeredon.x = lattice_player.wpos.x >> 8;
+    lattice_player.centeredon.y = lattice_player.wpos.y >> 8;
+    lattice_player.centeredon.z = lattice_player.wpos.z >> 8;
+    lattice_player.my_min_wcoord.x = lattice_player.centeredon.x << 8;
+    lattice_player.my_min_wcoord.y = lattice_player.centeredon.y << 8;
+    lattice_player.my_min_wcoord.z = lattice_player.centeredon.z << 8;
+    lattice_player.my_max_wcoord.x = (lattice_player.centeredon.x << 8) | 0x000000FF;
+    lattice_player.my_max_wcoord.y = (lattice_player.centeredon.y << 8) | 0x000000FF;
+    lattice_player.my_max_wcoord.z = (lattice_player.centeredon.z << 8) | 0x000000FF;
+
+    mess.type = T_DISCONNECTED;
+    ClrFlagFrom(&mess);
+    mess.fromuid = 0;
+    mess.args = NULL;
+
+    (*gcallback)(&mess);
+
+}
