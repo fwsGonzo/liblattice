@@ -426,6 +426,8 @@ void recenter_neighbors(n_coord newcenter) {
     int y;
     int z;
 
+    if (!find_neighbor(newcenter)) return;
+
     // get rid of the servers that are leaving us
 
     for (x=0;x<3;x++)
