@@ -430,6 +430,8 @@ int lattice_connect(char *ipstr, uint16_t port) {
 
     server_socket *p;
 
+    lattice_message mess;
+
     if (!ipstr || !*ipstr) return -2;
 
     if (!lattice_player.nickname || !*lattice_player.nickname) return -3;
@@ -441,6 +443,13 @@ int lattice_connect(char *ipstr, uint16_t port) {
     if (!p) return -4;
 
     neighbor_table[1][1][1]=p;
+
+    mess.type = T_CONNECTED;
+    ClrFlagFrom(&mess);
+    mess.fromuid = 0;
+    mess.args = NULL;
+
+    (*gcallback)(&mess);
 
     return (sendto_one(neighbor_table[1][1][1],
                        //                              wx  wy  wz bx by bz  HEAD  HAND

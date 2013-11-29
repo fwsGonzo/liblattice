@@ -637,8 +637,6 @@ int s_fade(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
     lattice_message mess;
 
-    lattice_fade submess;
-
     if (!src) return 0;
 
     if (!pfrom) return 0;
@@ -651,7 +649,7 @@ int s_fade(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
     mess.fromuid = *pfrom;
 
-    mess.args = &submess;
+    mess.args = NULL;
 
     (*gcallback)(&mess);
 
