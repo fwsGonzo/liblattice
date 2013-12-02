@@ -231,7 +231,7 @@ int add_neighbor(n_coord coord, server_socket *s) {
 
     if (!s) return 0;
 
-    if (!serv_in_range_of_serv(coord)) return 0;
+    if (!serv_in_range_of_serv(lattice_player.centeredon, coord)) return 0;
 
     a = coord.x - lattice_player.centeredon.x + reach;
     b = coord.y - lattice_player.centeredon.y + reach;
@@ -249,7 +249,7 @@ int del_neighbor(n_coord coord) {
 
     int a,b,c;
 
-    if (!serv_in_range_of_serv(coord)) return 0;
+    if (!serv_in_range_of_serv(lattice_player.centeredon, coord)) return 0;
 
     a = coord.x - lattice_player.centeredon.x + reach;
     b = coord.y - lattice_player.centeredon.y + reach;
