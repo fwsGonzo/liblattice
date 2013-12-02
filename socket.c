@@ -62,6 +62,7 @@
 void closesock(server_socket *s) {
 
     //server_socket *p;
+    n_coord old_coord;
     n_coord newcenter;
     if (!s) return;
 
@@ -115,13 +116,21 @@ void closesock(server_socket *s) {
     s->type = SOCKET_UNKNOWN;
     s->c_port = 0;
 
+    old_coord.x = s->coord.x;
+    old_coord.y = s->coord.y;
+    old_coord.z = s->coord.z;
 
-    if ( ncoord_is_equal(s->coord, wcoord_to_ncoord(lattice_player.wpos)) ) {
+    s->coord.x = 0;
+    s->coord.y = 0;
+    s->coord.z = 0;
+
+
+    if ( ncoord_is_equal(old_coord, wcoord_to_ncoord(lattice_player.wpos)) ) {
         // the server i am standing on is dieing. bail.
         disconnect_servers();
     } else {
         // i am not standing on this server but i might be centered to it
-        if (ncoord_is_equal(s->coord, lattice_player.centeredon)) {
+        if (ncoord_is_equal(old_coord, lattice_player.centeredon)) {
             // i am centered to but not standing on this server
             newcenter = wcoord_to_ncoord(lattice_player.wpos);
             if (find_neighbor(newcenter)) {
@@ -134,10 +143,6 @@ void closesock(server_socket *s) {
             }
         }
     }
-
-    s->coord.x = 0;
-    s->coord.y = 0;
-    s->coord.z = 0;
 
     return;
 
