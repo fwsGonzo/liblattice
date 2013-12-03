@@ -62,7 +62,7 @@
 void closesock(server_socket *s) {
 
     //server_socket *p;
-    n_coord old_coord;
+    n_coord server_coord;
     n_coord newcenter;
     if (!s) return;
 
@@ -116,21 +116,50 @@ void closesock(server_socket *s) {
     s->type = SOCKET_UNKNOWN;
     s->c_port = 0;
 
-    old_coord.x = s->coord.x;
-    old_coord.y = s->coord.y;
-    old_coord.z = s->coord.z;
+    server_coord.x = s->coord.x;
+    server_coord.y = s->coord.y;
+    server_coord.z = s->coord.z;
 
     s->coord.x = 0;
     s->coord.y = 0;
     s->coord.z = 0;
 
+    if (ncoord_is_equal(server_coord, lattice_player.centeredon)) {
+        // this is my centered server
+        if ( ncoord_is_equal(server_coord, wcoord_to_ncoord(lattice_player.wpos)) )  {
+            // i am standing on my centered server. i must die.
+            disconnect_servers();
+        } else {
+            // i am not standing on my centered server. its dieing. i need to recenter.
+            newcenter = wcoord_to_ncoord(lattice_player.wpos);
+            if (find_neighbor(newcenter)) {
+                // i am standing on a neighboring server i can force a recentering to
+                recenter_neighbors(newcenter);
+            } else {
+                // the server i am standing on is somehow not there?
+                // this case should not happen
+                //disconnect_servers();
+            }
+        }
+    } else {
+        // this is one of my sided servers
+        if ( ncoord_is_equal(server_coord, wcoord_to_ncoord(lattice_player.wpos)) )  {
+            // i am standing on this sided server. i must die.
+            disconnect_servers();
+        } else {
+            // i am not standing on this server. i will survive this. do nothing.
+        }
 
-    if ( ncoord_is_equal(old_coord, wcoord_to_ncoord(lattice_player.wpos)) ) {
+    }
+
+
+/*
+    if ( ncoord_is_equal(server_coord, wcoord_to_ncoord(lattice_player.wpos)) ) {
         // the server i am standing on is dieing. bail.
         disconnect_servers();
     } else {
         // i am not standing on this server but i might be centered to it
-        if (ncoord_is_equal(old_coord, lattice_player.centeredon)) {
+        if (ncoord_is_equal(server_coord, lattice_player.centeredon)) {
             // i am centered to but not standing on this server
             newcenter = wcoord_to_ncoord(lattice_player.wpos);
             if (find_neighbor(newcenter)) {
@@ -143,6 +172,7 @@ void closesock(server_socket *s) {
             }
         }
     }
+*/
 
     return;
 
