@@ -59,38 +59,21 @@
 
 #define CLOSESOCK_BUF 8192
 
-void closesock(server_socket *s) {
+void clearsock(server_socket *s) {
 
-    //server_socket *p;
-    n_coord server_coord;
-    n_coord newcenter;
     if (!s) return;
 
-    //if (s->server)
-    //   network_server_part(s->server->server_address.x,
-    //                       s->server->server_address.y,
-    //                       s->server->server_address.z);
-
-/*
-    if (!TstFlagClosed(s)) {
-        if (sendto_one(s, "CLOSING\n")) return;
-
-        flush_write(s, 1);
-    }
-*/
-
-//        servercount--;
-        del_neighbor(s->coord);
+    del_neighbor(s->coord);
 
     //sched_delfrom(&sched, s);
 
     sendq_popall(s);
-	
-	#ifdef __linux__
-		close(s->socket);
-	#else
-		closesocket(s->socket);
-	#endif
+
+        #ifdef __linux__
+                close(s->socket);
+        #else
+                closesocket(s->socket);
+        #endif
 
 
     FD_CLR(s->socket, &rready_set);
@@ -116,13 +99,24 @@ void closesock(server_socket *s) {
     s->type = SOCKET_UNKNOWN;
     s->c_port = 0;
 
+    s->coord.x = 0;
+    s->coord.y = 0;
+    s->coord.z = 0;
+
+}
+
+void closesock(server_socket *s) {
+
+    //server_socket *p;
+    n_coord server_coord;
+    n_coord newcenter;
+    if (!s) return;
+
     server_coord.x = s->coord.x;
     server_coord.y = s->coord.y;
     server_coord.z = s->coord.z;
 
-    s->coord.x = 0;
-    s->coord.y = 0;
-    s->coord.z = 0;
+    clearsock(s);
 
     if (ncoord_is_equal(server_coord, lattice_player.centeredon)) {
         // this is my centered server
@@ -186,7 +180,7 @@ void closeallservers(void) {
 
     for(fd = 0; fd <= maxfd; fd++) {
         if ((fd != input_sock) &&  (FD_ISSET(fd, &rtest_set)) ) {
-                closesock(socket_table+fd);
+                clearsock(socket_table+fd);
         }
     }
 
