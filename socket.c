@@ -59,6 +59,117 @@
 
 #define CLOSESOCK_BUF 8192
 
+uid_link * uid_link_add_front(server_socket *s, uint32_t uid) {
+
+    uid_link *p;
+
+    if (!s) return(NULL);
+
+    p = malloc(sizeof(uid_link));
+    if (!p) return(NULL);
+
+    p->userid = uid;
+    p->prev = NULL;
+    p->next = s->uidlist_head;
+
+    if (s->uidlist_head) s->uidlist_head->prev = p; // attach head of list to new link
+
+    // update header
+    s->uidlist_head = p;
+    if (!s->uidlist_tail) s->uidlist_tail = p;
+
+    return(p);
+
+}
+
+uid_link * uid_link_add_end(server_socket *s, uint32_t uid) {
+
+    uid_link *p;
+
+    if (!s) return(NULL);
+
+    p = malloc(sizeof(uid_link));
+    if (!p) return(NULL);
+
+    p->userid = uid;
+    p->next = NULL;
+    p->prev = s->uidlist_tail;
+
+    if (s->uidlist_tail) s->uidlist_tail->next = p; // attach head of list to new link
+
+    // update header
+    s->uidlist_tail = p;
+    if (!s->uidlist_head) s->uidlist_head = p;
+
+    return(p);
+
+}
+
+void uid_link_del(server_socket *s, uid_link *link) {
+    if (!s || !link) return;
+
+    if (link->prev)
+        link->prev->next = link->next;
+    else
+        s->uidlist_head = link->next;
+
+    if (link->next)
+        link->next->prev = link->prev;
+    else
+        s->uidlist_tail = link->prev;
+
+    free(link);
+
+
+    return;
+}
+
+void uid_link_delall(server_socket *s) {
+    uid_link *p;
+    uid_link *hold;
+
+    if (!s) return;
+
+    for (p = s->uidlist_head; p; p = hold) {
+        hold = p->next;
+        free(p);
+    }
+
+    s->uidlist_head = NULL;
+    s->uidlist_tail = NULL;
+
+    return;
+}
+
+uid_link *uid_link_find(server_socket *s, uint32_t uid) {
+
+    uid_link *p;
+
+    if (!s) return NULL;
+
+    for (p = s->uidlist_head; p; p = p->next)
+        if (p->userid == uid)
+            return p;
+
+    return NULL;
+
+}
+
+uid_link *uid_link_rfind(server_socket *s, uint32_t uid) {
+
+    uid_link *p;
+
+    if (!s) return NULL;
+
+    for (p = s->uidlist_tail; p; p = p->prev)
+        if (p->userid == uid)
+            return p;
+
+    return NULL;
+
+}
+
+
 void clearsock(server_socket *s) {
 
     if (!s) return;

@@ -71,7 +71,17 @@ typedef struct server_socket {
 
 typedef int socket_error_t;
 
+
+extern uid_link * uid_link_add_front(server_socket *s, uint32_t uid);
+extern uid_link * uid_link_add_end(server_socket *s, uint32_t uid);
+extern void uid_link_del(server_socket *s, uid_link *link);
+extern void uid_link_delall(server_socket *s);
+extern uid_link *uid_link_find(server_socket *s, uint32_t uid);
+extern uid_link *uid_link_rfind(server_socket *s, uint32_t uid);
+
 extern void closesock(server_socket *s);
 extern void closeallservers(void);
+
+
 
 #endif
