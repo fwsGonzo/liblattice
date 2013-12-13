@@ -103,6 +103,9 @@ void clearsock(server_socket *s) {
     s->coord.y = 0;
     s->coord.z = 0;
 
+    s->uidlist_head = NULL;
+    s->uidlist_tail = NULL;
+
 }
 
 void closesock(server_socket *s) {

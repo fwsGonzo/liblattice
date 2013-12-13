@@ -31,6 +31,12 @@ typedef struct sendq_link {
     struct sendq_link *next;
 } sendq_link;
 
+typedef struct uid_link {
+    uint32_t userid;
+    struct uid_link *prev;
+    struct uid_link *next;
+} uid_link;
+
 typedef struct server_socket {
     int socket;
 
@@ -57,6 +63,9 @@ typedef struct server_socket {
     n_coord coord;
 
     port_t c_port;
+
+    struct uid_link *uidlist_head;
+    struct uid_link *uidlist_tail;
 
 } server_socket;
 
