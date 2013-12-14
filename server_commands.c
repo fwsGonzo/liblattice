@@ -32,8 +32,10 @@ int s_ping(struct server_socket *src, int argc, char **argv) {
 int s_p(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
     lattice_message mess;
-
     lattice_p submess;
+
+    uid_link *uidlink;
+    int standing;
 
     if (!src) return 0;
 
@@ -53,6 +55,15 @@ int s_p(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
         submess.bcoord.x = atoi(argv[3]);
         submess.bcoord.y = atoi(argv[4]);
         submess.bcoord.z = atoi(argv[5]);
+
+        standing = ncoord_is_equal(src->coord, wcoord_to_ncoord(submess.wcoord));
+
+        uidlink = uid_link_find(src, mess.fromuid);
+
+        if (uidlink) {
+            uidlink->standing_on = standing;
+        }
+
     }
 
     (*gcallback)(&mess);
@@ -65,8 +76,9 @@ int s_p(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 int s_quit(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
     lattice_message mess;
-
     lattice_quit submess;
+
+    uid_link *uidlink;
 
     if (!src) return 0;
 
@@ -85,6 +97,12 @@ int s_quit(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
     submess.numeric = atoi(argv[0]);
     strncpy(submess.desc, argv[1] , sizeof(submess.desc));
     submess.desc[sizeof(submess.desc)-1]='\0';
+
+
+    uidlink = uid_link_find(src, mess.fromuid);
+
+    if (uidlink)
+        uid_link_del(src, uidlink);
 
     (*gcallback)(&mess);
 
@@ -637,6 +655,8 @@ int s_fade(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
     lattice_message mess;
 
+    uid_link *uidlink;
+
     if (!src) return 0;
 
     if (!pfrom) return 0;
@@ -651,6 +671,11 @@ int s_fade(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
     mess.args = NULL;
 
+    uidlink = uid_link_find(src, mess.fromuid);
+
+    if (uidlink)
+        uid_link_del(src, uidlink);
+
     (*gcallback)(&mess);
 
     return 0;
@@ -660,8 +685,11 @@ int s_fade(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 int s_user(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
     lattice_message mess;
-
     lattice_user submess;
+
+    //uid_link *uidlink;
+    int standing;
+
 
     if (!src) return 0;
 
@@ -700,6 +728,12 @@ int s_user(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
     submess.mining = atoi(argv[13]);
 
     submess.usercolor = (uint32_t) atoi(argv[14]);
+
+    standing = ncoord_is_equal(src->coord, wcoord_to_ncoord(submess.wpos));
+
+    uid_link_add_end(src, mess.fromuid, standing);
+
+    //if (!uidlink) return 0;
 
     (*gcallback)(&mess);
 
