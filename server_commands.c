@@ -56,13 +56,11 @@ int s_p(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
         submess.bcoord.y = atoi(argv[4]);
         submess.bcoord.z = atoi(argv[5]);
 
-        standing = ncoord_is_equal(src->coord, wcoord_to_ncoord(submess.wcoord));
-
         uidlink = uid_link_find(src, mess.fromuid);
 
-        if (uidlink) {
-            uidlink->standing_on = standing;
-        }
+        if (uidlink)
+            uidlink->standing_on = ncoord_is_equal(src->coord, wcoord_to_ncoord(submess.wcoord));
+
 
     }
 
