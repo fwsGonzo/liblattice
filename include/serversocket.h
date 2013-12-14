@@ -33,6 +33,7 @@ typedef struct sendq_link {
 
 typedef struct uid_link {
     uint32_t userid;
+    int standing_on;
     struct uid_link *prev;
     struct uid_link *next;
 } uid_link;
@@ -72,8 +73,8 @@ typedef struct server_socket {
 typedef int socket_error_t;
 
 
-extern uid_link * uid_link_add_front(server_socket *s, uint32_t uid);
-extern uid_link * uid_link_add_end(server_socket *s, uint32_t uid);
+extern uid_link * uid_link_add_front(server_socket *s, uint32_t uid, int standing_on);
+extern uid_link * uid_link_add_end(server_socket *s, uint32_t uid, int standing_on);
 extern void uid_link_del(server_socket *s, uid_link *link);
 extern void uid_link_delall(server_socket *s);
 extern uid_link *uid_link_find(server_socket *s, uint32_t uid);

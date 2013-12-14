@@ -59,7 +59,7 @@
 
 #define CLOSESOCK_BUF 8192
 
-uid_link * uid_link_add_front(server_socket *s, uint32_t uid) {
+uid_link * uid_link_add_front(server_socket *s, uint32_t uid, int standing_on) {
 
     uid_link *p;
 
@@ -69,6 +69,7 @@ uid_link * uid_link_add_front(server_socket *s, uint32_t uid) {
     if (!p) return(NULL);
 
     p->userid = uid;
+    p->standing_on = standing_on;
     p->prev = NULL;
     p->next = s->uidlist_head;
 
@@ -82,7 +83,7 @@ uid_link * uid_link_add_front(server_socket *s, uint32_t uid) {
 
 }
 
-uid_link * uid_link_add_end(server_socket *s, uint32_t uid) {
+uid_link * uid_link_add_end(server_socket *s, uint32_t uid, int standing_on) {
 
     uid_link *p;
 
@@ -92,6 +93,7 @@ uid_link * uid_link_add_end(server_socket *s, uint32_t uid) {
     if (!p) return(NULL);
 
     p->userid = uid;
+    p->standing_on = standing_on;
     p->next = NULL;
     p->prev = s->uidlist_tail;
 
@@ -213,6 +215,8 @@ void clearsock(server_socket *s) {
     s->coord.x = 0;
     s->coord.y = 0;
     s->coord.z = 0;
+
+    uid_link_delall(s);
 
     s->uidlist_head = NULL;
     s->uidlist_tail = NULL;
