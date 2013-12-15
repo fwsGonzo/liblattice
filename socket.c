@@ -127,14 +127,32 @@ void uid_link_del(server_socket *s, uid_link *link) {
 }
 
 void uid_link_delall(server_socket *s) {
+    lattice_message mess;
+    lattice_quit submess;
+
     uid_link *p;
     uid_link *hold;
 
     if (!s) return;
 
     for (p = s->uidlist_head; p; p = hold) {
+
+        if (p->standing_on) {
+
+            mess.type = T_QUIT;
+            SetFlagFrom(&mess);
+            mess.fromuid = p->userid;
+            mess.args = &submess;
+            submess.numeric = 103; // NUM_EOF
+            strncpy(submess.desc, "Connection closed by remote host" , sizeof(submess.desc));
+            submess.desc[sizeof(submess.desc)-1]='\0';
+            (*gcallback)(&mess);
+
+        }
+
         hold = p->next;
         free(p);
+
     }
 
     s->uidlist_head = NULL;
