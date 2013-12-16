@@ -841,3 +841,73 @@ int s_delserver(struct server_socket *src, uint32_t *pfrom, int argc, char **arg
     return 0;
 
 }
+
+int s_moveto(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+
+    uid_link *uidlink;
+    n_coord coord;
+
+    struct server_socket *dst;
+
+    if (!src) return 0;
+
+    if (!pfrom) return 0;
+
+    if (argc < 3) return 0;
+
+    coord.x = atoi(argv[0]);
+    coord.y = atoi(argv[1]);
+    coord.z = atoi(argv[2]);
+
+    uidlink = uid_link_find(src, *pfrom);
+
+    if (uidlink) {
+
+        dst = find_neighbor(coord);
+
+        if (dst) {
+            if (!uid_link_find(dst, *pfrom))
+                uid_link_add_end(dst, *pfrom, 1);
+        }
+
+        uid_link_del(src, uidlink);
+
+    }
+
+    return 0;
+
+}
+
+
+int s_movefrom(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+
+    uid_link *uidlink;
+    n_coord coord;
+
+    struct server_socket *from;
+
+    if (!src) return 0;
+
+    if (!pfrom) return 0;
+
+    if (argc < 3) return 0;
+
+    coord.x = atoi(argv[0]);
+    coord.y = atoi(argv[1]);
+    coord.z = atoi(argv[2]);
+
+    from = find_neighbor(coord);
+
+    if (from) {
+        if ((uidlink=uid_link_find(from, *pfrom)))
+            uid_link_del(from, uidlink);
+    }
+
+    if (!uid_link_find(src, *pfrom))
+        uid_link_add_end(src, *pfrom, 1);
+
+
+    return 0;
+
+}
+

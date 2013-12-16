@@ -59,6 +59,8 @@ struct message s_mestab[] = {
     { "user", s_user, 0 },
     { "server", s_server, 0 },
     { "delserver", s_delserver, 0 },
+    { "moveto", s_moveto, 0 },
+    { "movefrom", s_movefrom, 0 },
     { (char *) NULL, (int (*)()) NULL, 0 }
 };
 

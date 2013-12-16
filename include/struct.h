@@ -83,6 +83,8 @@ struct message {
 #define T_BUMP         24
 #define T_CONNECTED    25
 #define T_DISCONNECTED 26
+#define T_MOVETO       27
+#define T_MOVEFROM     28
 
 #define MFLAG_FROM      0x00000001         // Is fromuid set
 
