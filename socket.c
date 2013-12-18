@@ -143,8 +143,8 @@ void uid_link_delall(server_socket *s) {
             SetFlagFrom(&mess);
             mess.fromuid = p->userid;
             mess.args = &submess;
-            submess.numeric = 103; // NUM_EOF
-            strncpy(submess.desc, "Connection closed by remote host" , sizeof(submess.desc));
+            submess.numeric = 120; // NUM_BLACKHOLE
+            strncpy(submess.desc, "User occupying nonexistent space (blackhole)" , sizeof(submess.desc));
             submess.desc[sizeof(submess.desc)-1]='\0';
             (*gcallback)(&mess);
 
@@ -160,6 +160,27 @@ void uid_link_delall(server_socket *s) {
 
     return;
 }
+
+uid_link *uid_link_find_any(uint32_t uid) {
+
+    uid_link *p;
+    server_socket *s;
+    int x;
+    int y;
+    int z;
+
+    for (x=0;x<3;x++)
+    for (y=0;y<3;y++)
+    for (z=0;z<3;z++)
+        if ((s=neighbor_table[x][y][z]))
+            for (p = s->uidlist_head; p; p = p->next)
+                if (p->userid == uid)
+                    return p;
+
+    return NULL;
+
+}
+
 
 uid_link *uid_link_find(server_socket *s, uint32_t uid) {
 
