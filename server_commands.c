@@ -847,6 +847,10 @@ int s_moveto(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) 
     uid_link *uidlink;
     n_coord coord;
 
+    lattice_message mess;
+    lattice_quit submess;
+
+
     struct server_socket *dst;
 
     if (!src) return 0;
@@ -868,6 +872,17 @@ int s_moveto(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) 
         if (dst) {
             if (!uid_link_find(dst, *pfrom))
                 uid_link_add_end(dst, *pfrom, 1);
+        } else {
+            // user is walking into a blackhole
+            mess.type = T_QUIT;
+            SetFlagFrom(&mess);
+            mess.fromuid = *pfrom;
+            mess.args = &submess;
+            submess.numeric = 121; // NUM_BLACKHOLE_RECENTER
+            strncpy(submess.desc, "User recentering to nonexistent space (blackhole)" , sizeof(submess.desc));
+            submess.desc[sizeof(submess.desc)-1]='\0';
+            (*gcallback)(&mess);
+
         }
 
         uid_link_del(src, uidlink);
