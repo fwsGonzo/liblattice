@@ -850,6 +850,8 @@ int s_moveto(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) 
     lattice_message mess;
     lattice_quit submess;
 
+    lattice_user usubmess;
+
 
     struct server_socket *dst;
 
@@ -857,7 +859,7 @@ int s_moveto(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) 
 
     if (!pfrom) return 0;
 
-    if (argc < 3) return 0;
+    if (argc < 18) return 0;
 
     coord.x = atoi(argv[0]);
     coord.y = atoi(argv[1]);
@@ -866,28 +868,68 @@ int s_moveto(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) 
     uidlink = uid_link_find(src, *pfrom);
 
     if (uidlink) {
-
-        dst = find_neighbor(coord);
-
-        if (dst) {
-            if (!uid_link_find(dst, *pfrom))
-                uid_link_add_end(dst, *pfrom, 1);
-        } else {
-            // user is walking into a blackhole
-            mess.type = T_QUIT;
+        // normal case
+        // we found the uid tracked with the originating server socket
+        uid_link_del(src, uidlink);
+    } else {
+        // a MOVEFROM probably beat us
+        // lets see if its already moved
+        if (!uid_link_find_any(*pfrom)) {
+            // this uid was not tracked??
+            // intro user
+            mess.type = T_USER;
             SetFlagFrom(&mess);
             mess.fromuid = *pfrom;
-            mess.args = &submess;
-            submess.numeric = 121; // NUM_BLACKHOLE_RECENTER
-            strncpy(submess.desc, "User recentering to nonexistent space (blackhole)" , sizeof(submess.desc));
-            submess.desc[sizeof(submess.desc)-1]='\0';
-            (*gcallback)(&mess);
+            mess.args = &usubmess;
 
+            usubmess.model = (uint16_t) atoi(argv[3]);
+            usubmess.color = (uint32_t) atoi(argv[4]);
+
+            strncpy(usubmess.nickname, argv[5] , sizeof(usubmess.nickname));
+            usubmess.nickname[sizeof(usubmess.nickname)-1]='\0';
+
+            usubmess.wpos.x = atoi(argv[6]);
+            usubmess.wpos.y = atoi(argv[7]);
+            usubmess.wpos.z = atoi(argv[8]);
+
+            usubmess.bpos.x = atoi(argv[9]);
+            usubmess.bpos.y = atoi(argv[10]);
+            usubmess.bpos.z = atoi(argv[11]);
+
+            usubmess.hrot.xrot = atoi(argv[12]);
+            usubmess.hrot.yrot = atoi(argv[13]);
+
+            usubmess.hhold.item_id = atoi(argv[14]);
+            usubmess.hhold.item_type = atoi(argv[15]);
+
+            usubmess.mining = atoi(argv[16]);
+
+            usubmess.usercolor = (uint32_t) atoi(argv[17]);
+
+            (*gcallback)(&mess);
         }
 
-        uid_link_del(src, uidlink);
+    }
+
+    dst = find_neighbor(coord);
+
+    if (dst) {
+        //normal case
+        if (!uid_link_find(dst, *pfrom))
+            uid_link_add_end(dst, *pfrom, 1);
+    } else {
+        // user is walking into a blackhole
+        mess.type = T_QUIT;
+        SetFlagFrom(&mess);
+        mess.fromuid = *pfrom;
+        mess.args = &submess;
+        submess.numeric = 121; // NUM_BLACKHOLE_RECENTER
+        strncpy(submess.desc, "User recentering to nonexistent space (blackhole)" , sizeof(submess.desc));
+        submess.desc[sizeof(submess.desc)-1]='\0';
+        (*gcallback)(&mess);
 
     }
+
 
     return 0;
 
