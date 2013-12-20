@@ -959,8 +959,45 @@ int s_movefrom(struct server_socket *src, uint32_t *pfrom, int argc, char **argv
     from = find_neighbor(coord);
 
     if (from) {
-        if ((uidlink=uid_link_find(from, *pfrom)))
+        if ((uidlink=uid_link_find(from, *pfrom))) {
             uid_link_del(from, uidlink);
+        } else {
+            if (!uid_link_find_any(*pfrom)) {
+                // this uid was not tracked??
+                // intro user
+                mess.type = T_USER;
+                SetFlagFrom(&mess);
+                mess.fromuid = *pfrom;
+                mess.args = &submess;
+
+                submess.model = (uint16_t) atoi(argv[3]);
+                submess.color = (uint32_t) atoi(argv[4]);
+
+                strncpy(submess.nickname, argv[5] , sizeof(submess.nickname));
+                submess.nickname[sizeof(submess.nickname)-1]='\0';
+
+                submess.wpos.x = atoi(argv[6]);
+                submess.wpos.y = atoi(argv[7]);
+                submess.wpos.z = atoi(argv[8]);
+
+                submess.bpos.x = atoi(argv[9]);
+                submess.bpos.y = atoi(argv[10]);
+                submess.bpos.z = atoi(argv[11]);
+
+                submess.hrot.xrot = atoi(argv[12]);
+                submess.hrot.yrot = atoi(argv[13]);
+
+                submess.hhold.item_id = atoi(argv[14]);
+                submess.hhold.item_type = atoi(argv[15]);
+
+                submess.mining = atoi(argv[16]);
+
+                submess.usercolor = (uint32_t) atoi(argv[17]);
+
+                (*gcallback)(&mess);
+            }
+
+        }
     } else {
 
         mess.type = T_USER;
