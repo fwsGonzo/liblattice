@@ -24,4 +24,5 @@ extern int s_server(struct server_socket *src, uint32_t *pfrom, int argc, char *
 extern int s_delserver(struct server_socket *src, uint32_t *pfrom, int argc, char **argv);
 extern int s_moveto(struct server_socket *src, uint32_t *pfrom, int argc, char **argv);
 extern int s_movefrom(struct server_socket *src, uint32_t *pfrom, int argc, char **argv);
+extern int s_trackerfailure(struct server_socket *src, uint32_t *pfrom, int argc, char **argv);
 

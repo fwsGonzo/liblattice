@@ -1041,3 +1041,29 @@ int s_movefrom(struct server_socket *src, uint32_t *pfrom, int argc, char **argv
 
 }
 
+int s_trackerfailure(struct server_socket *src, int argc, char **argv) {
+
+    if (!src) return 0;
+
+    if (ncoord_is_equal(src->coord, lattice_player.centeredon)) {
+        // this is a centered server
+        if (ncoord_is_equal(src->coord, wcoord_to_ncoord(lattice_player.wpos))) {
+            // i am standing on this server. slideover kill everything else.
+        } else {
+            // i am NOT standing on this server. recenter away.
+        }
+    } else {
+        // this is a sided server
+        if (ncoord_is_equal(src->coord, wcoord_to_ncoord(lattice_player.wpos))) {
+            // i am standing on this server. recenter twards.
+        } else {
+            // i am NOT standing on this server. slideover kill only this server.
+        }
+
+    }
+
+
+    return 0;
+
+}
+

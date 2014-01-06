@@ -61,6 +61,7 @@ struct message s_mestab[] = {
     { "delserver", s_delserver, 0 },
     { "moveto", s_moveto, 0 },
     { "movefrom", s_movefrom, 0 },
+    { "trackerfailure", s_trackerfailure, 0 },
     { (char *) NULL, (int (*)()) NULL, 0 }
 };
 
