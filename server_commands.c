@@ -1042,6 +1042,10 @@ int s_movefrom(struct server_socket *src, uint32_t *pfrom, int argc, char **argv
 }
 
 int s_trackerfailure(struct server_socket *src, int argc, char **argv) {
+    server_socket *s;
+    int x;
+    int y;
+    int z;
 
     if (!src) return 0;
 
@@ -1049,15 +1053,51 @@ int s_trackerfailure(struct server_socket *src, int argc, char **argv) {
         // this is a centered server
         if (ncoord_is_equal(src->coord, wcoord_to_ncoord(lattice_player.wpos))) {
             // i am standing on this server. slideover kill everything else.
+            for (x=0;x<3;x++) for (y=0;y<3;y++) for (z=0;z<3;z++) {
+                if ((s=neighbor_table[x][y][z])) {
+                    if (s != src) {
+                        sendto_one(s, "SLIDEOVER\n");
+                        neighbor_table[x][y][z] = NULL;
+                    }
+                }
+            }
         } else {
-            // i am NOT standing on this server. recenter away.
+            // i am NOT standing on this server. recenter away. slideover kill old center.
+            recenter_neighbors(wcoord_to_ncoord(lattice_player.wpos));
+            for (x=0;x<3;x++) for (y=0;y<3;y++) for (z=0;z<3;z++) {
+                if ((s=neighbor_table[x][y][z])) {
+                    if (s == src) {
+                        sendto_one(s, "SLIDEOVER\n");
+                        neighbor_table[x][y][z] = NULL;
+                    }
+                }
+            }
         }
     } else {
         // this is a sided server
         if (ncoord_is_equal(src->coord, wcoord_to_ncoord(lattice_player.wpos))) {
-            // i am standing on this server. recenter twards.
+            // i am standing on this server. recenter twards. slideover kill everything else.
+            recenter_neighbors(src->coord);
+            for (x=0;x<3;x++) for (y=0;y<3;y++) for (z=0;z<3;z++) {
+                if ((s=neighbor_table[x][y][z])) {
+                    if (s != src) {
+                        sendto_one(s, "SLIDEOVER\n");
+                        neighbor_table[x][y][z] = NULL;
+                    }
+                }
+            }
+
         } else {
             // i am NOT standing on this server. slideover kill only this server.
+            for (x=0;x<3;x++) for (y=0;y<3;y++) for (z=0;z<3;z++) {
+                if ((s=neighbor_table[x][y][z])) {
+                    if (s == src) {
+                        sendto_one(s, "SLIDEOVER\n");
+                        neighbor_table[x][y][z] = NULL;
+                    }
+                }
+            }
+
         }
 
     }
