@@ -8,6 +8,7 @@
 	#include <arpa/inet.h>
 	#include <errno.h>
 	#include <sys/resource.h>
+        #include <netdb.h>
 #else
 #include <windows.h>
 #include <winsock2.h>
@@ -430,6 +431,7 @@ int lattice_send(lattice_message *msg) {
 int lattice_connect(char *ipstr, uint16_t port) {
 
     struct in_addr ip;
+    struct hostent *he;
 
     server_socket *p;
 
@@ -439,7 +441,16 @@ int lattice_connect(char *ipstr, uint16_t port) {
 
     if (!lattice_player.nickname || !*lattice_player.nickname) return -3;
 
-    ip.s_addr = inet_addr(ipstr);
+    he = gethostbyname (ipstr);
+
+    if (he) {
+        if (*he->h_addr_list)
+            bcopy(*he->h_addr_list, (char *) &ip, sizeof(ip));
+        else
+            ip.s_addr = inet_addr(ipstr);
+    } else {
+        ip.s_addr = inet_addr(ipstr);
+    }
 
     p = connect_server(lattice_player.centeredon, ip, port);
 
