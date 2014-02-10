@@ -4,7 +4,7 @@ OUTPUT = liblattice.a
 
 CC = gcc
 AR = ar rvs
-CCFLAGS = -c -Wall -I./include/liblattice/ -ggdb3
+CCFLAGS = -c -Wall -I./include/liblattice/
 LFLAGS  = -pthread -static
 
 CMODS = $(SOURCE)
