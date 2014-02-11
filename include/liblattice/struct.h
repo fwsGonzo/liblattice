@@ -85,6 +85,7 @@ struct message {
 #define T_DISCONNECTED 26
 #define T_MOVETO       27
 #define T_MOVEFROM     28
+#define T_CLOSING      29
 
 #define MFLAG_FROM      0x00000001         // Is fromuid set
 
@@ -116,6 +117,13 @@ typedef struct lattice_quit {
     char desc[MTU];
 
 } lattice_quit;
+
+typedef struct lattice_closing {
+
+    uint32_t numeric;
+    char desc[MTU];
+
+} lattice_closing;
 
 typedef struct lattice_pc {
 

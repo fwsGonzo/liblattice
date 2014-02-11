@@ -63,6 +63,7 @@ struct message s_mestab[] = {
     { "moveto", s_moveto, 0 },
     { "movefrom", s_movefrom, 0 },
     { "trackerfailure", s_trackerfailure, 0 },
+    { "closing", s_closing, 0 },
     { (char *) NULL, (int (*)()) NULL, 0 }
 };
 

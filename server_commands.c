@@ -1107,3 +1107,75 @@ int s_trackerfailure(struct server_socket *src, int argc, char **argv) {
 
 }
 
+int s_closing(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+
+    lattice_message mess;
+    lattice_closing submess;
+
+    n_coord server_coord;
+    n_coord newcenter;
+
+    if (!src) return 0;
+
+    if (argc < 2) return 0;
+
+    server_coord.x = src->coord.x;
+    server_coord.y = src->coord.y;
+    server_coord.z = src->coord.z;
+
+    if (ncoord_is_equal(server_coord, lattice_player.centeredon)) {
+        // this is my centered server
+        if ( ncoord_is_equal(server_coord, wcoord_to_ncoord(lattice_player.wpos)) )  {
+            // i am standing on my centered server. i must die.
+            mess.type = T_CLOSING;
+            ClrFlagFrom(&mess);
+            mess.fromuid = 0;
+            mess.args = &submess;
+            submess.numeric = atoi(argv[0]);
+            strncpy(submess.desc, argv[1] , sizeof(submess.desc));
+            submess.desc[sizeof(submess.desc)-1]='\0';
+
+            (*gcallback)(&mess);
+
+            disconnect_servers();
+            return 1;
+        } else {
+            // i am not standing on my centered server. its dieing. i need to recenter.
+            newcenter = wcoord_to_ncoord(lattice_player.wpos);
+            if (find_neighbor(newcenter)) {
+                // i am standing on a neighboring server i can force a recentering to
+                recenter_neighbors(newcenter);
+            } else {
+                // the server i am standing on is somehow not there?
+                // this case should not happen
+                //disconnect_servers();
+            }
+        }
+    } else {
+        // this is one of my sided servers
+        if ( ncoord_is_equal(server_coord, wcoord_to_ncoord(lattice_player.wpos)) )  {
+            // i am standing on this sided server. i must die.
+            mess.type = T_CLOSING;
+            ClrFlagFrom(&mess);
+            mess.fromuid = 0;
+            mess.args = &submess;
+
+            submess.numeric = atoi(argv[0]);
+            strncpy(submess.desc, argv[1] , sizeof(submess.desc));
+            submess.desc[sizeof(submess.desc)-1]='\0';
+
+            (*gcallback)(&mess);
+
+
+            disconnect_servers();
+            return 1;
+        } else {
+            // i am not standing on this server. i will survive this. do nothing.
+        }
+
+    }
+
+
+    return 0;
+
+}
