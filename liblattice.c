@@ -446,7 +446,7 @@ int lattice_connect(char *ipstr, uint16_t port) {
 
     if (he) {
         if (*he->h_addr_list)
-            bcopy(*he->h_addr_list, (char *) &ip, sizeof(ip));
+            memcpy((char *) &ip, *he->h_addr_list, sizeof(ip));
         else
             ip.s_addr = inet_addr(ipstr);
     } else {
