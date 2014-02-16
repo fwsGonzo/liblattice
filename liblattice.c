@@ -446,7 +446,7 @@ int lattice_connect(char *ipstr, uint16_t port) {
 
     if (he) {
         if (*he->h_addr_list)
-            bcopy(*he->h_addr_list, (char *) &ip, sizeof(ip));
+            memcpy((char *) &ip, *he->h_addr_list, sizeof(ip));
         else
             ip.s_addr = inet_addr(ipstr);
     } else {
@@ -468,7 +468,7 @@ int lattice_connect(char *ipstr, uint16_t port) {
 
     return (sendto_one(neighbor_table[1][1][1],
                        //                              wx  wy  wz bx by bz  HEAD  HAND
-                       "CENTEREDINTRO %d %d %u %s %d %u %u %u %d %d %d %d %d %d %d %d %u\n",
+                       "CENTEREDINTRO %lu %d %u %s %d %u %u %u %d %d %d %d %d %d %d %d %u\n",
                        lattice_player.userid,
                        lattice_player.model,
                        lattice_player.color,

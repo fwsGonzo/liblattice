@@ -776,7 +776,7 @@ int s_server(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) 
 
     if (user_is_within_outer_border(lattice_player.wpos, submess.ncoord)) {
         // close enogh to be tracked...
-        if (sendto_one(p, "SIDEDINTRO %d %d %u %s %d %u %u %u %u %u %u %d %d %d %d %d %d %d %d %u\n",
+        if (sendto_one(p, "SIDEDINTRO %lu %d %u %s %d %u %u %u %u %u %u %d %d %d %d %d %d %d %d %u\n",
                        lattice_player.userid,
                        lattice_player.model,
                        lattice_player.color,
@@ -800,7 +800,7 @@ int s_server(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) 
 
     } else {
         // too far to be tracked... just the basics....
-        if (sendto_one(p, "SIDEDINTRO %d %d %u %s %d %u %u %u\n",
+        if (sendto_one(p, "SIDEDINTRO %lu %d %u %s %d %u %u %u\n",
                        lattice_player.userid,
                        lattice_player.model,
                        lattice_player.color,
