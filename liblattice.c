@@ -21,9 +21,9 @@
 #include <ctype.h>
 
 #include "lattice_config.h"
-#include "struct.h"
 #include "socket.h"
 #include "serversocket.h"
+#include "struct.h"
 #include "globals.h"
 #include "neighbors.h"
 #include "send.h"

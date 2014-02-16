@@ -39,6 +39,7 @@
 #endif
 
 #include "lattice_config.h"
+#include "serversocket.h"
 #include "struct.h"
 #include "globals.h"
 #include "send.h"

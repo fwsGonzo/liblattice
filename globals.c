@@ -36,3 +36,6 @@ int reach=1; // dont change me
 lattice_player_t lattice_player;
 
 void (*gcallback)(lattice_message *mp);
+
+sched_header sched;
+

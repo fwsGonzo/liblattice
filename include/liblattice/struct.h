@@ -274,4 +274,32 @@ typedef struct lattice_bump {
 
 } lattice_bump;
 
+// ----------------------------------
+
+typedef struct sched_usec_link {
+    suseconds_t usec;
+    int type;
+    server_socket *socket;
+    struct sched_usec_link *prev;
+    struct sched_usec_link *next;
+} sched_usec_link;
+
+typedef struct sched_usec_header {
+    struct sched_usec_link *head;
+    struct sched_usec_link *tail;
+} sched_usec_header;
+
+
+typedef struct sched_sec_link {
+    time_t sec;
+    sched_usec_header usec_header;
+    struct sched_sec_link *prev;
+    struct sched_sec_link *next;
+} sched_sec_link;
+
+typedef struct sched_header {
+    struct sched_sec_link *head;
+    struct sched_sec_link *tail;
+} sched_header;
+
 #endif

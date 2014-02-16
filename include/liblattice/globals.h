@@ -24,4 +24,6 @@ extern lattice_player_t lattice_player;
 
 extern void (*gcallback)(lattice_message *mp);
 
+extern sched_header sched;
+
 #endif
