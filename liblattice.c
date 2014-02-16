@@ -30,6 +30,7 @@
 #include "macros.h"
 #include "server_commands.h"
 #include "client_commands.h"
+#include "sched.h"
 
 struct message s_mestab[] = {
 //    { "whoson", s_whoson, FLAG_REG },
@@ -178,16 +179,44 @@ int lattice_init(int in_sock, void (*callback)(lattice_message *mp)) {
 
     }
 
+    sched.head = NULL;
+    sched.tail = NULL;
+
     return 0;
 
 }
 
-int lattice_select(struct timeval *ptimeout) {
+int lattice_select(struct timeval *pt) { // pointer to timeout
+
+    struct timeval sd, *psd = NULL; // scheduler delay, pointer to scheduler delay
+
+    struct timeval *pd = NULL; // pointer to final delay
 
     memcpy(&rready_set, &rtest_set, sizeof (rtest_set));
     memcpy(&wready_set, &wtest_set, sizeof (wtest_set));
 
-    return select(maxfd + 1, &rready_set, &wready_set, NULL, ptimeout);
+    gettimeofday(&now, NULL);
+
+    psd = sched_whens_next(&sched, &sd);
+
+    if (psd) {
+        if (pt) {
+            if (timercmp(psd, pt, <))
+                pd = psd;
+            else
+                pd = pt;
+        } else {
+            pd = psd;
+        }
+    } else {
+        if (pt) {
+            pd = pt;
+        } else {
+            pd = NULL;
+        }
+    }
+
+    return select(maxfd + 1, &rready_set, &wready_set, NULL, pd);
 
 }
 
@@ -216,16 +245,15 @@ void lattice_process() {
 
     gettimeofday(&now, NULL);
 
+    sched_process_all(&sched);
 
     for(fd = 0; fd <= maxfd; fd++) {
 
         s = socket_table + fd;
 
-
         if ((fd != input_sock) && (FD_ISSET(fd, &wready_set)))
             if(sendq_flush(s))
                 FD_CLR(fd, &wtest_set);
-
 
         if ((fd != input_sock) && (FD_ISSET(fd, &rready_set))) {
 
