@@ -490,6 +490,7 @@ int lattice_connect(char *ipstr, uint16_t port) {
     mess.type = T_CONNECTED;
     ClrFlagFrom(&mess);
     mess.fromuid = 0;
+    mess.length = 0;
     mess.args = NULL;
 
     (*gcallback)(&mess);

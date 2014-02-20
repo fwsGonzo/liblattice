@@ -142,6 +142,7 @@ void uid_link_delall(server_socket *s) {
             mess.type = T_QUIT;
             SetFlagFrom(&mess);
             mess.fromuid = p->userid;
+            mess.length = sizeof submess;
             mess.args = &submess;
             submess.numeric = 120; // NUM_BLACKHOLE
             strncpy(submess.desc, "User occupying nonexistent space (blackhole)" , sizeof(submess.desc));

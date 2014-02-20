@@ -413,6 +413,7 @@ void disconnect_servers(void) {
     mess.type = T_DISCONNECTED;
     ClrFlagFrom(&mess);
     mess.fromuid = 0;
+    mess.length = 0;
     mess.args = NULL;
 
     (*gcallback)(&mess);

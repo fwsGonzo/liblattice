@@ -45,8 +45,10 @@ int s_p(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
     mess.fromuid = *pfrom;
 
     if (argc < 6) {
+        mess.length = 0;
         mess.args = NULL;
     } else {
+        mess.length = sizeof submess;
         mess.args = &submess;
         submess.wcoord.x = atoi(argv[0]);
         submess.wcoord.y = atoi(argv[1]);
@@ -89,6 +91,7 @@ int s_quit(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
     mess.fromuid = *pfrom;
 
+    mess.length = sizeof submess;
     mess.args = &submess;
 
     submess.numeric = atoi(argv[0]);
@@ -126,6 +129,7 @@ int s_pc(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
     mess.fromuid = *pfrom;
 
+    mess.length = sizeof submess;
     mess.args = &submess;
 
     submess.color = (uint32_t)atoi(argv[0]);
@@ -155,6 +159,7 @@ int s_pr(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
     mess.fromuid = *pfrom;
 
+    mess.length = sizeof submess;
     mess.args = &submess;
 
     submess.rot.xrot = (HEAD_TYPE)atoi(argv[0]);
@@ -184,6 +189,7 @@ int s_ph(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
     mess.fromuid = *pfrom;
 
+    mess.length = sizeof submess;
     mess.args = &submess;
 
     submess.hand.item_id = (HAND_TYPE)atoi(argv[0]);
@@ -214,6 +220,7 @@ int s_chat(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
     mess.fromuid = *pfrom;
 
+    mess.length = sizeof submess;
     mess.args = &submess;
 
     strncpy(submess.string, argv[0] , sizeof(submess.string));
@@ -244,6 +251,7 @@ int s_action(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) 
 
     mess.fromuid = *pfrom;
 
+    mess.length = sizeof submess;
     mess.args = &submess;
 
     strncpy(submess.string, argv[0] , sizeof(submess.string));
@@ -273,6 +281,7 @@ int s_s(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
     mess.fromuid = *pfrom;
 
+    mess.length = sizeof submess;
     mess.args = &submess;
 
     submess.mid = (int32_t)atoi(argv[0]);
@@ -302,6 +311,7 @@ int s_sc(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
     mess.fromuid = *pfrom;
 
+    mess.length = sizeof submess;
     mess.args = &submess;
 
     submess.csid = (int32_t)atoi(argv[0]);
@@ -331,6 +341,7 @@ int s_bo(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
     mess.fromuid = *pfrom;
 
+    mess.length = sizeof submess;
     mess.args = &submess;
 
     submess.wcoord.x = atoi(argv[0]);
@@ -371,6 +382,7 @@ int s_mo(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
         mess.fromuid = 0;
     }
 
+    mess.length = sizeof submess;
     mess.args = &submess;
 
     submess.wcoord.x = atoi(argv[0]);
@@ -411,6 +423,7 @@ int s_badd(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
         mess.fromuid = 0;
     }
 
+    mess.length = sizeof submess;
     mess.args = &submess;
 
     submess.wcoord.x = atoi(argv[0]);
@@ -453,6 +466,7 @@ int s_bset(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
         mess.fromuid = 0;
     }
 
+    mess.length = sizeof submess;
     mess.args = &submess;
 
     submess.wcoord.x = atoi(argv[0]);
@@ -494,6 +508,7 @@ int s_brem(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
         mess.fromuid = 0;
     }
 
+    mess.length = sizeof submess;
     mess.args = &submess;
 
     submess.wcoord.x = atoi(argv[0]);
@@ -527,6 +542,7 @@ int s_pmine(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
     mess.fromuid = *pfrom;
 
+    mess.length = sizeof submess;
     mess.args = &submess;
 
     submess.mining = ((int)atoi(argv[0]) ? 1 : 0);
@@ -553,6 +569,7 @@ int s_schat(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
     mess.fromuid = 0;
 
+    mess.length = sizeof submess;
     mess.args = &submess;
 
     strncpy(submess.nickname, argv[0] , sizeof(submess.nickname));
@@ -583,6 +600,7 @@ int s_log(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
     mess.fromuid = 0;
 
+    mess.length = sizeof submess;
     mess.args = &submess;
 
     strncpy(submess.string, argv[0] , sizeof(submess.string));
@@ -611,6 +629,7 @@ int s_satstep(struct server_socket *src, uint32_t *pfrom, int argc, char **argv)
 
     mess.fromuid = 0;
 
+    mess.length = sizeof submess;
     mess.args = &submess;
 
     submess.satstep = (uint32_t)atoi(argv[0]);
@@ -637,6 +656,7 @@ int s_sat(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
     mess.fromuid = 0;
 
+    mess.length = sizeof submess;
     mess.args = &submess;
 
     submess.sat = (double)atof(argv[0]);
@@ -666,6 +686,7 @@ int s_fade(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
     mess.fromuid = *pfrom;
 
+    mess.length = 0;
     mess.args = NULL;
 
     uidlink = uid_link_find(src, mess.fromuid);
@@ -700,6 +721,7 @@ int s_user(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
     mess.fromuid = *pfrom;
 
+    mess.length = sizeof submess;
     mess.args = &submess;
 
     submess.model = (uint16_t) atoi(argv[0]);
@@ -758,6 +780,7 @@ int s_server(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) 
 
     mess.fromuid = 0;
 
+    mess.length = sizeof submess;
     mess.args = &submess;
 
     submess.ncoord.x = atoi(argv[0]);
@@ -880,6 +903,7 @@ int s_moveto(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) 
             mess.type = T_USER;
             SetFlagFrom(&mess);
             mess.fromuid = *pfrom;
+            mess.length = sizeof usubmess;
             mess.args = &usubmess;
 
             usubmess.model = (uint16_t) atoi(argv[3]);
@@ -922,6 +946,7 @@ int s_moveto(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) 
         mess.type = T_QUIT;
         SetFlagFrom(&mess);
         mess.fromuid = *pfrom;
+        mess.length = sizeof submess;
         mess.args = &submess;
         submess.numeric = 121; // NUM_BLACKHOLE_RECENTER
         strncpy(submess.desc, "User recentering to nonexistent space (blackhole)" , sizeof(submess.desc));
@@ -968,6 +993,7 @@ int s_movefrom(struct server_socket *src, uint32_t *pfrom, int argc, char **argv
                 mess.type = T_USER;
                 SetFlagFrom(&mess);
                 mess.fromuid = *pfrom;
+                mess.length = sizeof submess;
                 mess.args = &submess;
 
                 submess.model = (uint16_t) atoi(argv[3]);
@@ -1003,6 +1029,7 @@ int s_movefrom(struct server_socket *src, uint32_t *pfrom, int argc, char **argv
         mess.type = T_USER;
         SetFlagFrom(&mess);
         mess.fromuid = *pfrom;
+        mess.length = sizeof submess;
         mess.args = &submess;
 
         submess.model = (uint16_t) atoi(argv[3]);
@@ -1130,6 +1157,7 @@ int s_closing(struct server_socket *src, uint32_t *pfrom, int argc, char **argv)
             mess.type = T_CLOSING;
             ClrFlagFrom(&mess);
             mess.fromuid = 0;
+            mess.length = sizeof submess;
             mess.args = &submess;
             submess.numeric = atoi(argv[0]);
             strncpy(submess.desc, argv[1] , sizeof(submess.desc));
@@ -1158,6 +1186,7 @@ int s_closing(struct server_socket *src, uint32_t *pfrom, int argc, char **argv)
             mess.type = T_CLOSING;
             ClrFlagFrom(&mess);
             mess.fromuid = 0;
+            mess.length = sizeof submess;
             mess.args = &submess;
 
             submess.numeric = atoi(argv[0]);

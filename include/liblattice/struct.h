@@ -99,6 +99,7 @@ typedef struct lattice_message {
     int type;
     int flags;
     uint32_t fromuid;
+    int length;
     void * args;
 
 } lattice_message;

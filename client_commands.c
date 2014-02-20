@@ -39,6 +39,7 @@ int c_p(w_coord wcoord, b_coord bcoord) {
         mess.type = T_BUMP;
         ClrFlagFrom(&mess);
         mess.fromuid = 0;
+        mess.length = sizeof submess;
         mess.args = &submess;
         submess.wcoord = lattice_player.wpos;
         submess.bcoord = lattice_player.bpos;
