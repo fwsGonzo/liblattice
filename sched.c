@@ -31,7 +31,6 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <stdlib.h>
-#include <Judy.h>
 
 #include "lattice_config.h"
 #include "serversocket.h"
