@@ -21,16 +21,16 @@
 **
 */
 
-extern sched_usec_link *sched_add_usec_link(sched_usec_header *header, suseconds_t usec, int type, server_socket *socket);
+extern sched_usec_link *sched_add_usec_link(sched_usec_header *header, long usec, int type, server_socket *socket);
 extern void sched_del_usec_link(sched_usec_header *header, sched_usec_link *link);
-extern sched_usec_link *sched_find_usec_link(sched_usec_header *header, suseconds_t usec);
-extern sched_usec_link *sched_rfind_usec_link(sched_usec_header *header, suseconds_t usec);
+extern sched_usec_link *sched_find_usec_link(sched_usec_header *header, long usec);
+extern sched_usec_link *sched_rfind_usec_link(sched_usec_header *header, long usec);
 
-extern sched_sec_link *sched_add_sec_link(sched_header *header, time_t sec, int *ran_malloc);
+extern sched_sec_link *sched_add_sec_link(sched_header *header, long sec, int *ran_malloc);
 extern void sched_del_sec_link(sched_header *header, sched_sec_link *link);
 
-extern sched_sec_link *sched_find_sec_link(sched_header *header, time_t sec);
-extern sched_sec_link *sched_rfind_sec_link(sched_header *header, time_t sec);
+extern sched_sec_link *sched_find_sec_link(sched_header *header, long sec);
+extern sched_sec_link *sched_rfind_sec_link(sched_header *header, long sec);
 
 extern int sched_add(server_socket *socket, int type, struct timeval triggr_time);
 extern struct timeval *sched_whens_next(sched_header *header, struct timeval *t);

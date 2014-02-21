@@ -278,7 +278,7 @@ typedef struct lattice_bump {
 // ----------------------------------
 
 typedef struct sched_usec_link {
-    suseconds_t usec;
+    long usec;
     int type;
     server_socket *socket;
     struct sched_usec_link *prev;
@@ -292,7 +292,7 @@ typedef struct sched_usec_header {
 
 
 typedef struct sched_sec_link {
-    time_t sec;
+    long sec;
     sched_usec_header usec_header;
     struct sched_sec_link *prev;
     struct sched_sec_link *next;

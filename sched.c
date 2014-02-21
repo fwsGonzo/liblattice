@@ -49,7 +49,7 @@ int sched_add(server_socket *socket, int type, struct timeval triggr_time);
 // -----------------------------------------
 
 
-sched_usec_link *sched_add_usec_link(sched_usec_header *header, suseconds_t usec, int type, server_socket *socket) {
+sched_usec_link *sched_add_usec_link(sched_usec_header *header, long usec, int type, server_socket *socket) {
 
     sched_usec_link *newlink;
     sched_usec_link *p;
@@ -109,7 +109,7 @@ void sched_del_usec_link(sched_usec_header *header, sched_usec_link *link) {
     return;
 }
 
-sched_usec_link *sched_find_usec_link(sched_usec_header *header, suseconds_t usec) {
+sched_usec_link *sched_find_usec_link(sched_usec_header *header, long usec) {
     sched_usec_link *p;
     if (!header) return NULL;
     for (p = header->head; p; p = p->next)
@@ -119,7 +119,7 @@ sched_usec_link *sched_find_usec_link(sched_usec_header *header, suseconds_t use
     return NULL;
 }
 
-sched_usec_link *sched_rfind_usec_link(sched_usec_header *header, suseconds_t usec) {
+sched_usec_link *sched_rfind_usec_link(sched_usec_header *header, long usec) {
     sched_usec_link *p;
     if (!header) return NULL;
     for (p = header->tail; p; p = p->prev)
@@ -129,7 +129,7 @@ sched_usec_link *sched_rfind_usec_link(sched_usec_header *header, suseconds_t us
     return NULL;
 }
 
-sched_sec_link *sched_add_sec_link(sched_header *header, time_t sec, int *ran_malloc) {
+sched_sec_link *sched_add_sec_link(sched_header *header, long sec, int *ran_malloc) {
 
     sched_sec_link *newlink;
     sched_sec_link *p;
@@ -209,7 +209,7 @@ void sched_del_sec_link(sched_header *header, sched_sec_link *link) {
     return;
 }
 
-sched_sec_link *sched_find_sec_link(sched_header *header, time_t sec) {
+sched_sec_link *sched_find_sec_link(sched_header *header, long sec) {
     sched_sec_link *p;
     if (!header) return NULL;
     for (p = header->head; p; p = p->next)
@@ -219,7 +219,7 @@ sched_sec_link *sched_find_sec_link(sched_header *header, time_t sec) {
     return NULL;
 }
 
-sched_sec_link *sched_rfind_sec_link(sched_header *header, time_t sec) {
+sched_sec_link *sched_rfind_sec_link(sched_header *header, long sec) {
     sched_sec_link *p;
     if (!header) return NULL;
     for (p = header->tail; p; p = p->prev)
