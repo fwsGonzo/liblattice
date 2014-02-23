@@ -23,14 +23,22 @@
 
 
 #define _GNU_SOURCE
-#include <errno.h>
-#include <stdint.h>
-#include <sys/time.h>
-#include <time.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 #include <stdlib.h>
+#include <stdint.h>
+#include <time.h>
+
+#ifdef __linux__
+    #include <errno.h>
+    #include <sys/time.h>
+    #include <sys/socket.h>
+    #include <netinet/in.h>
+    #include <arpa/inet.h>
+#else
+    #include <windows.h>
+    #include <winsock2.h>
+    #include <ws2tcpip.h>
+    #include <stdio.h>
+#endif
 
 #include "lattice_config.h"
 #include "serversocket.h"
