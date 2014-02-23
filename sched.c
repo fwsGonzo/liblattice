@@ -26,10 +26,10 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <time.h>
+#include <sys/time.h>
 
 #ifdef __linux__
     #include <errno.h>
-    #include <sys/time.h>
     #include <sys/socket.h>
     #include <netinet/in.h>
     #include <arpa/inet.h>
