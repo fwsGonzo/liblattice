@@ -38,6 +38,19 @@
     #include <winsock2.h>
     #include <ws2tcpip.h>
     #include <stdio.h>
+
+# define timersub(a, b, result)                                               \
+  do {                                                                        \
+    (result)->tv_sec = (a)->tv_sec - (b)->tv_sec;                             \
+    (result)->tv_usec = (a)->tv_usec - (b)->tv_usec;                          \
+    if ((result)->tv_usec < 0) {                                              \
+      --(result)->tv_sec;                                                     \
+      (result)->tv_usec += 1000000;                                           \
+    }                                                                         \
+  } while (0)
+
+
+
 #endif
 
 #include "lattice_config.h"
