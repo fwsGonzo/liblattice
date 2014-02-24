@@ -43,6 +43,8 @@ int c_p(w_coord wcoord, b_coord bcoord) {
         mess.args = &submess;
         submess.wcoord = lattice_player.wpos;
         submess.bcoord = lattice_player.bpos;
+        submess.bad_wcoord = wcoord;
+        submess.bad_bcoord = bcoord;
         (*gcallback)(&mess);
         return 0;
     }

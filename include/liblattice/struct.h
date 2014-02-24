@@ -273,6 +273,9 @@ typedef struct lattice_bump {
     w_coord wcoord;
     b_coord bcoord;
 
+    w_coord bad_wcoord;
+    b_coord bad_bcoord;
+
 } lattice_bump;
 
 // ----------------------------------
