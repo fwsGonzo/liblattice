@@ -2,9 +2,9 @@
 #define COORDINATES_H
 
 // int coords
-typedef long int ix;
-typedef long int iy;
-typedef long int iz;
+typedef int32_t ix;
+typedef int32_t iy;
+typedef int32_t iz;
 
 // network coordinates
 typedef struct n_coord {
