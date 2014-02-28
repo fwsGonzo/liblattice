@@ -54,6 +54,14 @@
 #include "macros.h"
 //#include "numerics.h"
 
+#define IsWritable(fd) (                                                                                    \
+    (                                                                                                       \
+        ( FD_ISSET((fd), &rtest_set) && !FD_ISSET((fd), &wtest_set) ) ||                                    \
+        ( FD_ISSET((fd), &rtest_set) &&  FD_ISSET((fd), &wtest_set) && FD_ISSET((fd), &wready_set) )        \
+    )                                                                                                       \
+)
+
+
 // -1 on error
 ssize_t flush_write(server_socket *s, int closing) {
 
@@ -63,6 +71,8 @@ ssize_t flush_write(server_socket *s, int closing) {
     if (s->socket < 0) return(-1);
     if (!FD_ISSET(s->socket, &rtest_set) && !FD_ISSET(s->socket, &wtest_set)) return(-1);
     if (s->wlen <= 0) return(-1);
+
+    if (!IsWritable(s->socket)) return(0);
 
     //ret = write(s->socket, s->writebuf, s->wlen);
     ret = send(s->socket, s->writebuf, s->wlen, 0);
@@ -99,7 +109,7 @@ void flushall_write(void) {
     int fd;
 
     for (fd = 0; fd <= maxfd; fd++)
-        if ( (FD_ISSET(fd, &rtest_set) || FD_ISSET(fd, &wtest_set)) )
+        if ( IsWritable(fd) )
                 flush_write(socket_table+fd, 0);
 
     return;
