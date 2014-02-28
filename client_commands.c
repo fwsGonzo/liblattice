@@ -5,8 +5,8 @@
         #include <netinet/in.h>
         #include <arpa/inet.h>
 #else
-#include <windows.h>
 #include <winsock2.h>
+#include <windows.h>
 #include <ws2tcpip.h>
 #include <stdlib.h>
 #include <stdio.h>

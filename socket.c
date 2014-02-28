@@ -37,8 +37,8 @@
 	#include <stdarg.h>
         #include <string.h>
 #else
-#include <windows.h>
 #include <winsock2.h>
+#include <windows.h>
 #include <ws2tcpip.h>
 #include <stdlib.h>
 #endif
