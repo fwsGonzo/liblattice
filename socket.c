@@ -49,7 +49,7 @@
 #include "lattice_config.h"
 #include "struct.h"
 #include "globals.h"
-//#include "sched.h"
+#include "sched.h"
 #include "neighbors.h"
 #include "send.h"
 #include "macros.h"
@@ -218,7 +218,7 @@ void clearsock(server_socket *s) {
 
     del_neighbor(s->coord);
 
-    //sched_delfrom(&sched, s);
+    sched_delfrom(&sched, s);
 
     sendq_popall(s);
 
