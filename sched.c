@@ -65,6 +65,38 @@ int sched_add(server_socket *socket, int type, struct timeval triggr_time);
 
 // ----------------------------------------------------------------------
 
+int sched_server_retry(server_socket *socket) {
+
+/*
+    struct timeval tv;
+    server_socket *t;
+
+    //if (tracker) return 0;
+
+    if (!(t=connect_tracker())) {
+        gettimeofday(&now, NULL);
+        tv = now;
+        tv.tv_sec += SERVER_RETRY;
+
+        if (!sched_add(NULL, SCHED_SERVER_RETRY, tv)) {
+            return 0;
+        }
+    } else {
+        gettimeofday(&now, NULL);
+        tv = now;
+        tv.tv_sec += TRACKER_HANDSHAKE_TIMEOUT;
+
+        if (!sched_add(t, SCHED_TRACKER_HANDSHAKE_TIMEOUT, tv)) {
+            closesock(t, NOSLIDEOVER, NUM_SCHED, numstr(NUM_SCHED));
+        }
+
+
+    }
+*/
+
+
+    return 0;
+}
 
 
 // -----------------------------------------
@@ -370,6 +402,10 @@ int sched_process(int type, server_socket *socket) {
     //if (!socket) return 0; // nto all events are tied to a socket (eg blocksautosave)
 
     switch(type) {
+        case SCHED_SERVER_RETRY:
+            i=sched_server_retry(socket);
+        break;
+
         default:
             i=0;
         break;

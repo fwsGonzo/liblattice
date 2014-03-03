@@ -280,6 +280,8 @@ typedef struct lattice_bump {
 
 // ----------------------------------
 
+#define SCHED_SERVER_RETRY 1
+
 typedef struct sched_usec_link {
     long usec;
     int type;
