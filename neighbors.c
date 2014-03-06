@@ -193,6 +193,25 @@ void init_neighbor_table(void) {
 
 }
 
+server_socket *find_neighbor_bysock(server_socket *sock) {
+
+    server_socket *s;
+    int x;
+    int y;
+    int z;
+
+    if (!sock) return NULL;
+
+    for (x=0;x<3;x++) for (y=0;y<3;y++) for (z=0;z<3;z++)
+        if ((s=neighbor_table[x][y][z]))
+            if (s == sock)
+                return s;
+
+    return NULL;
+
+}
+
+
 server_socket *find_neighbor(n_coord coord) {
 
     int a,b,c;

@@ -38,6 +38,7 @@ extern int user_is_within_inner_border(w_coord wcoord, n_coord ncoord);
 extern int user_can_recenter_to_me(w_coord wcoord, n_coord from_ncoord);
 
 extern void init_neighbor_table(void);
+extern server_socket *find_neighbor_bysock(server_socket *sock);
 extern server_socket *find_neighbor(n_coord coord);
 extern int add_neighbor(n_coord coord, server_socket *s);
 extern int del_neighbor(n_coord coord);
