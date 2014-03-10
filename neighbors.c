@@ -25,6 +25,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <time.h>
+#include <sys/time.h>
 
 #ifdef __linux__
 	#include <sys/socket.h>
@@ -399,6 +401,7 @@ server_socket *connect_server(n_coord coord, struct in_addr ip, port_t port) {
     socket_table[sockfd].coord.y = coord.y;
     socket_table[sockfd].coord.z = coord.z;
 
+    gettimeofday(&now, NULL);
     tv = now;
     tv.tv_sec += SERVER_HANDSHAKE_TIMEOUT;
 
