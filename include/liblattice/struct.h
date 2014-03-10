@@ -281,6 +281,7 @@ typedef struct lattice_bump {
 // ----------------------------------
 
 #define SCHED_SERVER_RETRY 1
+#define SCHED_SERVER_HANDSHAKE_TIMEOUT 2
 
 typedef struct sched_usec_link {
     long usec;

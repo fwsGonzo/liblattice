@@ -21,6 +21,10 @@
 **
 */
 
+
+extern int sched_server_handshake_timeout(server_socket *socket);
+
+
 extern sched_usec_link *sched_add_usec_link(sched_usec_header *header, long usec, int type, server_socket *socket);
 extern void sched_del_usec_link(sched_usec_header *header, sched_usec_link *link);
 extern sched_usec_link *sched_find_usec_link(sched_usec_header *header, long usec);

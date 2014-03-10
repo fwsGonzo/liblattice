@@ -43,6 +43,7 @@
 #include "struct.h"
 #include "globals.h"
 #include "send.h"
+#include "sched.h"
 
 int ncoord_is_equal(n_coord a, n_coord b) {
 
@@ -289,6 +290,8 @@ server_socket *connect_server(n_coord coord, struct in_addr ip, port_t port) {
     int sockfd;
     struct sockaddr_in  serv_addr;
 
+    struct timeval tv;
+
     #ifdef _WIN32
         unsigned long blocking;
     #endif
@@ -395,6 +398,15 @@ server_socket *connect_server(n_coord coord, struct in_addr ip, port_t port) {
     socket_table[sockfd].coord.x = coord.x;
     socket_table[sockfd].coord.y = coord.y;
     socket_table[sockfd].coord.z = coord.z;
+
+    tv = now;
+    tv.tv_sec += SERVER_HANDSHAKE_TIMEOUT;
+
+    if (!sched_add(socket_table+sockfd, SCHED_SERVER_HANDSHAKE_TIMEOUT, tv)) {
+        closesock(socket_table+sockfd);
+    }
+
+
 
 /*
     if (sendto_one(socket_table+sockfd, "SERVER %d %d %d %s %d %d\n", lattice_player.centeredon.x,

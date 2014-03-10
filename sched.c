@@ -99,6 +99,17 @@ int sched_server_retry(server_socket *socket) {
 }
 
 
+
+int sched_server_handshake_timeout(server_socket *socket) {
+
+    if (!socket) return 0;
+
+    closesock(socket);
+
+    return 1;
+}
+
+
 // -----------------------------------------
 
 
@@ -405,7 +416,9 @@ int sched_process(int type, server_socket *socket) {
         case SCHED_SERVER_RETRY:
             i=sched_server_retry(socket);
         break;
-
+        case SCHED_SERVER_HANDSHAKE_TIMEOUT:
+            i=sched_server_handshake_timeout(socket);
+        break;
         default:
             i=0;
         break;

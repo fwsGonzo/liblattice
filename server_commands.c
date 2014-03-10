@@ -18,6 +18,7 @@
 #include "send.h"
 #include "globals.h"
 #include "neighbors.h"
+#include "sched.h"
 
 int s_ping(struct server_socket *src, int argc, char **argv) {
 
@@ -34,6 +35,8 @@ int s_iamserver(struct server_socket *src, int argc, char **argv) {
     if (!src) return 0;
 
     SetFlagReg(src);
+
+    sched_deltypefrom(&sched, src, SCHED_SERVER_HANDSHAKE_TIMEOUT);
 
     return 0;
 
