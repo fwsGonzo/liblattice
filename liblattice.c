@@ -33,38 +33,35 @@
 #include "sched.h"
 
 struct message s_mestab[] = {
-//    { "whoson", s_whoson, FLAG_REG },
-//    { "server", s_server, 0 },
-//    { "serverack", s_serverack, 0 },
-//    { "kill", s_kill, 0 },
-    { "ping", s_ping, 0 },
-    { "p", s_p, 0 },
-    { "quit", s_quit, 0 },
-    { "pc", s_pc, 0 },
-    { "pr", s_pr, 0 },
-    { "ph", s_ph, 0 },
-    { "chat", s_chat, 0 },
-    { "action", s_action, 0 },
-    { "s", s_s, 0 },
-    { "sc", s_sc, 0 },
-    { "bo", s_bo, 0 },
-    { "mo", s_mo, 0 },
-    { "badd", s_badd, 0 },
-    { "bset", s_bset, 0 },
-    { "brem", s_brem, 0 },
-    { "pmine", s_pmine, 0 },
-    { "schat", s_schat, 0 },
-    { "log", s_log, 0 },
-    { "satstep", s_satstep, 0 },
-    { "sat", s_sat, 0 },
-    { "fade", s_fade, 0 },
-    { "user", s_user, 0 },
-    { "server", s_server, 0 },
-    { "delserver", s_delserver, 0 },
-    { "moveto", s_moveto, 0 },
-    { "movefrom", s_movefrom, 0 },
-    { "trackerfailure", s_trackerfailure, 0 },
-    { "closing", s_closing, 0 },
+    { "ping", s_ping, FLAG_REG },
+    { "iamserver", s_iamserver, 0 },
+    { "p", s_p, FLAG_REG },
+    { "quit", s_quit, FLAG_REG },
+    { "pc", s_pc, FLAG_REG },
+    { "pr", s_pr, FLAG_REG },
+    { "ph", s_ph, FLAG_REG },
+    { "chat", s_chat, FLAG_REG },
+    { "action", s_action, FLAG_REG },
+    { "s", s_s, FLAG_REG },
+    { "sc", s_sc, FLAG_REG },
+    { "bo", s_bo, FLAG_REG },
+    { "mo", s_mo, FLAG_REG },
+    { "badd", s_badd, FLAG_REG },
+    { "bset", s_bset, FLAG_REG },
+    { "brem", s_brem, FLAG_REG },
+    { "pmine", s_pmine, FLAG_REG },
+    { "schat", s_schat, FLAG_REG },
+    { "log", s_log, FLAG_REG },
+    { "satstep", s_satstep, FLAG_REG },
+    { "sat", s_sat, FLAG_REG },
+    { "fade", s_fade, FLAG_REG },
+    { "user", s_user, FLAG_REG },
+    { "server", s_server, FLAG_REG },
+    { "delserver", s_delserver, FLAG_REG },
+    { "moveto", s_moveto, FLAG_REG },
+    { "movefrom", s_movefrom, FLAG_REG },
+    { "trackerfailure", s_trackerfailure, FLAG_REG },
+    { "closing", s_closing, FLAG_REG },
     { (char *) NULL, (int (*)()) NULL, 0 }
 };
 
@@ -317,14 +314,14 @@ void lattice_process() {
 
                     if (!find_command->func) {s->rlen = 0; continue;}
 
-/*
+
                     if ( (find_command->flags & FLAG_REG) && (!TstFlagReg(s)) ) {
-                        closesock(s,NOSLIDEOVER, NUM_PROTO, numstr(NUM_PROTO));
+                        closesock(s);
                         //s->rlen = 0; // done in closesock()
                         break;
                     }
 
-*/
+
 
                     if (isalpha(*arg_v[0])) {
 

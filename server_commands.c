@@ -29,6 +29,16 @@ int s_ping(struct server_socket *src, int argc, char **argv) {
 
 }
 
+int s_iamserver(struct server_socket *src, int argc, char **argv) {
+
+    if (!src) return 0;
+
+    SetFlagReg(src);
+
+    return 0;
+
+}
+
 int s_p(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
     lattice_message mess;
