@@ -109,6 +109,34 @@ int sched_server_handshake_timeout(server_socket *socket) {
     return 1;
 }
 
+int sched_server_send_ping(server_socket *socket) {
+
+    struct timeval tv;
+
+    if (!socket) return 0;
+
+    if (sendto_one(socket, "PING\n")) return 1;
+
+    gettimeofday(&now, NULL);
+    tv = now;
+    tv.tv_sec += SERVER_PING_TIMEOUT;
+
+    if (!sched_add(socket, SCHED_SERVER_PING_TIMEOUT, tv)) {
+        closesock(socket);
+        return 1;
+    }
+
+    return 0;
+}
+
+int sched_server_ping_timeout(server_socket *socket) {
+
+    if (!socket) return 0;
+
+    closesock(socket);
+
+    return 1;
+}
 
 // -----------------------------------------
 
@@ -418,6 +446,12 @@ int sched_process(int type, server_socket *socket) {
         break;
         case SCHED_SERVER_HANDSHAKE_TIMEOUT:
             i=sched_server_handshake_timeout(socket);
+        break;
+        case SCHED_SERVER_SEND_PING:
+            i=sched_server_send_ping(socket);
+        break;
+        case SCHED_SERVER_PING_TIMEOUT:
+            i=sched_server_ping_timeout(socket);
         break;
         default:
             i=0;

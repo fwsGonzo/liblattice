@@ -34,6 +34,7 @@
 
 struct message s_mestab[] = {
     { "ping", s_ping, FLAG_REG },
+    { "pong", s_pong, FLAG_REG },
     { "iamserver", s_iamserver, 0 },
     { "p", s_p, FLAG_REG },
     { "quit", s_quit, FLAG_REG },

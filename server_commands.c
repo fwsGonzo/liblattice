@@ -1,5 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+#include <sys/time.h>
 
 #ifdef __linux__
         #include <sys/socket.h>
@@ -30,13 +32,53 @@ int s_ping(struct server_socket *src, int argc, char **argv) {
 
 }
 
+int s_pong(struct server_socket *src, int argc, char **argv) {
+
+    struct timeval pingtime;
+
+    if (!src) return 0;
+
+    sched_deltypefrom(&sched, src, SCHED_SERVER_PING_TIMEOUT);
+
+    if(SERVER_SEND_PING > 0) {
+
+        gettimeofday(&now, NULL);
+        pingtime = now;
+        pingtime.tv_sec += SERVER_SEND_PING;
+
+        if (!sched_add(src, SCHED_SERVER_SEND_PING, pingtime)) {
+            closesock(src);
+            return 1;
+        }
+    }
+
+    return 0;
+
+}
+
 int s_iamserver(struct server_socket *src, int argc, char **argv) {
+
+    struct timeval pingtime;
 
     if (!src) return 0;
 
     SetFlagReg(src);
 
     sched_deltypefrom(&sched, src, SCHED_SERVER_HANDSHAKE_TIMEOUT);
+
+    if (SERVER_SEND_PING > 0) {
+
+        gettimeofday(&now, NULL);
+        pingtime = now;
+        pingtime.tv_sec += SERVER_SEND_PING;
+
+        if (!sched_add(src, SCHED_SERVER_SEND_PING, pingtime)) {
+            closesock(src);
+            return 1;
+        }
+
+    }
+
 
     return 0;
 
