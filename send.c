@@ -378,9 +378,9 @@ int sendto_allservers(char *format, ...) {
     int z;
     int i;
 
-    if (!format) return 0;
-
     va_list args;
+
+    if (!format) return 0;
 
     va_start(args, format);
 
@@ -411,9 +411,9 @@ int sendto_allservers_butone(server_socket *butme, char *format, ...) {
     int z;
     int i;
 
-    if (!butme || !format) return 0;
-
     va_list args;
+
+    if (!butme || !format) return 0;
 
     va_start(args, format);
 
