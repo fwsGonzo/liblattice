@@ -63,9 +63,9 @@
 
 
 // -1 on error
-ssize_t flush_write(server_socket *s, int closing) {
+int flush_write(server_socket *s, int closing) {
 
-    ssize_t ret;
+    int ret;
 
     if (!s) return(-1);
     if (s->socket < 0) return(-1);

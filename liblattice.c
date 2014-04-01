@@ -230,7 +230,7 @@ void lattice_process() {
 
     char read_block[READ_LENGTH];
 
-    ssize_t read_length;
+    int read_length;
     size_t read_move_length;
     size_t read_index;
     size_t check_length;

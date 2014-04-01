@@ -23,7 +23,7 @@
 
 #include "serversocket.h"
 
-extern ssize_t flush_write(server_socket *s, int closing);
+extern int flush_write(server_socket *s, int closing);
 extern void flushall_write(void);
 extern int sendq_add(server_socket *s, void *data, int length);
 extern int sendq_pop(server_socket *s, int length);
