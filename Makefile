@@ -1,3 +1,5 @@
+# needs Ws2_32.lib for visual studio
+
 # source files
 SOURCE = liblattice.c globals.c socket.c send.c neighbors.c server_commands.c client_commands.c sched.c forwin.c
 OUTPUT = liblattice.a
