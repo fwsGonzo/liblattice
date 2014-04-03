@@ -2,19 +2,24 @@
 
 #include <stdlib.h>
 #include <string.h>
+
 #ifdef __linux__
-	#include <sys/socket.h>
-	#include <netinet/in.h>
-	#include <arpa/inet.h>
-	#include <errno.h>
-	#include <sys/resource.h>
-        #include <netdb.h>
+    #include <sys/socket.h>
+    #include <netinet/in.h>
+    #include <arpa/inet.h>
+    #include <errno.h>
+    #include <sys/resource.h>
+    #include <netdb.h>
 #else
-#include <winsock2.h>
-#include <windows.h>
-#include <ws2tcpip.h>
-#include <stdio.h>
+    #include <winsock2.h>
+    #include <windows.h>
+    #include <ws2tcpip.h>
+    #include <stdio.h>
+    #ifndef __MINGW32__
+        #define strcasecmp(a, b) _stricmp((a), (b))
+    #endif
 #endif
+
 
 #include <sys/time.h>
 #include <unistd.h>
