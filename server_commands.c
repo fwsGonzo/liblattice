@@ -1,9 +1,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <sys/time.h>
 
 #ifdef __linux__
+#include <sys/time.h>
         #include <sys/socket.h>
         #include <netinet/in.h>
         #include <arpa/inet.h>
@@ -12,6 +12,11 @@
 #include <windows.h>
 #include <ws2tcpip.h>
 #include <stdio.h>
+#ifndef __MINGW32__
+#include "forwin.h"
+#else
+#include <sys/time.h>
+#endif
 #endif
 
 #include "lattice_config.h"

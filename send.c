@@ -27,12 +27,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include <getopt.h>
 #include <string.h>
 #include <stdarg.h>
-#include <unistd.h>
 
 #ifdef __linux__
+#include <getopt.h>
+#include <unistd.h>
 	#include <sys/types.h>
 	#include <sys/stat.h>
 	#include <fcntl.h>
@@ -44,6 +44,10 @@
 #include <winsock2.h>
 #include <windows.h>
 #include <ws2tcpip.h>
+#ifdef __MINGW32__
+#include <getopt.h>
+#include <unistd.h>
+#endif
 #endif
 
 #include "lattice_config.h"

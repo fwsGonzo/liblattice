@@ -23,12 +23,12 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <stdio.h>
 #include <time.h>
-#include <sys/time.h>
 
 #ifdef __linux__
+#include <sys/time.h>
+#include <unistd.h>
 	#include <sys/socket.h>
 	#include <sys/select.h>
 	#include <netinet/in.h>
@@ -38,6 +38,12 @@
 #include <winsock2.h>
 #include <windows.h>
 #include <ws2tcpip.h>
+#ifndef __MINGW32__
+ #include "forwin.h"
+#else
+ #include <sys/time.h>
+ #include <unistd.h>
+#endif
 #endif
 
 #include "lattice_config.h"

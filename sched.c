@@ -26,9 +26,9 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <time.h>
-#include <sys/time.h>
 
 #ifdef __linux__
+#include <sys/time.h>
     #include <errno.h>
     #include <sys/socket.h>
     #include <netinet/in.h>
@@ -38,7 +38,9 @@
     #include <windows.h>
     #include <ws2tcpip.h>
     #include <stdio.h>
-
+#ifdef __MINGW32__
+#include <sys/time.h>
+#endif
 # define timersub(a, b, result)                                               \
   do {                                                                        \
     (result)->tv_sec = (a)->tv_sec - (b)->tv_sec;                             \
@@ -49,7 +51,9 @@
     }                                                                         \
   } while (0)
 
-
+#ifndef __MINGW32__
+#include "forwin.h"
+#endif
 
 #endif
 

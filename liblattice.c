@@ -3,7 +3,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <ctype.h>
+
 #ifdef __linux__
+#include <sys/time.h>
+#include <unistd.h>
     #include <sys/socket.h>
     #include <netinet/in.h>
     #include <arpa/inet.h>
@@ -17,13 +21,13 @@
     #include <stdio.h>
     #ifndef __MINGW32__
         #define strcasecmp(a, b) _stricmp((a), (b))
+        #include "forwin.h"
+    #else
+        #include <sys/time.h>
+        #include <unistd.h>
     #endif
 #endif
 
-
-#include <sys/time.h>
-#include <unistd.h>
-#include <ctype.h>
 
 #include "lattice_config.h"
 #include "socket.h"
