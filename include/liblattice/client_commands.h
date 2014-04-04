@@ -1,23 +1,41 @@
 #ifndef CLIENT_COMMANDS_H
 #define CLIENT_COMMANDS_H
 
-extern int c_p(w_coord wcoord, b_coord bcoord);
-extern int c_p_empty(void);
-extern int c_quit(char *reason);
-extern int c_pc(uint32_t color);
-extern int c_pr(head_rot rot);
-extern int c_ph(hand_hold hand);
-extern int c_chat(char *string);
-extern int c_action(char *string);
-extern int c_s(int32_t mid, int32_t sid);
-extern int c_sc(int32_t csid);
-extern int c_bo(w_coord wcoord, b_coord bcoord, int32_t id);
-extern int c_mo(w_coord wcoord, b_coord bcoord, int32_t id, int32_t count);
-extern int c_badd(w_coord wcoord, b_coord bcoord, block_t block);
-extern int c_bset(w_coord wcoord, b_coord bcoord, block_t block);
-extern int c_brem(w_coord wcoord, b_coord bcoord);
-extern int c_pmine(int mining);
-extern int c_schat(char *string);
-extern int c_lusers();
+
+  #if defined(_WIN32) && !defined(__MINGW32__)
+
+    #ifndef LIBLATTICE_API
+      #ifdef LIBLATTICE_EXPORTS
+        #define LIBLATTICE_API __declspec(dllexport)
+      #else
+        #define LIBLATTICE_API __declspec(dllimport)
+      #endif
+    #endif
+
+  #else
+
+    #define LIBLATTICE_API extern
+
+  #endif
+
+
+  LIBLATTICE_API int c_p(w_coord wcoord, b_coord bcoord);
+  LIBLATTICE_API int c_p_empty(void);
+  LIBLATTICE_API int c_quit(char *reason);
+  LIBLATTICE_API int c_pc(uint32_t color);
+  LIBLATTICE_API int c_pr(head_rot rot);
+  LIBLATTICE_API int c_ph(hand_hold hand);
+  LIBLATTICE_API int c_chat(char *string);
+  LIBLATTICE_API int c_action(char *string);
+  LIBLATTICE_API int c_s(int32_t mid, int32_t sid);
+  LIBLATTICE_API int c_sc(int32_t csid);
+  LIBLATTICE_API int c_bo(w_coord wcoord, b_coord bcoord, int32_t id);
+  LIBLATTICE_API int c_mo(w_coord wcoord, b_coord bcoord, int32_t id, int32_t count);
+  LIBLATTICE_API int c_badd(w_coord wcoord, b_coord bcoord, block_t block);
+  LIBLATTICE_API int c_bset(w_coord wcoord, b_coord bcoord, block_t block);
+  LIBLATTICE_API int c_brem(w_coord wcoord, b_coord bcoord);
+  LIBLATTICE_API int c_pmine(int mining);
+  LIBLATTICE_API int c_schat(char *string);
+  LIBLATTICE_API int c_lusers();
 
 #endif

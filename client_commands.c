@@ -1,15 +1,15 @@
 #include <stdlib.h>
 
 #ifdef __linux__
-        #include <sys/socket.h>
-        #include <netinet/in.h>
-        #include <arpa/inet.h>
+  #include <sys/socket.h>
+  #include <netinet/in.h>
+  #include <arpa/inet.h>
 #else
-#include <winsock2.h>
-#include <windows.h>
-#include <ws2tcpip.h>
-#include <stdlib.h>
-#include <stdio.h>
+  #include <winsock2.h>
+  #include <windows.h>
+  #include <ws2tcpip.h>
+  #include <stdlib.h>
+  #include <stdio.h>
 #endif
 
 #include "lattice_config.h"
@@ -18,6 +18,10 @@
 #include "send.h"
 #include "globals.h"
 #include "neighbors.h"
+
+#if defined(_WIN32) && !defined(__MINGW32__)
+  #include "client_commands.h"
+#endif
 
 int c_p(w_coord wcoord, b_coord bcoord) {
 
