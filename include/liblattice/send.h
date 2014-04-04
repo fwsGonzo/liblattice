@@ -21,19 +21,24 @@
 **
 */
 
-#include "serversocket.h"
+#ifndef SEND_H
+#define SEND_H
 
-extern int flush_write(server_socket *s, int closing);
-extern void flushall_write(void);
-extern int sendq_add(server_socket *s, void *data, int length);
-extern int sendq_pop(server_socket *s, int length);
-extern int sendq_flush(server_socket *s);
-extern int writeto(server_socket *s, const void *buf, size_t count);
+  #include "serversocket.h"
 
-extern int sendto_one(server_socket *entry, char *format, ...);
-extern int sendto_centeredclients(char *format, ...);
-extern int sendto_sidedclients(char *format, ...);
-extern int sendto_allclients(char *format, ...);
-extern int sendto_allclients_butone(server_socket *butme, char *format, ...);
-extern int sendto_allservers(char *format, ...);
-extern int sendto_allservers_butone(server_socket *butme, char *format, ...);
+  extern int flush_write(server_socket *s, int closing);
+  extern void flushall_write(void);
+  extern int sendq_add(server_socket *s, void *data, int length);
+  extern int sendq_pop(server_socket *s, int length);
+  extern int sendq_flush(server_socket *s);
+  extern int writeto(server_socket *s, const void *buf, size_t count);
+
+  extern int sendto_one(server_socket *entry, char *format, ...);
+  extern int sendto_centeredclients(char *format, ...);
+  extern int sendto_sidedclients(char *format, ...);
+  extern int sendto_allclients(char *format, ...);
+  extern int sendto_allclients_butone(server_socket *butme, char *format, ...);
+  extern int sendto_allservers(char *format, ...);
+  extern int sendto_allservers_butone(server_socket *butme, char *format, ...);
+
+#endif

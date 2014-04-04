@@ -1,3 +1,6 @@
+#ifndef CLIENT_COMMANDS_H
+#define CLIENT_COMMANDS_H
+
 extern int c_p(w_coord wcoord, b_coord bcoord);
 extern int c_p_empty(void);
 extern int c_quit(char *reason);
@@ -17,3 +20,4 @@ extern int c_pmine(int mining);
 extern int c_schat(char *string);
 extern int c_lusers();
 
+#endif

@@ -21,13 +21,15 @@
 **
 */
 
+#ifndef MACROS_H
+#define MACROS_H
 
-#define my_min(x, y) ((x) < (y)) ? (x) : (y)
-#define my_max(x, y) ((x) > (y)) ? (x) : (y)
+  #define my_min(x, y) ((x) < (y)) ? (x) : (y)
+  #define my_max(x, y) ((x) > (y)) ? (x) : (y)
 
-#define sendq_popall(x) sendq_pop((x), (x->sendq_length))
+  #define sendq_popall(x) sendq_pop((x), (x->sendq_length))
 
-#define NOSLIDEOVER 0
-#define SLIDEOVER   1
+  #define NOSLIDEOVER 0
+  #define SLIDEOVER   1
 
-
+#endif

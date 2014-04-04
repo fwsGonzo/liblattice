@@ -21,29 +21,33 @@
 **
 */
 
-extern int ncoord_is_equal(n_coord a, n_coord b);
-extern n_coord wcoord_to_ncoord(w_coord wcoord);
+#ifndef NEIGHBORS_H
+#define NEIGHBORS_H
 
-extern int serv_can_connect_to_me(n_coord coord);
-extern int serv_can_connect_to_serv(n_coord coord_a, n_coord coord_b);
-extern int serv_in_range_of_serv(n_coord center, n_coord side);
+  extern int ncoord_is_equal(n_coord a, n_coord b);
+  extern n_coord wcoord_to_ncoord(w_coord wcoord);
 
-extern int user_is_within_server_border(w_coord wcoord, n_coord ncoord);
-extern int user_can_center_to_me(w_coord wcoord);
+  extern int serv_can_connect_to_me(n_coord coord);
+  extern int serv_can_connect_to_serv(n_coord coord_a, n_coord coord_b);
+  extern int serv_in_range_of_serv(n_coord center, n_coord side);
 
-extern int user_is_within_outer_border(w_coord wcoord, n_coord ncoord);
-extern int user_can_walk_on_me(w_coord wcoord);
+  extern int user_is_within_server_border(w_coord wcoord, n_coord ncoord);
+  extern int user_can_center_to_me(w_coord wcoord);
 
-extern int user_is_within_inner_border(w_coord wcoord, n_coord ncoord);
-extern int user_can_recenter_to_me(w_coord wcoord, n_coord from_ncoord);
+  extern int user_is_within_outer_border(w_coord wcoord, n_coord ncoord);
+  extern int user_can_walk_on_me(w_coord wcoord);
 
-extern void init_neighbor_table(void);
-extern server_socket *find_neighbor_bysock(server_socket *sock);
-extern server_socket *find_neighbor(n_coord coord);
-extern int add_neighbor(n_coord coord, server_socket *s);
-extern int del_neighbor(n_coord coord);
+  extern int user_is_within_inner_border(w_coord wcoord, n_coord ncoord);
+  extern int user_can_recenter_to_me(w_coord wcoord, n_coord from_ncoord);
 
-extern server_socket *connect_server(n_coord coord, struct in_addr ip, port_t port);
-extern void disconnect_servers(void);
-extern void recenter_neighbors(n_coord newcenter);
+  extern void init_neighbor_table(void);
+  extern server_socket *find_neighbor_bysock(server_socket *sock);
+  extern server_socket *find_neighbor(n_coord coord);
+  extern int add_neighbor(n_coord coord, server_socket *s);
+  extern int del_neighbor(n_coord coord);
 
+  extern server_socket *connect_server(n_coord coord, struct in_addr ip, port_t port);
+  extern void disconnect_servers(void);
+  extern void recenter_neighbors(n_coord newcenter);
+
+#endif
