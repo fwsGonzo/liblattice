@@ -22,6 +22,7 @@
     #ifndef __MINGW32__
         #define strcasecmp(a, b) _stricmp((a), (b))
         #include "forwin.h"
+        #include "liblattice.h"
     #else
         #include <sys/time.h>
         #include <unistd.h>
