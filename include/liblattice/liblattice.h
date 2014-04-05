@@ -39,7 +39,7 @@
   LIBLATTICE_API int lattice_select(struct timeval *ptimeout);
   LIBLATTICE_API void lattice_process(void);
   LIBLATTICE_API int lattice_send(lattice_message *msg);
-  LIBLATTICE_API void lattice_flush();
+  LIBLATTICE_API void lattice_flush(void);
   LIBLATTICE_API int lattice_connect(char *ipstr, uint16_t port);
 
 

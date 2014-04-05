@@ -228,12 +228,12 @@ int lattice_select(struct timeval *pt) { // pointer to timeout
 
 }
 
-void lattice_flush() {
+void lattice_flush(void) {
     flushall_write();
     return;
 }
 
-void lattice_process() {
+void lattice_process(void) {
 
     server_socket *s;
     int fd;
