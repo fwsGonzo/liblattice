@@ -529,5 +529,44 @@ int lattice_connect(char *ipstr, uint16_t port) {
 }
 
 
+int lattice_setplayer(lattice_player_t *player) {
 
+    if (!player) return -1;
+    if (!player->nickname) return -1;
+
+    lattice_player.userid = player->userid;
+    lattice_player.flags = player->flags;
+    lattice_player.model = player->model;
+    lattice_player.color = player->color;
+    lattice_player.wpos.x = player->wpos.x;
+    lattice_player.wpos.y = player->wpos.y;
+    lattice_player.wpos.z = player->wpos.z;
+    lattice_player.bpos.x = player->bpos.x;
+    lattice_player.bpos.y = player->bpos.y;
+    lattice_player.bpos.z = player->bpos.z;
+    lattice_player.hrot.xrot = player->hrot.xrot;
+    lattice_player.hrot.yrot = player->hrot.yrot;
+    lattice_player.hhold.item_id = player->hhold.item_id;
+    lattice_player.hhold.item_type = player->hhold.item_type;
+    lattice_player.usercolor = player->usercolor;
+    lattice_player.burstdist = player->burstdist;
+    lattice_player.mining = player->mining;
+
+    if (lattice_player.nickname) free(lattice_player.nickname);
+
+    lattice_player.nickname = strdup(player->nickname);
+
+    lattice_player.centeredon.x = lattice_player.wpos.x >> 8;
+    lattice_player.centeredon.y = lattice_player.wpos.y >> 8;
+    lattice_player.centeredon.z = lattice_player.wpos.z >> 8;
+    lattice_player.my_min_wcoord.x = lattice_player.centeredon.x << 8;
+    lattice_player.my_min_wcoord.y = lattice_player.centeredon.y << 8;
+    lattice_player.my_min_wcoord.z = lattice_player.centeredon.z << 8;
+    lattice_player.my_max_wcoord.x = (lattice_player.centeredon.x << 8) | 0x000000FF;
+    lattice_player.my_max_wcoord.y = (lattice_player.centeredon.y << 8) | 0x000000FF;
+    lattice_player.my_max_wcoord.z = (lattice_player.centeredon.z << 8) | 0x000000FF;
+
+    return 0;
+
+}
 
