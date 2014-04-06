@@ -532,7 +532,8 @@ int lattice_connect(char *ipstr, uint16_t port) {
 int lattice_setplayer(lattice_player_t *player) {
 
     if (!player) return -1;
-    if (!player->nickname) return -1;
+    if (!player->nickname) return -2;
+    if (!*player->nickname) return -3;
 
     lattice_player.userid = player->userid;
     lattice_player.flags = player->flags;
