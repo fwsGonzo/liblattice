@@ -470,13 +470,15 @@ int lattice_connect(char *ipstr, uint16_t port) {
     struct in_addr ip;
     struct hostent *he;
 
+    int error;
+
     server_socket *p;
 
     lattice_message mess;
 
-    if (!ipstr || !*ipstr) return -2;
+    if (!ipstr || !*ipstr) return -10;
 
-    if (!lattice_player.nickname || !*lattice_player.nickname) return -3;
+    if (!lattice_player.nickname || !*lattice_player.nickname) return -11;
 
     he = gethostbyname (ipstr);
 
@@ -489,9 +491,9 @@ int lattice_connect(char *ipstr, uint16_t port) {
         ip.s_addr = inet_addr(ipstr);
     }
 
-    p = connect_server(lattice_player.centeredon, ip, port);
+    p = connect_server(lattice_player.centeredon, ip, port, &error);
 
-    if (!p) return -4;
+    if (!p) return error;
 
     neighbor_table[1][1][1]=p;
 
@@ -503,7 +505,7 @@ int lattice_connect(char *ipstr, uint16_t port) {
 
     (*gcallback)(&mess);
 
-    return (sendto_one(neighbor_table[1][1][1],
+    if(sendto_one(neighbor_table[1][1][1],
                        //                              wx  wy  wz bx by bz  HEAD  HAND
                        "CENTEREDINTRO %lu %d %u %s %d %u %u %u %d %d %d %d %d %d %d %d %u\n",
                        lattice_player.userid,
@@ -523,8 +525,9 @@ int lattice_connect(char *ipstr, uint16_t port) {
                        lattice_player.hhold.item_type,
                        lattice_player.mining,
                        lattice_player.usercolor
-                       ));
+                       )) return -12;
 
+    return 0;
 
 }
 

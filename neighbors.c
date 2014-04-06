@@ -293,7 +293,7 @@ int del_neighbor(n_coord coord) {
 }
 
 
-server_socket *connect_server(n_coord coord, struct in_addr ip, port_t port) {
+server_socket *connect_server(n_coord coord, struct in_addr ip, port_t port, int *error) {
 
     int sockfd;
     struct sockaddr_in  serv_addr;
@@ -305,12 +305,14 @@ server_socket *connect_server(n_coord coord, struct in_addr ip, port_t port) {
     #endif
 
     if (!serv_in_range_of_serv(lattice_player.centeredon, coord)) {
+        if(error) *error = -1;
         return NULL;
     }
 
     sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
     if (sockfd < 0) {
+        if(error) *error = -2;
         return NULL;
     }
 
@@ -326,6 +328,7 @@ server_socket *connect_server(n_coord coord, struct in_addr ip, port_t port) {
         #else
                 closesocket(sockfd);
         #endif
+        if(error) *error = -3;
         return NULL;
     }
 
@@ -359,6 +362,7 @@ server_socket *connect_server(n_coord coord, struct in_addr ip, port_t port) {
         #else
                 closesocket(sockfd);
         #endif
+        if(error) *error = -4;
         return NULL;
     }
 
@@ -375,6 +379,7 @@ server_socket *connect_server(n_coord coord, struct in_addr ip, port_t port) {
         #else
                 closesocket(sockfd);
         #endif
+        if(error) *error = -5;
         return NULL;
     }
 
@@ -413,6 +418,8 @@ server_socket *connect_server(n_coord coord, struct in_addr ip, port_t port) {
 
     if (!sched_add(socket_table+sockfd, SCHED_SERVER_HANDSHAKE_TIMEOUT, tv)) {
         closesock(socket_table+sockfd);
+        if(error) *error = -6;
+        return NULL;
     }
 
 

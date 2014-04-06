@@ -849,7 +849,7 @@ int s_server(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) 
     submess.ip.s_addr = inet_addr(argv[3]);
     submess.port = atoi(argv[4]);
 
-    p = connect_server(submess.ncoord, submess.ip, submess.port);
+    p = connect_server(submess.ncoord, submess.ip, submess.port, NULL);
 
     if (!p) return 0;
 
