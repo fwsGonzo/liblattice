@@ -283,8 +283,8 @@ int s_chat(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
     mess.length = sizeof submess;
     mess.args = &submess;
 
-    strncpy(submess.string, argv[0] , sizeof(submess.string));
-    submess.string[sizeof(submess.string)-1]='\0';
+    strncpy(submess.chat_text, argv[0] , sizeof(submess.chat_text));
+    submess.chat_text[sizeof(submess.chat_text)-1]='\0';
 
     (*gcallback)(&mess);
 
@@ -314,8 +314,8 @@ int s_action(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) 
     mess.length = sizeof submess;
     mess.args = &submess;
 
-    strncpy(submess.string, argv[0] , sizeof(submess.string));
-    submess.string[sizeof(submess.string)-1]='\0';
+    strncpy(submess.action_text, argv[0] , sizeof(submess.action_text));
+    submess.action_text[sizeof(submess.action_text)-1]='\0';
 
     (*gcallback)(&mess);
 
@@ -635,8 +635,8 @@ int s_schat(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
     strncpy(submess.nickname, argv[0] , sizeof(submess.nickname));
     submess.nickname[sizeof(submess.nickname)-1]='\0';
     submess.color = (uint32_t)atoi(argv[1]);
-    strncpy(submess.string, argv[2] , sizeof(submess.string));
-    submess.string[sizeof(submess.string)-1]='\0';
+    strncpy(submess.schat_text, argv[2] , sizeof(submess.schat_text));
+    submess.schat_text[sizeof(submess.schat_text)-1]='\0';
 
     (*gcallback)(&mess);
 
@@ -663,8 +663,8 @@ int s_log(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
     mess.length = sizeof submess;
     mess.args = &submess;
 
-    strncpy(submess.string, argv[0] , sizeof(submess.string));
-    submess.string[sizeof(submess.string)-1]='\0';
+    strncpy(submess.log_text, argv[0] , sizeof(submess.log_text));
+    submess.log_text[sizeof(submess.log_text)-1]='\0';
 
     (*gcallback)(&mess);
 

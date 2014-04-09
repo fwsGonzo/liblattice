@@ -124,19 +124,19 @@ int c_ph(hand_hold hand) {
 
 }
 
-int c_chat(char *string) {
+int c_chat(char *chat_text) {
 
-    if (string)
-        return (sendto_one(neighbor_table[1][1][1], "CHAT :%s\n", string));
+    if (chat_text)
+        return (sendto_one(neighbor_table[1][1][1], "CHAT :%s\n", chat_text));
     else
         return (sendto_one(neighbor_table[1][1][1], "CHAT :\n"));
 
 }
 
-int c_action(char *string) {
+int c_action(char *action_text) {
 
-    if (string)
-        return (sendto_one(neighbor_table[1][1][1], "ACTION :%s\n", string));
+    if (action_text)
+        return (sendto_one(neighbor_table[1][1][1], "ACTION :%s\n", action_text));
     else
         return (sendto_one(neighbor_table[1][1][1], "ACTION :\n"));
 
@@ -223,10 +223,10 @@ int c_pmine(int mining) {
 
 }
 
-int c_schat(char *string) {
+int c_schat(char *schat_text) {
 
-    if (string)
-        return (sendto_one(neighbor_table[1][1][1], "SCHAT :%s\n", string));
+    if (schat_text)
+        return (sendto_one(neighbor_table[1][1][1], "SCHAT :%s\n", schat_text));
     else
         return (sendto_one(neighbor_table[1][1][1], "SCHAT :\n"));
 

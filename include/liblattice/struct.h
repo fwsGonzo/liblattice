@@ -146,13 +146,13 @@ typedef struct lattice_ph {
 
 typedef struct lattice_chat {
 
-    char string[MTU];
+    char chat_text[MTU];
 
 } lattice_chat;
 
 typedef struct lattice_action {
 
-    char string[MTU];
+    char action_text[MTU];
 
 } lattice_action;
 
@@ -219,13 +219,13 @@ typedef struct lattice_schat {
 
     char nickname[MTU/2];
     uint32_t color;
-    char string[MTU];
+    char schat_text[MTU];
 
 } lattice_schat;
 
 typedef struct lattice_log {
 
-    char string[MTU];
+    char log_text[MTU];
 
 } lattice_log;
 
