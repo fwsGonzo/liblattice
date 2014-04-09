@@ -16,6 +16,7 @@
 
     #ifndef LIBLATTICE_API
       #ifdef LIBLATTICE_EXPORTS
+        #pragma comment(lib, "ws2_32.lib")
         #define LIBLATTICE_API __declspec(dllexport)
       #else
         #define LIBLATTICE_API __declspec(dllimport)
