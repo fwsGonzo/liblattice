@@ -56,6 +56,8 @@ struct message {
   uint32_t flags;
 };
 
+// messages we pass to the game and server
+
 #define T_UNKNOWN      0
 #define T_P            1
 #define T_QUIT         2
@@ -86,6 +88,18 @@ struct message {
 #define T_MOVETO       27
 #define T_MOVEFROM     28
 #define T_CLOSING      29
+
+//messags we only send to the server
+
+#define T_CENTEREDINTRO  30
+#define T_SIDEDINTRO     31
+#define T_CENTEREDMOVE   32
+#define T_SIDEDMOVE      33
+#define T_ENDP           34
+#define T_SLIDEOVER      35
+#define T_PING           36
+#define T_PONG           37
+
 
 #define MFLAG_FROM      0x00000001         // Is fromuid set
 
