@@ -56,41 +56,38 @@ struct message {
   uint32_t flags;
 };
 
-// messages we pass to the game and server
+// Messages
 
-#define T_UNKNOWN      0
-#define T_P            1
-#define T_QUIT         2
-#define T_PC           3
-#define T_PR           4
-#define T_PH           5
-#define T_CHAT         6
-#define T_ACTION       7
-#define T_S            8
-#define T_SC           9
-#define T_BO           10
-#define T_MO           11
-#define T_BADD         12
-#define T_BSET         13
-#define T_BREM         14
-#define T_PMINE        15
-#define T_SCHAT        16
-#define T_LUSERS       17
-#define T_LOG          18
-#define T_SATSTEP      19
-#define T_SAT          20
-#define T_FADE         21
-#define T_USER         22
-#define T_SERVER       23
-#define T_BUMP         24
-#define T_CONNECTED    25
-#define T_DISCONNECTED 26
-#define T_MOVETO       27
-#define T_MOVEFROM     28
-#define T_CLOSING      29
-
-//messags we only send to the server
-
+#define T_UNKNOWN        0
+#define T_P              1
+#define T_QUIT           2
+#define T_PC             3
+#define T_PR             4
+#define T_PH             5
+#define T_CHAT           6
+#define T_ACTION         7
+#define T_S              8
+#define T_SC             9
+#define T_BO             10
+#define T_MO             11
+#define T_BADD           12
+#define T_BSET           13
+#define T_BREM           14
+#define T_PMINE          15
+#define T_SCHAT          16
+#define T_LUSERS         17
+#define T_LOG            18
+#define T_SATSTEP        19
+#define T_SAT            20
+#define T_FADE           21
+#define T_USER           22
+#define T_SERVER         23
+#define T_BUMP           24
+#define T_CONNECTED      25
+#define T_DISCONNECTED   26
+#define T_MOVETO         27
+#define T_MOVEFROM       28
+#define T_CLOSING        29
 #define T_CENTEREDINTRO  30
 #define T_SIDEDINTRO     31
 #define T_CENTEREDMOVE   32
@@ -99,6 +96,9 @@ struct message {
 #define T_SLIDEOVER      35
 #define T_PING           36
 #define T_PONG           37
+#define T_IAMSERVER      38
+#define T_DELSERVER      39
+#define T_TRACKERFAILURE 40
 
 
 #define MFLAG_FROM      0x00000001         // Is fromuid set
