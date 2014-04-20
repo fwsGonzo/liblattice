@@ -99,6 +99,7 @@ struct message {
 #define T_IAMSERVER      38
 #define T_DELSERVER      39
 #define T_TRACKERFAILURE 40
+#define T_SERVEREOL      41
 
 
 #define MFLAG_FROM      0x00000001         // Is fromuid set
