@@ -10,6 +10,8 @@
     #include <arpa/inet.h>
     #include <netinet/in.h>
     #include <sys/socket.h>
+  #else
+    #include <windows.h>
   #endif
 
   #if defined(_WIN32) && !defined(__MINGW32__)
