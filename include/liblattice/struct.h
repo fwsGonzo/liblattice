@@ -100,6 +100,7 @@ struct message {
 #define T_DELSERVER      39
 #define T_TRACKERFAILURE 40
 #define T_SERVEREOL      41
+#define T_PCHAT          42
 
 
 #define MFLAG_FROM      0x00000001         // Is fromuid set
@@ -164,6 +165,13 @@ typedef struct lattice_chat {
     char chat_text[MTU];
 
 } lattice_chat;
+
+typedef struct lattice_pchat {
+
+    uint32_t uid;
+    char pchat_text[MTU];
+
+} lattice_pchat;
 
 typedef struct lattice_action {
 

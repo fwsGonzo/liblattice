@@ -133,6 +133,15 @@ int c_chat(char *chat_text) {
 
 }
 
+int c_pchat(uint32_t uid, char *chat_text) {
+
+    if (chat_text)
+        return (sendto_one(neighbor_table[1][1][1], "PCHAT %lu :%s\n", uid, chat_text));
+    else
+        return (sendto_one(neighbor_table[1][1][1], "PCHAT %lu :\n", uid));
+
+}
+
 int c_action(char *action_text) {
 
     if (action_text)

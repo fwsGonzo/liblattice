@@ -394,7 +394,11 @@ int lattice_send(lattice_message *msg) {
         break;
 
         case T_CHAT:
-            return c_chat( (char *)msg->args );
+            return c_chat( ((lattice_chat *)msg->args)->chat_text );
+        break;
+
+        case T_PCHAT:
+            return c_pchat( ((lattice_pchat *)msg->args)->uid, ((lattice_pchat *)msg->args)->pchat_text );
         break;
 
         case T_ACTION:

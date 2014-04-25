@@ -26,6 +26,7 @@
   LIBLATTICE_API int c_pr(head_rot rot);
   LIBLATTICE_API int c_ph(hand_hold hand);
   LIBLATTICE_API int c_chat(char *chat_text);
+  LIBLATTICE_API int c_pchat(uint32_t uid, char *chat_text);
   LIBLATTICE_API int c_action(char *action_text);
   LIBLATTICE_API int c_s(int32_t mid, int32_t sid);
   LIBLATTICE_API int c_sc(int32_t csid);
