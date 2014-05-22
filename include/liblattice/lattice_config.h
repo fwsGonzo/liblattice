@@ -15,6 +15,14 @@
 #define MTU 512 // message size max (including (\r)\n\0)
 #define MAX_ARGS MTU
 
+// binary stuff
+
+#define PACKET_MTU 512  // match this to MTU
+#define PAYLOAD_MTU          (PACKET_MTU - sizeof(lt_packet_h))
+
+#define SYNCH_MARKER  0xFFFFFFFF
+
+
 #define SENDQ_BLOCK 262144
 
 #define VISUAL_UNIT  32  // sectors
