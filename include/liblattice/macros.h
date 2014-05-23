@@ -32,33 +32,43 @@
   #define NOSLIDEOVER 0
   #define SLIDEOVER   1
 
+  #define uid_t uint32_t
   #define get_uid get_uint32
   #define put_uid put_uint32
 
+  #define model_t uint16_t
   #define get_model get_uint16
   #define put_model put_uint16
 
+  #define color_t uint32_t
   #define get_color get_uint32
   #define put_color put_uint32
 
+  #define nickname_t char *
   #define get_nickname get_string
   #define put_nickname put_string
 
+  #define chat_t char *
   #define get_chat get_string
   #define put_chat put_string
 
+  #define action_t char *
   #define get_action get_string
   #define put_action put_string
 
+  #define quitreason_t char *
   #define get_quitreason get_string
   #define put_quitreason put_string
 
+  #define burstdist_t uint16_t
   #define get_burstdist get_uint16
   #define put_burstdist put_uint16
 
+  // struct
   #define get_block get_uint16
   #define put_block put_uint16
 
+  #define w_t int32_t
   #define get_wx get_int32
   #define put_wx put_int32
   #define get_wy get_int32
@@ -66,6 +76,7 @@
   #define get_wz get_int32
   #define put_wz put_int32
 
+  #define b_t int32_t
   #define get_bx get_int32
   #define put_bx put_int32
   #define get_by get_int32
@@ -73,6 +84,7 @@
   #define get_bz get_int32
   #define put_bz put_int32
 
+  #define n_t int32_t
   #define get_nx get_int32
   #define put_nx put_int32
   #define get_ny get_int32
@@ -80,45 +92,58 @@
   #define get_nz get_int32
   #define put_nz put_int32
 
+  #define rot_t int16_t
   #define get_xrot get_int16
   #define get_yrot get_int16
   #define put_xrot put_int16
   #define put_yrot put_int16
 
+  #define item_id_t uint16_t
   #define get_item_id get_uint16
-  #define get_item_type get_uint16
   #define put_item_id put_uint16
+
+  #define item_type_t uint16_t
+  #define get_item_type get_uint16
   #define put_item_type put_uint16
 
+  #define mining_t uint16_t
   #define get_mining get_uint16
   #define put_mining put_uint16
 
+  #define usercolor_t uint32_t
   #define get_usercolor get_uint32
   #define put_usercolor put_uint32
 
+  #define satstep_t uint32_t
   #define get_satstep get_uint32
   #define put_satstep put_uint32
 
+  #define sat_t double
   #define get_sat get_double
   #define put_sat put_double
 
+  #define mid_t int32_t
   #define get_mid get_int32
   #define put_mid put_int32
 
+  #define sid_t int32_t
   #define get_sid get_int32
   #define put_sid put_int32
 
+  #define csid_t int32_t
   #define get_csid get_int32
   #define put_csid put_int32
 
+  #define boid_t int32_t
   #define get_boid get_int32
   #define put_boid put_int32
 
+  #define moid_t int32_t
   #define get_moid get_int32
   #define put_moid put_int32
 
+  #define mocount_t int32_t
   #define get_mocount get_int32
   #define put_mocount put_int32
-
 
 #endif
