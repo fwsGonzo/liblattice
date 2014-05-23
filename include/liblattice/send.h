@@ -24,7 +24,9 @@
 #ifndef SEND_H
 #define SEND_H
 
+  #include "lattice_config.h"
   #include "serversocket.h"
+  #include "struct.h"
 
   extern int flush_write(server_socket *s, int closing);
   extern void flushall_write(void);
@@ -34,11 +36,11 @@
   extern int writeto(server_socket *s, const void *buf, size_t count);
 
   extern int sendto_one(server_socket *entry, char *format, ...);
-  extern int sendto_centeredclients(char *format, ...);
-  extern int sendto_sidedclients(char *format, ...);
-  extern int sendto_allclients(char *format, ...);
-  extern int sendto_allclients_butone(server_socket *butme, char *format, ...);
   extern int sendto_allservers(char *format, ...);
   extern int sendto_allservers_butone(server_socket *butme, char *format, ...);
+
+  extern int sendpacket(server_socket *entry, lt_packet *packet);
+  extern int sendpacketto_allservers(lt_packet *packet);
+  extern int sendpacketto_allservers_butone(server_socket *butme, lt_packet *packet);
 
 #endif

@@ -57,6 +57,7 @@
 #include "socket.h"
 #include "macros.h"
 //#include "numerics.h"
+#include "lattice_packet.h"
 
 #define IsWritable(fd) (                                                                                    \
     (                                                                                                       \
@@ -349,7 +350,7 @@ int writeto(server_socket *s, const void *buf, size_t count) {
 }
 
 
-
+//  -------- sendto stuff
 
 int sendto_one(server_socket *entry, char *format, ...) {
 
@@ -390,6 +391,7 @@ int sendto_allservers(char *format, ...) {
 
     i=vsnprintf((char *)buf, 8192, format, args);
 
+    if (i > 0)
     for (x=0;x<3;x++)
     for (y=0;y<3;y++)
     for (z=0;z<3;z++) {
@@ -423,6 +425,7 @@ int sendto_allservers_butone(server_socket *butme, char *format, ...) {
 
     i=vsnprintf((char *)buf, 8192, format, args);
 
+    if (i > 0)
     for (x=0;x<3;x++)
     for (y=0;y<3;y++)
     for (z=0;z<3;z++) {
@@ -439,3 +442,80 @@ int sendto_allservers_butone(server_socket *butme, char *format, ...) {
 }
 
 
+
+// packet header is passed in HOST order
+
+int sendpacket(server_socket *entry, lt_packet *packet) {
+
+    uint16_t packet_length;
+
+    int ret=0;
+
+    if (!entry || !packet) return 0;
+
+    packet_length = packet->header.payload_length + sizeof(lt_packet_h);
+
+    packet_hton(&packet->header);
+
+    ret=writeto(entry, packet, packet_length);
+
+    packet_ntoh(&packet->header);
+
+    return ret;
+
+}
+
+int sendpacketto_allservers(lt_packet *packet) {
+
+    uint16_t packet_length;
+    server_socket *s;
+    int x;
+    int y;
+    int z;
+
+    if (!packet) return 0;
+
+    packet_length = packet->header.payload_length + sizeof(lt_packet_h);
+
+    packet_hton(&packet->header);
+
+    for (x=0;x<3;x++)
+    for (y=0;y<3;y++)
+    for (z=0;z<3;z++) {
+        if ((s=neighbor_table[x][y][z])) {
+            writeto(s, packet, packet_length);
+        }
+    }
+
+    packet_ntoh(&packet->header);
+
+    return(packet_length);
+}
+
+int sendpacketto_allservers_butone(server_socket *butme, lt_packet *packet) {
+
+    uint16_t packet_length;
+    server_socket *s;
+    int x;
+    int y;
+    int z;
+
+    if (!butme || !packet) return 0;
+
+    packet_length = packet->header.payload_length + sizeof(lt_packet_h);
+
+    packet_hton(&packet->header);
+
+    for (x=0;x<3;x++)
+    for (y=0;y<3;y++)
+    for (z=0;z<3;z++) {
+        if ((s=neighbor_table[x][y][z])) {
+            if (s != butme)
+                writeto(s, packet, packet_length);
+        }
+    }
+
+    packet_ntoh(&packet->header);
+
+    return(packet_length);
+}
