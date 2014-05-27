@@ -64,6 +64,7 @@
 #include "send.h"
 #include "macros.h"
 #include "socket.h"
+#include "lattice_packet.h"
 
 int sched_add(server_socket *socket, int type, struct timeval triggr_time);
 
@@ -117,9 +118,13 @@ int sched_server_send_ping(server_socket *socket) {
 
     struct timeval tv;
 
+    lt_packet out_packet;
+
     if (!socket) return 0;
 
-    if (sendto_one(socket, "PING\n")) return 1;
+    makepacket(&out_packet, C_PING);
+    if (sendpacket(socket, &out_packet)) return 1;
+    //if (sendto_one(socket, "PING\n")) return 1;
 
     gettimeofday(&now, NULL);
     tv = now;
