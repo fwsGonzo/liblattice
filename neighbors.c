@@ -52,6 +52,8 @@
 #include "globals.h"
 #include "send.h"
 #include "sched.h"
+#include "macros.h"
+#include "lattice_packet.h"
 
 int ncoord_is_equal(n_coord a, n_coord b) {
 
@@ -597,6 +599,205 @@ void recenter_neighbors(n_coord newcenter) {
                                newcenter.x,
                                newcenter.y,
                                newcenter.z);
+                } // if (user_is_within_outer_border(lattice_player.wpos, s->coord))
+            } // if (s == neighbor_table[1][1][1])
+        } // if ((s=neighbor_table[x][y][z]))
+    } // for ()
+
+    // update lattice_player
+    lattice_player.centeredon.x = neighbor_table[1][1][1]->coord.x;
+    lattice_player.centeredon.y = neighbor_table[1][1][1]->coord.y;
+    lattice_player.centeredon.z = neighbor_table[1][1][1]->coord.z;
+    lattice_player.my_min_wcoord.x = lattice_player.centeredon.x << 8;
+    lattice_player.my_min_wcoord.y = lattice_player.centeredon.y << 8;
+    lattice_player.my_min_wcoord.z = lattice_player.centeredon.z << 8;
+    lattice_player.my_max_wcoord.x = (lattice_player.centeredon.x << 8) | 0x000000FF;
+    lattice_player.my_max_wcoord.y = (lattice_player.centeredon.y << 8) | 0x000000FF;
+    lattice_player.my_max_wcoord.z = (lattice_player.centeredon.z << 8) | 0x000000FF;
+
+    return;
+
+}
+
+
+void packet_recenter_neighbors(n_coord newcenter) {
+    server_socket *s;
+    int x;
+    int y;
+    int z;
+
+    void *p;
+    lt_packet out_packet;
+
+    if (!find_neighbor(newcenter)) return;
+
+    // get rid of the servers that are leaving us
+
+    for (x=0;x<3;x++)
+    for (y=0;y<3;y++)
+    for (z=0;z<3;z++) {
+        if ((s=neighbor_table[x][y][z])) {
+            if (!serv_in_range_of_serv(newcenter, s->coord)) {
+                // we are falling off the edge of the neighbor table
+
+                makepacket(&out_packet, T_SLIDEOVER);
+                sendpacket(s, &out_packet);
+                //sendto_one(s, "SLIDEOVER\n");
+
+                neighbor_table[x][y][z] = NULL;
+            }
+        }
+    }
+
+
+    // neighbor table matrix translation
+
+    if (serv_in_range_of_serv(lattice_player.centeredon, newcenter)) {
+
+        // X plane
+
+        if (newcenter.x > lattice_player.centeredon.x) {
+            for (x=1;x<=2;x++) for (y=0;y<=2;y++) for (z=0;z<=2;z++) {
+                neighbor_table[x-1][y][z] = neighbor_table[x][y][z];
+                neighbor_table[x][y][z] = NULL;
+            }
+        }
+        if (newcenter.x < lattice_player.centeredon.x) {
+            for (x=1;x>=0;x--) for (y=2;y>=0;y--) for (z=2;z>=0;z--) {
+                neighbor_table[x+1][y][z] = neighbor_table[x][y][z];
+                neighbor_table[x][y][z] = NULL;
+            }
+        }
+
+        // Y plane
+
+        if (newcenter.y > lattice_player.centeredon.y) {
+            for (x=0;x<=2;x++) for (y=1;y<=2;y++) for (z=0;z<=2;z++) {
+                neighbor_table[x][y-1][z] = neighbor_table[x][y][z];
+                neighbor_table[x][y][z] = NULL;
+            }
+        }
+        if (newcenter.y < lattice_player.centeredon.y) {
+            for (x=2;x>=0;x--) for (y=1;y>=0;y--) for (z=2;z>=0;z--) {
+                neighbor_table[x][y+1][z] = neighbor_table[x][y][z];
+                neighbor_table[x][y][z] = NULL;
+            }
+        }
+
+        // Z plane
+
+        if (newcenter.z > lattice_player.centeredon.z) {
+            for (x=0;x<=2;x++) for (y=0;y<=2;y++) for (z=1;z<=2;z++) {
+                neighbor_table[x][y][z-1] = neighbor_table[x][y][z];
+                neighbor_table[x][y][z] = NULL;
+            }
+        }
+        if (newcenter.z < lattice_player.centeredon.z) {
+            for (x=2;x>=0;x--) for (y=2;y>=0;y--) for (z=1;z>=0;z--) {
+                neighbor_table[x][y][z+1] = neighbor_table[x][y][z];
+                neighbor_table[x][y][z] = NULL;
+            }
+        }
+    }
+
+
+    // send out CENTERED AND SIDED MOVEs
+
+    for (x=0;x<3;x++)
+    for (y=0;y<3;y++)
+    for (z=0;z<3;z++) {
+        if ((s=neighbor_table[x][y][z])) {
+            if (s == neighbor_table[1][1][1]) {
+                // this is a new center
+                makepacket(&out_packet, T_CENTEREDMOVE);
+                put_nx(&p, lattice_player.centeredon.x, &PLength(&out_packet), &PArgc(&out_packet));
+                put_ny(&p, lattice_player.centeredon.y, &PLength(&out_packet), &PArgc(&out_packet));
+                put_nz(&p, lattice_player.centeredon.z, &PLength(&out_packet), &PArgc(&out_packet));
+                put_wx(&p, lattice_player.wpos.x, &PLength(&out_packet), &PArgc(&out_packet));
+                put_wy(&p, lattice_player.wpos.y, &PLength(&out_packet), &PArgc(&out_packet));
+                put_wz(&p, lattice_player.wpos.z, &PLength(&out_packet), &PArgc(&out_packet));
+                put_bx(&p, lattice_player.bpos.x, &PLength(&out_packet), &PArgc(&out_packet));
+                put_by(&p, lattice_player.bpos.y, &PLength(&out_packet), &PArgc(&out_packet));
+                put_bz(&p, lattice_player.bpos.z, &PLength(&out_packet), &PArgc(&out_packet));
+                put_xrot(&p, lattice_player.hrot.xrot, &PLength(&out_packet), &PArgc(&out_packet));
+                put_yrot(&p, lattice_player.hrot.yrot, &PLength(&out_packet), &PArgc(&out_packet));
+                put_item_id(&p, lattice_player.hhold.item_id, &PLength(&out_packet), &PArgc(&out_packet));
+                put_item_type(&p, lattice_player.hhold.item_type, &PLength(&out_packet), &PArgc(&out_packet));
+                put_mining(&p, lattice_player.mining, &PLength(&out_packet), &PArgc(&out_packet));
+                put_usercolor(&p, lattice_player.usercolor, &PLength(&out_packet), &PArgc(&out_packet));
+                sendpacket(s, &out_packet);
+
+                //sendto_one(s,
+                //           //                     wx wy wz bx by bz  HEAD  HAND
+                //           "CENTEREDMOVE %u %u %u %u %u %u %d %d %d %d %d %d %d %d %u\n",
+                //           lattice_player.centeredon.x,
+                //           lattice_player.centeredon.y,
+                //           lattice_player.centeredon.z,
+                //           lattice_player.wpos.x,
+                //           lattice_player.wpos.y,
+                //           lattice_player.wpos.z,
+                //           lattice_player.bpos.x,
+                //           lattice_player.bpos.y,
+                //           lattice_player.bpos.z,
+                //           lattice_player.hrot.xrot,
+                //           lattice_player.hrot.yrot,
+                //           lattice_player.hhold.item_id,
+                //           lattice_player.hhold.item_type,
+                //           lattice_player.mining,
+                //           lattice_player.usercolor);
+            } else {
+                // this is a moved side
+                if (user_is_within_outer_border(lattice_player.wpos, s->coord)) {
+
+                    makepacket(&out_packet, T_SIDEDMOVE);
+                    put_nx(&p, newcenter.x, &PLength(&out_packet), &PArgc(&out_packet));
+                    put_ny(&p, newcenter.y, &PLength(&out_packet), &PArgc(&out_packet));
+                    put_nz(&p, newcenter.z, &PLength(&out_packet), &PArgc(&out_packet));
+                    put_wx(&p, lattice_player.wpos.x, &PLength(&out_packet), &PArgc(&out_packet));
+                    put_wy(&p, lattice_player.wpos.y, &PLength(&out_packet), &PArgc(&out_packet));
+                    put_wz(&p, lattice_player.wpos.z, &PLength(&out_packet), &PArgc(&out_packet));
+                    put_bx(&p, lattice_player.bpos.x, &PLength(&out_packet), &PArgc(&out_packet));
+                    put_by(&p, lattice_player.bpos.y, &PLength(&out_packet), &PArgc(&out_packet));
+                    put_bz(&p, lattice_player.bpos.z, &PLength(&out_packet), &PArgc(&out_packet));
+                    put_xrot(&p, lattice_player.hrot.xrot, &PLength(&out_packet), &PArgc(&out_packet));
+                    put_yrot(&p, lattice_player.hrot.yrot, &PLength(&out_packet), &PArgc(&out_packet));
+                    put_item_id(&p, lattice_player.hhold.item_id, &PLength(&out_packet), &PArgc(&out_packet));
+                    put_item_type(&p, lattice_player.hhold.item_type, &PLength(&out_packet), &PArgc(&out_packet));
+                    put_mining(&p, lattice_player.mining, &PLength(&out_packet), &PArgc(&out_packet));
+                    put_usercolor(&p, lattice_player.usercolor, &PLength(&out_packet), &PArgc(&out_packet));
+                    sendpacket(s, &out_packet);
+
+                    //sendto_one(s,
+                    //           //                  wx wy wz bx by bz  HEAD  HAND
+                    //           "SIDEDMOVE %u %u %u %u %u %u %d %d %d %d %d %d %d %d %u\n",
+                    //           newcenter.x,
+                    //           newcenter.y,
+                    //           newcenter.z,
+                    //           lattice_player.wpos.x,
+                    //           lattice_player.wpos.y,
+                    //           lattice_player.wpos.z,
+                    //           lattice_player.bpos.x,
+                    //           lattice_player.bpos.y,
+                    //           lattice_player.bpos.z,
+                    //           lattice_player.hrot.xrot,
+                    //           lattice_player.hrot.yrot,
+                    //           lattice_player.hhold.item_id,
+                    //           lattice_player.hhold.item_type,
+                    //           lattice_player.mining,
+                    //           lattice_player.usercolor);
+
+                } else {
+                    makepacket(&out_packet, T_SIDEDMOVE);
+                    put_nx(&p, newcenter.x, &PLength(&out_packet), &PArgc(&out_packet));
+                    put_ny(&p, newcenter.y, &PLength(&out_packet), &PArgc(&out_packet));
+                    put_nz(&p, newcenter.z, &PLength(&out_packet), &PArgc(&out_packet));
+                    sendpacket(s, &out_packet);
+
+                    //sendto_one(s,
+                    //           "SIDEDMOVE %u %u %u\n",
+                    //           newcenter.x,
+                    //           newcenter.y,
+                    //           newcenter.z);
                 } // if (user_is_within_outer_border(lattice_player.wpos, s->coord))
             } // if (s == neighbor_table[1][1][1])
         } // if ((s=neighbor_table[x][y][z]))

@@ -49,5 +49,6 @@
   extern server_socket *connect_server(n_coord coord, struct in_addr ip, port_t port, int *error);
   extern void disconnect_servers(void);
   extern void recenter_neighbors(n_coord newcenter);
+  extern void packet_recenter_neighbors(n_coord newcenter);
 
 #endif

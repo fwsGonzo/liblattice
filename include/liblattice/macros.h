@@ -52,6 +52,10 @@
   #define get_chat get_string
   #define put_chat put_string
 
+  #define log_t char *
+  #define get_log get_string
+  #define put_log put_string
+
   #define action_t char *
   #define get_action get_string
   #define put_action put_string
@@ -59,6 +63,10 @@
   #define quitreason_t char *
   #define get_quitreason get_string
   #define put_quitreason put_string
+
+  #define numeric_t uint32_t
+  #define get_numeric get_uint32
+  #define put_numeric put_uint32
 
   #define burstdist_t uint16_t
   #define get_burstdist get_uint16
