@@ -1392,6 +1392,14 @@ int s_moveto(struct server_socket *src, lt_packet *packet) {
 
     lattice_user usubmess;
 
+    void *p;
+    uint16_t len;
+    uint16_t argc;
+
+    char *str;
+
+    mining_t mining;
+
     uid_t *pfrom;
 
     struct server_socket *dst;
@@ -1407,9 +1415,16 @@ int s_moveto(struct server_socket *src, lt_packet *packet) {
 
     if (PArgc(packet) < 18) return 0;
 
-    coord.x = atoi(argv[0]);
-    coord.y = atoi(argv[1]);
-    coord.z = atoi(argv[2]);
+    argc = packet->header.payload_argc;
+    len = packet->header.payload_length;
+    p = packet->payload;
+
+    if (!get_nx(&p, &(coord.x), &len, &argc)) return 0;
+    if (!get_ny(&p, &(coord.y), &len, &argc)) return 0;
+    if (!get_nz(&p, &(coord.z), &len, &argc)) return 0;
+    //coord.x = atoi(argv[0]);
+    //coord.y = atoi(argv[1]);
+    //coord.z = atoi(argv[2]);
 
     uidlink = uid_link_find(src, *pfrom);
 
@@ -1429,28 +1444,43 @@ int s_moveto(struct server_socket *src, lt_packet *packet) {
             mess.length = sizeof usubmess;
             mess.args = &usubmess;
 
-            usubmess.model = (uint16_t) atoi(argv[3]);
-            usubmess.color = (uint32_t) atoi(argv[4]);
+            if (!get_model(&p, &(usubmess.model), &len, &argc)) return 0;
+            //usubmess.model = (uint16_t) atoi(argv[3]);
+            if (!get_color(&p, &(usubmess.color), &len, &argc)) return 0;
+            //usubmess.color = (uint32_t) atoi(argv[4]);
 
-            strncpy(usubmess.nickname, argv[5] , sizeof(usubmess.nickname));
+            if (!get_nickname(&p, &(str), &len, &argc)) return 0;
+            strncpy(usubmess.nickname, str , sizeof(usubmess.nickname));
             usubmess.nickname[sizeof(usubmess.nickname)-1]='\0';
 
-            usubmess.wpos.x = atoi(argv[6]);
-            usubmess.wpos.y = atoi(argv[7]);
-            usubmess.wpos.z = atoi(argv[8]);
+            if (!get_wx(&p, &(usubmess.wpos.x), &len, &argc)) return 0;
+            if (!get_wy(&p, &(usubmess.wpos.y), &len, &argc)) return 0;
+            if (!get_wz(&p, &(usubmess.wpos.z), &len, &argc)) return 0;
+            //usubmess.wpos.x = atoi(argv[6]);
+            //usubmess.wpos.y = atoi(argv[7]);
+            //usubmess.wpos.z = atoi(argv[8]);
 
-            usubmess.bpos.x = atoi(argv[9]);
-            usubmess.bpos.y = atoi(argv[10]);
-            usubmess.bpos.z = atoi(argv[11]);
+            if (!get_bx(&p, &(usubmess.bpos.x), &len, &argc)) return 0;
+            if (!get_by(&p, &(usubmess.bpos.y), &len, &argc)) return 0;
+            if (!get_bz(&p, &(usubmess.bpos.z), &len, &argc)) return 0;
+            //usubmess.bpos.x = atoi(argv[9]);
+            //usubmess.bpos.y = atoi(argv[10]);
+            //usubmess.bpos.z = atoi(argv[11]);
 
-            usubmess.hrot.xrot = atoi(argv[12]);
-            usubmess.hrot.yrot = atoi(argv[13]);
+            if (!get_xrot(&p, &(usubmess.hrot.xrot), &len, &argc)) return 0;
+            if (!get_yrot(&p, &(usubmess.hrot.yrot), &len, &argc)) return 0;
+            //usubmess.hrot.xrot = atoi(argv[12]);
+            //usubmess.hrot.yrot = atoi(argv[13]);
 
-            usubmess.hhold.item_id = atoi(argv[14]);
-            usubmess.hhold.item_type = atoi(argv[15]);
+            if (!get_item_id(&p, &(usubmess.hhold.item_id), &len, &argc)) return 0;
+            if (!get_item_type(&p, &(usubmess.hhold.item_type), &len, &argc)) return 0;
+            //usubmess.hhold.item_id = atoi(argv[14]);
+            //usubmess.hhold.item_type = atoi(argv[15]);
 
-            usubmess.mining = atoi(argv[16]);
+            if (!get_mining(&p, &(mining), &len, &argc)) return 0;
+            usubmess.mining = mining;
 
+            if (!get_usercolor(&p, &(usubmess.usercolor), &len, &argc)) return 0;
             usubmess.usercolor = (uint32_t) atoi(argv[17]);
 
             (*gcallback)(&mess);
@@ -1489,6 +1519,14 @@ int s_movefrom(struct server_socket *src, lt_packet *packet) {
     uid_link *uidlink;
     n_coord coord;
 
+    void *p;
+    uint16_t len;
+    uint16_t argc;
+
+    char *str;
+
+    mining_t mining;
+
     uid_t *pfrom;
 
     struct server_socket *from;
@@ -1507,9 +1545,16 @@ int s_movefrom(struct server_socket *src, lt_packet *packet) {
 
     if (PArgc(packet) < 18) return 0;
 
-    coord.x = atoi(argv[0]);
-    coord.y = atoi(argv[1]);
-    coord.z = atoi(argv[2]);
+    argc = packet->header.payload_argc;
+    len = packet->header.payload_length;
+    p = packet->payload;
+
+    if (!get_nx(&p, &(coord.x), &len, &argc)) return 0;
+    if (!get_ny(&p, &(coord.y), &len, &argc)) return 0;
+    if (!get_nz(&p, &(coord.z), &len, &argc)) return 0;
+    //coord.x = atoi(argv[0]);
+    //coord.y = atoi(argv[1]);
+    //coord.z = atoi(argv[2]);
 
     from = find_neighbor(coord);
 
@@ -1526,29 +1571,44 @@ int s_movefrom(struct server_socket *src, lt_packet *packet) {
                 mess.length = sizeof submess;
                 mess.args = &submess;
 
-                submess.model = (uint16_t) atoi(argv[3]);
-                submess.color = (uint32_t) atoi(argv[4]);
+                if (!get_model(&p, &(submess.model), &len, &argc)) return 0;
+                //submess.model = (uint16_t) atoi(argv[3]);
+                if (!get_color(&p, &(submess.color), &len, &argc)) return 0;
+                //submess.color = (uint32_t) atoi(argv[4]);
 
-                strncpy(submess.nickname, argv[5] , sizeof(submess.nickname));
+                if (!get_nickname(&p, &(str), &len, &argc)) return 0;
+                strncpy(submess.nickname, str , sizeof(submess.nickname));
                 submess.nickname[sizeof(submess.nickname)-1]='\0';
 
-                submess.wpos.x = atoi(argv[6]);
-                submess.wpos.y = atoi(argv[7]);
-                submess.wpos.z = atoi(argv[8]);
+                if (!get_wx(&p, &(submess.wpos.x), &len, &argc)) return 0;
+                if (!get_wy(&p, &(submess.wpos.y), &len, &argc)) return 0;
+                if (!get_wz(&p, &(submess.wpos.z), &len, &argc)) return 0;
+                //submess.wpos.x = atoi(argv[6]);
+                //submess.wpos.y = atoi(argv[7]);
+                //submess.wpos.z = atoi(argv[8]);
 
-                submess.bpos.x = atoi(argv[9]);
-                submess.bpos.y = atoi(argv[10]);
-                submess.bpos.z = atoi(argv[11]);
+                if (!get_bx(&p, &(submess.bpos.x), &len, &argc)) return 0;
+                if (!get_by(&p, &(submess.bpos.y), &len, &argc)) return 0;
+                if (!get_bz(&p, &(submess.bpos.z), &len, &argc)) return 0;
+                //submess.bpos.x = atoi(argv[9]);
+                //submess.bpos.y = atoi(argv[10]);
+                //submess.bpos.z = atoi(argv[11]);
 
-                submess.hrot.xrot = atoi(argv[12]);
-                submess.hrot.yrot = atoi(argv[13]);
+                if (!get_xrot(&p, &(submess.hrot.xrot), &len, &argc)) return 0;
+                if (!get_yrot(&p, &(submess.hrot.yrot), &len, &argc)) return 0;
+                //submess.hrot.xrot = atoi(argv[12]);
+                //submess.hrot.yrot = atoi(argv[13]);
 
-                submess.hhold.item_id = atoi(argv[14]);
-                submess.hhold.item_type = atoi(argv[15]);
+                if (!get_item_id(&p, &(submess.hhold.item_id), &len, &argc)) return 0;
+                if (!get_item_type(&p, &(submess.hhold.item_type), &len, &argc)) return 0;
+                //submess.hhold.item_id = atoi(argv[14]);
+                //submess.hhold.item_type = atoi(argv[15]);
 
-                submess.mining = atoi(argv[16]);
+                if (!get_mining(&p, &(mining), &len, &argc)) return 0;
+                submess.mining = mining;
 
-                submess.usercolor = (uint32_t) atoi(argv[17]);
+                if (!get_usercolor(&p, &(submess.usercolor), &len, &argc)) return 0;
+                //submess.usercolor = (uint32_t) atoi(argv[17]);
 
                 (*gcallback)(&mess);
             }
@@ -1562,29 +1622,45 @@ int s_movefrom(struct server_socket *src, lt_packet *packet) {
         mess.length = sizeof submess;
         mess.args = &submess;
 
-        submess.model = (uint16_t) atoi(argv[3]);
-        submess.color = (uint32_t) atoi(argv[4]);
+        if (!get_model(&p, &(submess.model), &len, &argc)) return 0;
+        //submess.model = (uint16_t) atoi(argv[3]);
 
-        strncpy(submess.nickname, argv[5] , sizeof(submess.nickname));
+        if (!get_color(&p, &(submess.color), &len, &argc)) return 0;
+        //submess.color = (uint32_t) atoi(argv[4]);
+
+        if (!get_nickname(&p, &(str), &len, &argc)) return 0;
+        strncpy(submess.nickname, str , sizeof(submess.nickname));
         submess.nickname[sizeof(submess.nickname)-1]='\0';
 
-        submess.wpos.x = atoi(argv[6]);
-        submess.wpos.y = atoi(argv[7]);
-        submess.wpos.z = atoi(argv[8]);
+        if (!get_wx(&p, &(submess.wpos.x), &len, &argc)) return 0;
+        if (!get_wy(&p, &(submess.wpos.y), &len, &argc)) return 0;
+        if (!get_wz(&p, &(submess.wpos.z), &len, &argc)) return 0;
+        //submess.wpos.x = atoi(argv[6]);
+        //submess.wpos.y = atoi(argv[7]);
+        //submess.wpos.z = atoi(argv[8]);
 
-        submess.bpos.x = atoi(argv[9]);
-        submess.bpos.y = atoi(argv[10]);
-        submess.bpos.z = atoi(argv[11]);
+        if (!get_bx(&p, &(submess.bpos.x), &len, &argc)) return 0;
+        if (!get_by(&p, &(submess.bpos.y), &len, &argc)) return 0;
+        if (!get_bz(&p, &(submess.bpos.z), &len, &argc)) return 0;
+        //submess.bpos.x = atoi(argv[9]);
+        //submess.bpos.y = atoi(argv[10]);
+        //submess.bpos.z = atoi(argv[11]);
 
-        submess.hrot.xrot = atoi(argv[12]);
-        submess.hrot.yrot = atoi(argv[13]);
+        if (!get_xrot(&p, &(submess.hrot.xrot), &len, &argc)) return 0;
+        if (!get_yrot(&p, &(submess.hrot.yrot), &len, &argc)) return 0;
+        //submess.hrot.xrot = atoi(argv[12]);
+        //submess.hrot.yrot = atoi(argv[13]);
 
-        submess.hhold.item_id = atoi(argv[14]);
-        submess.hhold.item_type = atoi(argv[15]);
+        if (!get_item_id(&p, &(submess.hhold.item_id), &len, &argc)) return 0;
+        if (!get_item_type(&p, &(submess.hhold.item_type), &len, &argc)) return 0;
+        //submess.hhold.item_id = atoi(argv[14]);
+        //submess.hhold.item_type = atoi(argv[15]);
 
-        submess.mining = atoi(argv[16]);
+        if (!get_mining(&p, &(mining), &len, &argc)) return 0;
+        submess.mining = mining;
 
-        submess.usercolor = (uint32_t) atoi(argv[17]);
+        if (!get_usercolor(&p, &(submess.usercolor), &len, &argc)) return 0;
+        //submess.usercolor = (uint32_t) atoi(argv[17]);
 
         (*gcallback)(&mess);
 
@@ -1604,6 +1680,8 @@ int s_trackerfailure(struct server_socket *src, lt_packet *packet) {
     int y;
     int z;
 
+    lt_packet out_packet;
+
     if (!src || !packet) return 0;
 
     if (ncoord_is_equal(src->coord, lattice_player.centeredon)) {
@@ -1613,7 +1691,9 @@ int s_trackerfailure(struct server_socket *src, lt_packet *packet) {
             for (x=0;x<3;x++) for (y=0;y<3;y++) for (z=0;z<3;z++) {
                 if ((s=neighbor_table[x][y][z])) {
                     if (s != src) {
-                        sendto_one(s, "SLIDEOVER\n");
+                        makepacket(&out_packet, T_SLIDEOVER);
+                        sendpacket(s, &out_packet);
+                        //sendto_one(s, "SLIDEOVER\n");
                         neighbor_table[x][y][z] = NULL;
                     }
                 }
@@ -1624,7 +1704,9 @@ int s_trackerfailure(struct server_socket *src, lt_packet *packet) {
             for (x=0;x<3;x++) for (y=0;y<3;y++) for (z=0;z<3;z++) {
                 if ((s=neighbor_table[x][y][z])) {
                     if (s == src) {
-                        sendto_one(s, "SLIDEOVER\n");
+                        makepacket(&out_packet, T_SLIDEOVER);
+                        sendpacket(s, &out_packet);
+                        //sendto_one(s, "SLIDEOVER\n");
                         neighbor_table[x][y][z] = NULL;
                     }
                 }
@@ -1638,7 +1720,9 @@ int s_trackerfailure(struct server_socket *src, lt_packet *packet) {
             for (x=0;x<3;x++) for (y=0;y<3;y++) for (z=0;z<3;z++) {
                 if ((s=neighbor_table[x][y][z])) {
                     if (s != src) {
-                        sendto_one(s, "SLIDEOVER\n");
+                        makepacket(&out_packet, T_SLIDEOVER);
+                        sendpacket(s, &out_packet);
+                        //sendto_one(s, "SLIDEOVER\n");
                         neighbor_table[x][y][z] = NULL;
                     }
                 }
@@ -1649,7 +1733,9 @@ int s_trackerfailure(struct server_socket *src, lt_packet *packet) {
             for (x=0;x<3;x++) for (y=0;y<3;y++) for (z=0;z<3;z++) {
                 if ((s=neighbor_table[x][y][z])) {
                     if (s == src) {
-                        sendto_one(s, "SLIDEOVER\n");
+                        makepacket(&out_packet, T_SLIDEOVER);
+                        sendpacket(s, &out_packet);
+                        //sendto_one(s, "SLIDEOVER\n");
                         neighbor_table[x][y][z] = NULL;
                     }
                 }
@@ -1669,12 +1755,22 @@ int s_closing(struct server_socket *src, lt_packet *packet) {
     lattice_message mess;
     lattice_closing submess;
 
+    void *p;
+    uint16_t len;
+    uint16_t argc;
+
+    char *str;
+
     n_coord server_coord;
     n_coord newcenter;
 
     if (!src || !packet) return 0;
 
     if (PArgc(packet) < 2) return 0;
+
+    argc = packet->header.payload_argc;
+    len = packet->header.payload_length;
+    p = packet->payload;
 
     server_coord.x = src->coord.x;
     server_coord.y = src->coord.y;
@@ -1689,8 +1785,11 @@ int s_closing(struct server_socket *src, lt_packet *packet) {
             mess.fromuid = 0;
             mess.length = sizeof submess;
             mess.args = &submess;
-            submess.numeric = atoi(argv[0]);
-            strncpy(submess.desc, argv[1] , sizeof(submess.desc));
+
+            if (!get_numeric(&p, &(submess.numeric), &len, &argc)) return 0;
+            //submess.numeric = atoi(argv[0]);
+            if (!get_closingreason(&p, &(str), &len, &argc)) return 0;
+            strncpy(submess.desc, str, sizeof(submess.desc));
             submess.desc[sizeof(submess.desc)-1]='\0';
 
             (*gcallback)(&mess);
@@ -1719,8 +1818,11 @@ int s_closing(struct server_socket *src, lt_packet *packet) {
             mess.length = sizeof submess;
             mess.args = &submess;
 
-            submess.numeric = atoi(argv[0]);
-            strncpy(submess.desc, argv[1] , sizeof(submess.desc));
+            if (!get_numeric(&p, &(submess.numeric), &len, &argc)) return 0;
+            //submess.numeric = atoi(argv[0]);
+
+            if (!get_closingreason(&p, &(str), &len, &argc)) return 0;
+            strncpy(submess.desc, str, sizeof(submess.desc));
             submess.desc[sizeof(submess.desc)-1]='\0';
 
             (*gcallback)(&mess);

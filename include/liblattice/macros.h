@@ -68,6 +68,10 @@
   #define get_numeric get_uint32
   #define put_numeric put_uint32
 
+  #define closingreason_t char *
+  #define get_closingreason get_string
+  #define put_closingreason put_string
+
   #define burstdist_t uint16_t
   #define get_burstdist get_uint16
   #define put_burstdist put_uint16
