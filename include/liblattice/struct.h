@@ -50,11 +50,20 @@ typedef struct lattice_player_t {
 
 } lattice_player_t;
 
+/*
 struct message {
   char *cmd;
   int (*func)();
   uint32_t flags;
 };
+*/
+
+struct message {
+  int type;
+  int (*func)();
+  uint32_t flags;
+};
+
 
 // Messages
 

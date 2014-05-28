@@ -122,7 +122,7 @@ int sched_server_send_ping(server_socket *socket) {
 
     if (!socket) return 0;
 
-    makepacket(&out_packet, C_PING);
+    makepacket(&out_packet, T_PING);
     if (sendpacket(socket, &out_packet)) return 1;
     //if (sendto_one(socket, "PING\n")) return 1;
 

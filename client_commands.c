@@ -18,6 +18,8 @@
 #include "send.h"
 #include "globals.h"
 #include "neighbors.h"
+#include "macros.h"
+#include "lattice_packet.h"
 
 #if defined(_WIN32) && !defined(__MINGW32__)
   #include "client_commands.h"
@@ -31,6 +33,8 @@ int c_p(w_coord wcoord, b_coord bcoord) {
     int y;
     int z;
     n_coord newcenter;
+    void *p;
+    lt_packet out_packet;
 
     lattice_message mess;
     lattice_bump submess;
@@ -64,11 +68,22 @@ int c_p(w_coord wcoord, b_coord bcoord) {
             if ((s=neighbor_table[x][y][z])) {
                 if (user_is_within_outer_border(lattice_player.wpos, s->coord)) {
                     // we need to relay the P
-                    sendto_one(s, "P %d %d %d %d %d %d\n", wcoord.x, wcoord.y, wcoord.z, bcoord.x, bcoord.y, bcoord.z);
+                    makepacket(&out_packet, T_P);
+                    p = &out_packet.payload;
+                    if (!put_wx(&p, wcoord.x, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+                    if (!put_wy(&p, wcoord.y, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+                    if (!put_wz(&p, wcoord.z, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+                    if (!put_bx(&p, bcoord.x, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+                    if (!put_by(&p, bcoord.y, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+                    if (!put_bz(&p, bcoord.z, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+                    sendpacket(src, &out_packet);
+                    //sendto_one(s, "P %d %d %d %d %d %d\n", wcoord.x, wcoord.y, wcoord.z, bcoord.x, bcoord.y, bcoord.z);
                 } else {
                     // need to ENDP if we are walking away
                     if (user_is_within_outer_border(oldwcoord, s->coord)) {
-                        sendto_one(s, "ENDP\n");
+                        makepacket(&out_packet, T_ENDP);
+                        sendpacket(src, &out_packet);
+                        //sendto_one(s, "ENDP\n");
                     }
                 }
             }
@@ -76,7 +91,7 @@ int c_p(w_coord wcoord, b_coord bcoord) {
     } else {
         // we need to recenter to the neighboring server
 
-        recenter_neighbors(newcenter);
+        packet_recenter_neighbors(newcenter);
 
     }
 
@@ -87,163 +102,297 @@ int c_p(w_coord wcoord, b_coord bcoord) {
 
 int c_quit(char *reason) {
 
+    void *p;
+    lt_packet out_packet;
+
+    makepacket(&out_packet, T_QUIT);
+
     if (reason)
-        return (sendto_one(neighbor_table[1][1][1], "QUIT :%s\n", reason));
-    else
-        return (sendto_one(neighbor_table[1][1][1], "QUIT\n"));
+        put_quitreson(&p, reason, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+
+    return sendpacket(neighbor_table[1][1][1], &out_packet);
 
 }
 
 int c_p_empty(void) {
 
-    return (sendto_one(neighbor_table[1][1][1], "P\n"));
+    lt_packet out_packet;
+
+    makepacket(&out_packet, T_P);
+
+    return (sendpacket(neighbor_table[1][1][1], &out_packet));
 
 }
 
 int c_pc(uint32_t color) {
 
+    void *p;
+    lt_packet out_packet;
+
     lattice_player.usercolor = color;
 
-    return (sendto_one(neighbor_table[1][1][1], "PC %d\n", color));
+    makepacket(&out_packet, T_PC);
+    if (!put_usercolor(&p, color, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+
+    return (sendpacket(neighbor_table[1][1][1], &out_packet));
 
 }
 
 int c_pr(head_rot rot) {
 
+    void *p;
+    lt_packet out_packet;
+
     lattice_player.hrot = rot;
 
-    return (sendto_one(neighbor_table[1][1][1], "PR %d %d\n", rot.xrot, rot.yrot));
+    makepacket(&out_packet, T_PR);
+    if (!put_xrot(&p, rot.xrot, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_yrot(&p, rot.yrot, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+
+    return (sendpacket(neighbor_table[1][1][1], &out_packet));
 
 }
 
 int c_ph(hand_hold hand) {
 
+    void *p;
+    lt_packet out_packet;
+
     lattice_player.hhold = hand;
 
-    return (sendto_one(neighbor_table[1][1][1], "PH %d %d\n", hand.item_id, hand.item_type));
+    makepacket(&out_packet, T_PH);
+    if (!put_item_id(&p, hand.item_id, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_item_type(&p, hand.item_type, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+
+    return (sendpacket(neighbor_table[1][1][1], &out_packet));
 
 }
 
 int c_chat(char *chat_text) {
 
+    void *p;
+    lt_packet out_packet;
+
+    makepacket(&out_packet, T_CHAT);
+
     if (chat_text)
-        return (sendto_one(neighbor_table[1][1][1], "CHAT :%s\n", chat_text));
-    else
-        return (sendto_one(neighbor_table[1][1][1], "CHAT :\n"));
+        put_chat(&p, chat_text, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+
+    return sendpacket(neighbor_table[1][1][1], &out_packet);
 
 }
 
 int c_pchat(uint32_t uid, char *chat_text) {
 
+    void *p;
+    lt_packet out_packet;
+
+    makepacket(&out_packet, T_PCHAT);
+
+    if (!put_uid(&p, uid, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+
     if (chat_text)
-        return (sendto_one(neighbor_table[1][1][1], "PCHAT %lu :%s\n", uid, chat_text));
-    else
-        return (sendto_one(neighbor_table[1][1][1], "PCHAT %lu :\n", uid));
+        put_chat(&p, chat_text, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+
+    return sendpacket(neighbor_table[1][1][1], &out_packet);
+
 
 }
 
 int c_action(char *action_text) {
 
+    void *p;
+    lt_packet out_packet;
+
+    makepacket(&out_packet, T_ACTION);
+
     if (action_text)
-        return (sendto_one(neighbor_table[1][1][1], "ACTION :%s\n", action_text));
-    else
-        return (sendto_one(neighbor_table[1][1][1], "ACTION :\n"));
+        put_action(&p, action_text, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+
+    return sendpacket(neighbor_table[1][1][1], &out_packet);
 
 }
 
 int c_s(int32_t mid, int32_t sid) {
 
-    return (sendto_one(neighbor_table[1][1][1], "S %d %d\n", mid, sid));
+    void *p;
+    lt_packet out_packet;
+
+    makepacket(&out_packet, T_S);
+    if (!put_mid(&p, mid, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_sid(&p, sid, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+
+    return (sendpacket(neighbor_table[1][1][1], &out_packet));
 
 }
 
 int c_sc(int32_t csid) {
 
-    return (sendto_one(neighbor_table[1][1][1], "SC %d\n", csid));
+    void *p;
+    lt_packet out_packet;
+
+    makepacket(&out_packet, T_SC);
+    if (!put_csid(&p, csid, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+
+    return (sendpacket(neighbor_table[1][1][1], &out_packet));
 
 }
 
 int c_bo(w_coord wcoord, b_coord bcoord, int32_t id) {
 
-    return (sendto_one(neighbor_table[1][1][1], "BO %d %d %d %d %d %d $d\n", wcoord.x, wcoord.y, wcoord.z, bcoord.x, bcoord.y, bcoord.z, id));
+    void *p;
+    lt_packet out_packet;
+
+    makepacket(&out_packet, T_BO);
+    if (!put_wx(&p, wcoord.x, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_wy(&p, wcoord.y, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_wz(&p, wcoord.z, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_bx(&p, bcoord.x, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_by(&p, bcoord.y, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_bz(&p, bcoord.z, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_boid(&p, id, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+
+    return (sendpacket(neighbor_table[1][1][1], &out_packet));
 
 }
 
 int c_mo(w_coord wcoord, b_coord bcoord, int32_t id, int32_t count) {
 
-    return (sendto_one(neighbor_table[1][1][1], "MO %d %d %d %d %d %d $d %d\n", wcoord.x, wcoord.y, wcoord.z, bcoord.x, bcoord.y, bcoord.z, id, count));
+    void *p;
+    lt_packet out_packet;
+
+    makepacket(&out_packet, T_MO);
+    if (!put_wx(&p, wcoord.x, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_wy(&p, wcoord.y, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_wz(&p, wcoord.z, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_bx(&p, bcoord.x, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_by(&p, bcoord.y, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_bz(&p, bcoord.z, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_moid(&p, id, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_mocount(&p, count, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+
+    return (sendpacket(neighbor_table[1][1][1], &out_packet));
 
 }
 
 int c_badd(w_coord wcoord, b_coord bcoord, block_t block) {
 
-    server_socket *p;
+    server_socket *dst;
 
     n_coord ncoord;
 
+    void *p;
+    lt_packet out_packet;
+
     ncoord = wcoord_to_ncoord(wcoord);
 
-    p = find_neighbor(ncoord);
+    dst = find_neighbor(ncoord);
 
-    if (!p) return 0;
+    if (!dst) return 0;
 
-    return (sendto_one(p, "BADD %d %d %d %d %d %d %d %d\n", wcoord.x, wcoord.y, wcoord.z, bcoord.x, bcoord.y, bcoord.z, block.id, block.bf));
+    makepacket(&out_packet, T_BADD);
+    if (!put_wx(&p, wcoord.x, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_wy(&p, wcoord.y, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_wz(&p, wcoord.z, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_bx(&p, bcoord.x, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_by(&p, bcoord.y, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_bz(&p, bcoord.z, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_block(&p, *(uint16_t *)&block, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+
+    return (sendpacket(dst, &out_packet));
 
 }
 
 int c_bset(w_coord wcoord, b_coord bcoord, block_t block) {
 
-    server_socket *p;
+    server_socket *dst;
 
     n_coord ncoord;
 
+    void *p;
+    lt_packet out_packet;
+
     ncoord = wcoord_to_ncoord(wcoord);
 
-    p = find_neighbor(ncoord);
+    dst = find_neighbor(ncoord);
 
-    if (!p) return 0;
+    if (!dst) return 0;
 
-    return (sendto_one(p, "BSET %d %d %d %d %d %d %d %d\n", wcoord.x, wcoord.y, wcoord.z, bcoord.x, bcoord.y, bcoord.z, block.id, block.bf));
+    makepacket(&out_packet, T_BSET);
+    if (!put_wx(&p, wcoord.x, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_wy(&p, wcoord.y, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_wz(&p, wcoord.z, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_bx(&p, bcoord.x, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_by(&p, bcoord.y, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_bz(&p, bcoord.z, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_block(&p, *(uint16_t *)&block, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+
+    return (sendpacket(dst, &out_packet));
 
 }
 
 int c_brem(w_coord wcoord, b_coord bcoord) {
 
-    server_socket *p;
+    server_socket *dst;
 
     n_coord ncoord;
 
+    void *p;
+    lt_packet out_packet;
+
     ncoord = wcoord_to_ncoord(wcoord);
 
-    p = find_neighbor(ncoord);
+    dst = find_neighbor(ncoord);
 
-    if (!p) return 0;
+    if (!dst) return 0;
 
-    return (sendto_one(p, "BREM %d %d %d %d %d %d\n", wcoord.x, wcoord.y, wcoord.z, bcoord.x, bcoord.y, bcoord.z));
+    makepacket(&out_packet, T_BREM);
+    if (!put_wx(&p, wcoord.x, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_wy(&p, wcoord.y, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_wz(&p, wcoord.z, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_bx(&p, bcoord.x, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_by(&p, bcoord.y, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_bz(&p, bcoord.z, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+
+    return (sendpacket(dst, &out_packet));
 
 }
 
 
 int c_pmine(int mining) {
 
+    void *p;
+    lt_packet out_packet;
+
     lattice_player.mining = mining ? 1 : 0;
 
-    return (sendto_one(neighbor_table[1][1][1], "PMINE %d\n", mining ? 1 : 0));
+    makepacket(&out_packet, T_PMINE);
+    if (!put_mining(&p, mining ? 1 : 0, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    return (sendpacket(neighbor_table[1][1][1], &out_packet));
 
 }
 
 int c_schat(char *schat_text) {
 
+    void *p;
+    lt_packet out_packet;
+
+    makepacket(&out_packet, T_SCHAT);
+
     if (schat_text)
-        return (sendto_one(neighbor_table[1][1][1], "SCHAT :%s\n", schat_text));
-    else
-        return (sendto_one(neighbor_table[1][1][1], "SCHAT :\n"));
+        put_chat(&p, schat_text, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+
+    return sendpacket(neighbor_table[1][1][1], &out_packet);
 
 }
 
 int c_lusers() {
 
-    return (sendto_one(neighbor_table[1][1][1], "LUSERS\n"));
+    void *p;
+    lt_packet out_packet;
+
+    makepacket(&out_packet, T_LUSERS);
+    return (sendpacket(neighbor_table[1][1][1], &out_packet));
 
 }
 

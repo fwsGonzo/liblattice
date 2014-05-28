@@ -41,41 +41,43 @@
 #include "server_commands.h"
 #include "client_commands.h"
 #include "sched.h"
+#include "lattice_packet.h"
 
 struct message s_mestab[] = {
-    { "ping", s_ping, FLAG_REG },
-    { "pong", s_pong, FLAG_REG },
-    { "iamserver", s_iamserver, 0 },
-    { "p", s_p, FLAG_REG },
-    { "quit", s_quit, FLAG_REG },
-    { "pc", s_pc, FLAG_REG },
-    { "pr", s_pr, FLAG_REG },
-    { "ph", s_ph, FLAG_REG },
-    { "chat", s_chat, FLAG_REG },
-    { "action", s_action, FLAG_REG },
-    { "s", s_s, FLAG_REG },
-    { "sc", s_sc, FLAG_REG },
-    { "bo", s_bo, FLAG_REG },
-    { "mo", s_mo, FLAG_REG },
-    { "badd", s_badd, FLAG_REG },
-    { "bset", s_bset, FLAG_REG },
-    { "brem", s_brem, FLAG_REG },
-    { "pmine", s_pmine, FLAG_REG },
-    { "schat", s_schat, FLAG_REG },
-    { "log", s_log, FLAG_REG },
-    { "satstep", s_satstep, FLAG_REG },
-    { "sat", s_sat, FLAG_REG },
-    { "fade", s_fade, FLAG_REG },
-    { "user", s_user, FLAG_REG },
-    { "server", s_server, FLAG_REG },
-    { "delserver", s_delserver, FLAG_REG },
-    { "moveto", s_moveto, FLAG_REG },
-    { "movefrom", s_movefrom, FLAG_REG },
-    { "trackerfailure", s_trackerfailure, FLAG_REG },
-    { "closing", s_closing, FLAG_REG },
-    { (char *) NULL, (int (*)()) NULL, 0 }
+    { T_PING, s_ping, FLAG_REG },
+    { T_PONG, s_pong, FLAG_REG },
+    { T_IAMSERVER, s_iamserver, 0 },
+    { T_P, s_p, FLAG_REG },
+    { T_QUIT, s_quit, FLAG_REG },
+    { T_PC, s_pc, FLAG_REG },
+    { T_PR, s_pr, FLAG_REG },
+    { T_PH, s_ph, FLAG_REG },
+    { T_CHAT, s_chat, FLAG_REG },
+    { T_ACTION, s_action, FLAG_REG },
+    { T_S, s_s, FLAG_REG },
+    { T_SC, s_sc, FLAG_REG },
+    { T_BO, s_bo, FLAG_REG },
+    { T_MO, s_mo, FLAG_REG },
+    { T_BADD, s_badd, FLAG_REG },
+    { T_BSET, s_bset, FLAG_REG },
+    { T_BREM, s_brem, FLAG_REG },
+    { T_PMINE, s_pmine, FLAG_REG },
+    { T_SCHAT, s_schat, FLAG_REG },
+    { T_LOG, s_log, FLAG_REG },
+    { T_SATSTEP, s_satstep, FLAG_REG },
+    { T_SAT, s_sat, FLAG_REG },
+    { T_FADE, s_fade, FLAG_REG },
+    { T_USER, s_user, FLAG_REG },
+    { T_SERVER, s_server, FLAG_REG },
+    { T_DELSERVER, s_delserver, FLAG_REG },
+    { T_MOVETO, s_moveto, FLAG_REG },
+    { T_MOVEFROM, s_movefrom, FLAG_REG },
+    { T_TRACKERFAILURE, s_trackerfailure, FLAG_REG },
+    { T_CLOSING, s_closing, FLAG_REG },
+    { 0, (int (*)()) NULL, 0 }
 };
 
+/*
 struct message *find_message (struct message *tab, char *command) {
     struct message *m = (struct message *)NULL;
 
@@ -87,6 +89,20 @@ struct message *find_message (struct message *tab, char *command) {
 
     return m;
 }
+*/
+
+struct message *find_message (struct message *tab, int type) {
+    struct message *m = (struct message *)NULL;
+
+    if (!tab) return NULL;
+
+    for (m = tab; m->type; m++)
+        if (m->type == type)
+            if (m->func) return m;
+
+    return NULL;
+}
+
 
 
 char *arg_v[MAX_ARGS];
@@ -243,13 +259,15 @@ void lattice_process(void) {
     int read_length;
     size_t read_move_length;
     size_t read_index;
-    size_t check_length;
-    char *p;
+    //size_t check_length;
+    //char *p;
 
     struct message *find_command;
 
-    uint32_t from;
-    uint32_t *pfrom;
+//    uint32_t from;
+//    uint32_t *pfrom;
+
+    lt_packet *packet;
 
     gettimeofday(&now, NULL);
 
@@ -284,6 +302,95 @@ void lattice_process(void) {
                 continue;
             }
 
+            // BINARY based protocols
+            read_index = 0;
+
+            while(read_index < read_length) {
+
+                if(s->rlen < sizeof(lt_packet_h)) {
+                    // we do not yet have the main header for this packet
+
+                    read_move_length = my_min(
+                        sizeof(lt_packet_h) - s->rlen,
+                        read_length - read_index );
+
+                    if (read_move_length > 0)
+                        memcpy((char *)s->rmsg + s->rlen,
+                            read_block + read_index,
+                            read_move_length);
+
+                    read_index += read_move_length;
+                    s->rlen += read_move_length;
+
+                    if(s->rlen < sizeof(lt_packet_h)) break;
+
+                    packet = (lt_packet *)s->rmsg;
+
+                    packet_ntoh(&packet->header);
+
+                }
+
+                // at this point we know we have a header in host order
+
+                if (packet->header.marker != SYNCH_MARKER) {
+                    // This is a loss of synchronization. close the socket
+                    closesock(s);
+                    break;
+                }
+
+                if ( packet->header.payload_length > PAYLOAD_MTU) {
+                    // This is an MTU violation. close the socket
+                    closesock(s);
+                    break;
+                }
+
+                read_move_length = my_min(
+                    packet->header.payload_length - (s->rlen - sizeof(lt_packet_h)),
+                    read_length - read_index );
+
+                if (read_move_length > 0)
+                    memcpy((char *)s->rmsg + s->rlen,
+                        read_block + read_index,
+                        read_move_length);
+
+                read_index += read_move_length;
+                s->rlen += read_move_length;
+
+                if( s->rlen <
+                    (sizeof(lt_packet_h) + packet->header.payload_length) )
+                    break;
+
+                // We have a packet ready to execute!
+
+                //switch(s->type) {
+
+                //    case SOCKET_SERVER:
+                //        find_packet_command = find_packet_message(ps_mestab, packet->header.payload_type);
+                //    break;
+                //    default:
+                //        find_packet_command = NULL;
+                //    break;
+                //}
+
+                find_command = find_message(s_mestab, packet->header.payload_type);
+
+                if (!find_command) {s->rlen = 0; continue;}
+
+                if (!find_command->func) {s->rlen = 0; continue;}
+
+                if ( (find_command->flags & FLAG_REG) && (!TstFlagReg(s)) ) {
+                    closesock(s);
+                    //s->rlen = 0; // done in closesock()
+                    break;
+                }
+
+                if ((*find_command->func)(s, packet)) break; // if true we've been closed, dont process more...
+
+                s->rlen=0;
+
+            } // End while(read_index < read_length)
+
+/*
             read_index = 0;
 
             while(read_index < read_length) {
@@ -354,6 +461,7 @@ void lattice_process(void) {
                 }  // end p
 
             } // while(read_index < read_length)
+*/
 
         } // End if(FD_ISSET(fd &rready_set))
 
@@ -474,9 +582,12 @@ int lattice_connect(char *ipstr, uint16_t port) {
     struct in_addr ip;
     struct hostent *he;
 
+    void *p;
+    lt_packet out_packet;
+
     int error;
 
-    server_socket *p;
+    server_socket *dst;
 
     lattice_message mess;
 
@@ -495,11 +606,11 @@ int lattice_connect(char *ipstr, uint16_t port) {
         ip.s_addr = inet_addr(ipstr);
     }
 
-    p = connect_server(lattice_player.centeredon, ip, port, &error);
+    dst = connect_server(lattice_player.centeredon, ip, port, &error);
 
-    if (!p) return error;
+    if (!dst) return error;
 
-    neighbor_table[1][1][1]=p;
+    neighbor_table[1][1][1]=dst;
 
     mess.type = T_CONNECTED;
     ClrFlagFrom(&mess);
@@ -509,27 +620,49 @@ int lattice_connect(char *ipstr, uint16_t port) {
 
     (*gcallback)(&mess);
 
-    if(sendto_one(neighbor_table[1][1][1],
-                       //                              wx  wy  wz bx by bz  HEAD  HAND
-                       "CENTEREDINTRO %lu %d %u %s %d %u %u %u %d %d %d %d %d %d %d %d %u\n",
-                       lattice_player.userid,
-                       lattice_player.model,
-                       lattice_player.color,
-                       lattice_player.nickname,
-                       lattice_player.burstdist,
-                       lattice_player.wpos.x,
-                       lattice_player.wpos.y,
-                       lattice_player.wpos.z,
-                       lattice_player.bpos.x,
-                       lattice_player.bpos.y,
-                       lattice_player.bpos.z,
-                       lattice_player.hrot.xrot,
-                       lattice_player.hrot.yrot,
-                       lattice_player.hhold.item_id,
-                       lattice_player.hhold.item_type,
-                       lattice_player.mining,
-                       lattice_player.usercolor
-                       )) return -12;
+    makepacket(&out_packet, T_CENTEREDINTRO);
+
+    if (!put_uid(&p, lattice_player.userid, &PLength(&out_packet), &PArgc(&out_packet))) return -13;
+    if (!put_model(&p, lattice_player.model, &PLength(&out_packet), &PArgc(&out_packet))) return -14;
+    if (!put_color(&p, lattice_player.color, &PLength(&out_packet), &PArgc(&out_packet))) return -15;
+    if (!put_nickname(&p, lattice_player.nickname, &PLength(&out_packet), &PArgc(&out_packet))) return -16;
+    if (!put_burstdist(&p, lattice_player.burstdist, &PLength(&out_packet), &PArgc(&out_packet))) return -17;
+    if (!put_wx(&p, lattice_player.wpos.x, &PLength(&out_packet), &PArgc(&out_packet))) return -18;
+    if (!put_wy(&p, lattice_player.wpos.y, &PLength(&out_packet), &PArgc(&out_packet))) return -19;
+    if (!put_wz(&p, lattice_player.wpos.z, &PLength(&out_packet), &PArgc(&out_packet))) return -20;
+    if (!put_bx(&p, lattice_player.bpos.x, &PLength(&out_packet), &PArgc(&out_packet))) return -21;
+    if (!put_by(&p, lattice_player.bpos.y, &PLength(&out_packet), &PArgc(&out_packet))) return -22;
+    if (!put_bz(&p, lattice_player.bpos.z, &PLength(&out_packet), &PArgc(&out_packet))) return -23;
+    if (!put_xrot(&p, lattice_player.hrot.xrot, &PLength(&out_packet), &PArgc(&out_packet))) return -24;
+    if (!put_yrot(&p, lattice_player.hrot.yrot, &PLength(&out_packet), &PArgc(&out_packet))) return -25;
+    if (!put_item_id(&p, lattice_player.hhold.item_id, &PLength(&out_packet), &PArgc(&out_packet))) return -26;
+    if (!put_item_type(&p, lattice_player.hhold.item_type, &PLength(&out_packet), &PArgc(&out_packet))) return -27;
+    if (!put_mining(&p, lattice_player.mining, &PLength(&out_packet), &PArgc(&out_packet))) return -28;
+    if (!put_usercolor(&p, lattice_player.usercolor, &PLength(&out_packet), &PArgc(&out_packet))) return -29;
+
+    if (sendpacket(neighbor_table[1][1][1], &out_packet)) return -12;
+
+    //if(sendto_one(neighbor_table[1][1][1],
+    //                   //                              wx  wy  wz bx by bz  HEAD  HAND
+    //                   "CENTEREDINTRO %lu %d %u %s %d %u %u %u %d %d %d %d %d %d %d %d %u\n",
+    //                   lattice_player.userid,
+    //                   lattice_player.model,
+    //                   lattice_player.color,
+    //                   lattice_player.nickname,
+    //                   lattice_player.burstdist,
+    //                   lattice_player.wpos.x,
+    //                   lattice_player.wpos.y,
+    //                   lattice_player.wpos.z,
+    //                   lattice_player.bpos.x,
+    //                   lattice_player.bpos.y,
+    //                   lattice_player.bpos.z,
+    //                   lattice_player.hrot.xrot,
+    //                   lattice_player.hrot.yrot,
+    //                   lattice_player.hhold.item_id,
+    //                   lattice_player.hhold.item_type,
+    //                   lattice_player.mining,
+    //                   lattice_player.usercolor
+    //                   )) return -12;
 
     return 0;
 

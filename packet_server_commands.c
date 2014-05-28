@@ -35,7 +35,7 @@ int s_ping(struct server_socket *src, lt_packet *packet) {
 
     if (!src || !packet) return 0;
 
-    makepacket(&out_packet, C_PONG);
+    makepacket(&out_packet, T_PONG);
     if (sendpacket(src, &out_packet)) return 1;
     //if (sendto_one(src, "PONG\n")) return 1;
 
