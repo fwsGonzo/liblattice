@@ -26,22 +26,28 @@
 #include "globals.h"
 #include "neighbors.h"
 #include "sched.h"
+#include "macros.h"
+#include "lattice_packet.h"
 
-int s_ping(struct server_socket *src, int argc, char **argv) {
+int s_ping(struct server_socket *src, lt_packet *packet) {
 
-    if (!src) return 0;
+    lt_packet out_packet;
 
-    if (sendto_one(src, "PONG\n")) return 1;
+    if (!src || !packet) return 0;
+
+    makepacket(&out_packet, T_PONG);
+    if (sendpacket(src, &out_packet)) return 1;
+    //if (sendto_one(src, "PONG\n")) return 1;
 
     return 0;
 
 }
 
-int s_pong(struct server_socket *src, int argc, char **argv) {
+int s_pong(struct server_socket *src, lt_packet *packet) {
 
     struct timeval pingtime;
 
-    if (!src) return 0;
+    if (!src || !packet) return 0;
 
     sched_deltypefrom(&sched, src, SCHED_SERVER_PING_TIMEOUT);
 
@@ -61,11 +67,11 @@ int s_pong(struct server_socket *src, int argc, char **argv) {
 
 }
 
-int s_iamserver(struct server_socket *src, int argc, char **argv) {
+int s_iamserver(struct server_socket *src, lt_packet *packet) {
 
     struct timeval pingtime;
 
-    if (!src) return 0;
+    if (!src || !packet) return 0;
 
     SetFlagReg(src);
 
@@ -89,33 +95,57 @@ int s_iamserver(struct server_socket *src, int argc, char **argv) {
 
 }
 
-int s_p(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+int s_p(struct server_socket *src, lt_packet *packet) {
 
     lattice_message mess;
     lattice_p submess;
 
+    void *p;
+    uint16_t len;
+    uint16_t argc;
+
+    uid_t *pfrom;
+
     uid_link *uidlink;
 
-    if (!src) return 0;
+    if (!src || !packet) return 0;
+
+    if (TstPFlagFrom(packet))
+        pfrom = &(packet->header.fromuid);
+    else
+        pfrom = NULL;
 
     if (!pfrom) return 0;
+
+    argc = packet->header.payload_argc;
+    len = packet->header.payload_length;
+    p = packet->payload;
 
     mess.type = T_P;
     SetFlagFrom(&mess);
     mess.fromuid = *pfrom;
 
-    if (argc < 6) {
+    if (PArgc(packet) < 6) {
         mess.length = 0;
         mess.args = NULL;
     } else {
         mess.length = sizeof submess;
         mess.args = &submess;
-        submess.wcoord.x = atoi(argv[0]);
-        submess.wcoord.y = atoi(argv[1]);
-        submess.wcoord.z = atoi(argv[2]);
-        submess.bcoord.x = atoi(argv[3]);
-        submess.bcoord.y = atoi(argv[4]);
-        submess.bcoord.z = atoi(argv[5]);
+
+        if (!get_wx(&p, &(submess.wcoord.x), &len, &argc)) return 0;
+        if (!get_wy(&p, &(submess.wcoord.y), &len, &argc)) return 0;
+        if (!get_wz(&p, &(submess.wcoord.z), &len, &argc)) return 0;
+
+        if (!get_bx(&p, &(submess.bcoord.x), &len, &argc)) return 0;
+        if (!get_by(&p, &(submess.bcoord.y), &len, &argc)) return 0;
+        if (!get_bz(&p, &(submess.bcoord.z), &len, &argc)) return 0;
+
+        //submess.wcoord.x = atoi(argv[0]);
+        //submess.wcoord.y = atoi(argv[1]);
+        //submess.wcoord.z = atoi(argv[2]);
+        //submess.bcoord.x = atoi(argv[3]);
+        //submess.bcoord.y = atoi(argv[4]);
+        //submess.bcoord.z = atoi(argv[5]);
 
         uidlink = uid_link_find(src, mess.fromuid);
 
@@ -132,18 +162,35 @@ int s_p(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 }
 
 
-int s_quit(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+int s_quit(struct server_socket *src, lt_packet *packet) {
 
     lattice_message mess;
     lattice_quit submess;
 
+    void *p;
+    uint16_t len;
+    uint16_t argc;
+
+    char *str;
+
+    uid_t *pfrom;
+
     uid_link *uidlink;
 
-    if (!src) return 0;
+    if (!src || !packet) return 0;
+
+    if (TstPFlagFrom(packet))
+        pfrom = &(packet->header.fromuid);
+    else
+        pfrom = NULL;
 
     if (!pfrom) return 0;
 
-    if (argc < 2) return 0;
+    if (PArgc(packet) < 2) return 0;
+
+    argc = packet->header.payload_argc;
+    len = packet->header.payload_length;
+    p = packet->payload;
 
     mess.type = T_QUIT;
 
@@ -154,10 +201,10 @@ int s_quit(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
     mess.length = sizeof submess;
     mess.args = &submess;
 
-    submess.numeric = atoi(argv[0]);
-    strncpy(submess.desc, argv[1] , sizeof(submess.desc));
+    if (!get_numeric(&p, &(submess.numeric), &len, &argc)) return 0;
+    if (!get_quitreason(&p, &(str), &len, &argc)) return 0;
+    strncpy(submess.desc, str , sizeof(submess.desc));
     submess.desc[sizeof(submess.desc)-1]='\0';
-
 
     uidlink = uid_link_find(src, mess.fromuid);
 
@@ -171,17 +218,32 @@ int s_quit(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 }
 
 
-int s_pc(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+int s_pc(struct server_socket *src, lt_packet *packet) {
 
     lattice_message mess;
 
     lattice_pc submess;
 
-    if (!src) return 0;
+    void *p;
+    uint16_t len;
+    uint16_t argc;
+
+    uid_t *pfrom;
+
+    if (!src || !packet) return 0;
+
+    if (TstPFlagFrom(packet))
+        pfrom = &(packet->header.fromuid);
+    else
+        pfrom = NULL;
 
     if (!pfrom) return 0;
 
-    if (argc < 1) return 0;
+    if (PArgc(packet) < 1) return 0;
+
+    argc = packet->header.payload_argc;
+    len = packet->header.payload_length;
+    p = packet->payload;
 
     mess.type = T_PC;
 
@@ -192,7 +254,8 @@ int s_pc(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
     mess.length = sizeof submess;
     mess.args = &submess;
 
-    submess.color = (uint32_t)atoi(argv[0]);
+    //submess.color = (uint32_t)atoi(argv[0]);
+    if (!get_usercolor(&p, &(submess.color), &len, &argc)) return 0;
 
     (*gcallback)(&mess);
 
@@ -201,17 +264,32 @@ int s_pc(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 }
 
 
-int s_pr(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+int s_pr(struct server_socket *src, lt_packet *packet) {
 
     lattice_message mess;
 
     lattice_pr submess;
 
-    if (!src) return 0;
+    void *p;
+    uint16_t len;
+    uint16_t argc;
+
+    uid_t *pfrom;
+
+    if (!src || !packet) return 0;
+
+    if (TstPFlagFrom(packet))
+        pfrom = &(packet->header.fromuid);
+    else
+        pfrom = NULL;
 
     if (!pfrom) return 0;
 
-    if (argc < 2) return 0;
+    if (PArgc(packet) < 2) return 0;
+
+    argc = packet->header.payload_argc;
+    len = packet->header.payload_length;
+    p = packet->payload;
 
     mess.type = T_PR;
 
@@ -222,8 +300,11 @@ int s_pr(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
     mess.length = sizeof submess;
     mess.args = &submess;
 
-    submess.rot.xrot = (HEAD_TYPE)atoi(argv[0]);
-    submess.rot.yrot = (HEAD_TYPE)atoi(argv[1]);
+    if (!get_xrot(&p, &(submess.rot.xrot), &len, &argc)) return 0;
+    if (!get_yrot(&p, &(submess.rot.yrot), &len, &argc)) return 0;
+
+    //submess.rot.xrot = (HEAD_TYPE)atoi(argv[0]);
+    //submess.rot.yrot = (HEAD_TYPE)atoi(argv[1]);
 
     (*gcallback)(&mess);
 
@@ -231,17 +312,32 @@ int s_pr(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
 }
 
-int s_ph(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+int s_ph(struct server_socket *src, lt_packet *packet) {
 
     lattice_message mess;
 
     lattice_ph submess;
 
-    if (!src) return 0;
+    void *p;
+    uint16_t len;
+    uint16_t argc;
+
+    uid_t *pfrom;
+
+    if (!src || !packet) return 0;
+
+    if (TstPFlagFrom(packet))
+        pfrom = &(packet->header.fromuid);
+    else
+        pfrom = NULL;
 
     if (!pfrom) return 0;
 
-    if (argc < 2) return 0;
+    if (PArgc(packet) < 2) return 0;
+
+    argc = packet->header.payload_argc;
+    len = packet->header.payload_length;
+    p = packet->payload;
 
     mess.type = T_PH;
 
@@ -252,8 +348,11 @@ int s_ph(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
     mess.length = sizeof submess;
     mess.args = &submess;
 
-    submess.hand.item_id = (HAND_TYPE)atoi(argv[0]);
-    submess.hand.item_type = (HAND_TYPE)atoi(argv[1]);
+    if (!get_item_id(&p, &(submess.hand.item_id), &len, &argc)) return 0;
+    if (!get_item_type(&p, &(submess.hand.item_type), &len, &argc)) return 0;
+
+    //submess.hand.item_id = (HAND_TYPE)atoi(argv[0]);
+    //submess.hand.item_type = (HAND_TYPE)atoi(argv[1]);
 
     (*gcallback)(&mess);
 
@@ -262,17 +361,34 @@ int s_ph(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 }
 
 
-int s_chat(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+int s_chat(struct server_socket *src, lt_packet *packet) {
 
     lattice_message mess;
 
     lattice_chat submess;
 
-    if (!src) return 0;
+    void *p;
+    uint16_t len;
+    uint16_t argc;
+
+    char *str;
+
+    uid_t *pfrom;
+
+    if (!src || !packet) return 0;
+
+    if (TstPFlagFrom(packet))
+        pfrom = &(packet->header.fromuid);
+    else
+        pfrom = NULL;
 
     if (!pfrom) return 0;
 
-    if (argc < 1) return 0;
+    if (PArgc(packet) < 1) return 0;
+
+    argc = packet->header.payload_argc;
+    len = packet->header.payload_length;
+    p = packet->payload;
 
     mess.type = T_CHAT;
 
@@ -283,7 +399,8 @@ int s_chat(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
     mess.length = sizeof submess;
     mess.args = &submess;
 
-    strncpy(submess.chat_text, argv[0] , sizeof(submess.chat_text));
+    if (!get_chat(&p, &(str), &len, &argc)) return 0;
+    strncpy(submess.chat_text, str , sizeof(submess.chat_text));
     submess.chat_text[sizeof(submess.chat_text)-1]='\0';
 
     (*gcallback)(&mess);
@@ -293,17 +410,34 @@ int s_chat(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 }
 
 
-int s_action(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+int s_action(struct server_socket *src, lt_packet *packet) {
 
     lattice_message mess;
 
     lattice_action submess;
 
-    if (!src) return 0;
+    void *p;
+    uint16_t len;
+    uint16_t argc;
+
+    char *str;
+
+    uid_t *pfrom;
+
+    if (!src || !packet) return 0;
+
+    if (TstPFlagFrom(packet))
+        pfrom = &(packet->header.fromuid);
+    else
+        pfrom = NULL;
 
     if (!pfrom) return 0;
 
-    if (argc < 1) return 0;
+    if (PArgc(packet) < 1) return 0;
+
+    argc = packet->header.payload_argc;
+    len = packet->header.payload_length;
+    p = packet->payload;
 
     mess.type = T_ACTION;
 
@@ -314,7 +448,8 @@ int s_action(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) 
     mess.length = sizeof submess;
     mess.args = &submess;
 
-    strncpy(submess.action_text, argv[0] , sizeof(submess.action_text));
+    if (!get_action(&p, &(str), &len, &argc)) return 0;
+    strncpy(submess.action_text, str , sizeof(submess.action_text));
     submess.action_text[sizeof(submess.action_text)-1]='\0';
 
     (*gcallback)(&mess);
@@ -323,17 +458,32 @@ int s_action(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) 
 
 }
 
-int s_s(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+int s_s(struct server_socket *src, lt_packet *packet) {
 
     lattice_message mess;
 
     lattice_s submess;
 
-    if (!src) return 0;
+    void *p;
+    uint16_t len;
+    uint16_t argc;
+
+    uid_t *pfrom;
+
+    if (!src || !packet) return 0;
+
+    if (TstPFlagFrom(packet))
+        pfrom = &(packet->header.fromuid);
+    else
+        pfrom = NULL;
 
     if (!pfrom) return 0;
 
-    if (argc < 2) return 0;
+    if (PArgc(packet) < 2) return 0;
+
+    argc = packet->header.payload_argc;
+    len = packet->header.payload_length;
+    p = packet->payload;
 
     mess.type = T_S;
 
@@ -344,8 +494,11 @@ int s_s(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
     mess.length = sizeof submess;
     mess.args = &submess;
 
-    submess.mid = (int32_t)atoi(argv[0]);
-    submess.sid = (int32_t)atoi(argv[1]);
+    if (!get_mid(&p, &(submess.mid), &len, &argc)) return 0;
+    if (!get_sid(&p, &(submess.sid), &len, &argc)) return 0;
+
+    //submess.mid = (int32_t)atoi(argv[0]);
+    //submess.sid = (int32_t)atoi(argv[1]);
 
     (*gcallback)(&mess);
 
@@ -353,17 +506,32 @@ int s_s(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
 }
 
-int s_sc(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+int s_sc(struct server_socket *src, lt_packet *packet) {
 
     lattice_message mess;
 
     lattice_sc submess;
 
-    if (!src) return 0;
+    void *p;
+    uint16_t len;
+    uint16_t argc;
+
+    uid_t *pfrom;
+
+    if (!src || !packet) return 0;
+
+    if (TstPFlagFrom(packet))
+        pfrom = &(packet->header.fromuid);
+    else
+        pfrom = NULL;
 
     if (!pfrom) return 0;
 
-    if (argc < 1) return 0;
+    if (PArgc(packet) < 1) return 0;
+
+    argc = packet->header.payload_argc;
+    len = packet->header.payload_length;
+    p = packet->payload;
 
     mess.type = T_SC;
 
@@ -374,7 +542,8 @@ int s_sc(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
     mess.length = sizeof submess;
     mess.args = &submess;
 
-    submess.csid = (int32_t)atoi(argv[0]);
+    if (!get_csid(&p, &(submess.csid), &len, &argc)) return 0;
+    //submess.csid = (int32_t)atoi(argv[0]);
 
     (*gcallback)(&mess);
 
@@ -383,17 +552,32 @@ int s_sc(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 }
 
 
-int s_bo(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+int s_bo(struct server_socket *src, lt_packet *packet) {
 
     lattice_message mess;
 
     lattice_bo submess;
 
-    if (!src) return 0;
+    void *p;
+    uint16_t len;
+    uint16_t argc;
+
+    uid_t *pfrom;
+
+    if (!src || !packet) return 0;
+
+    if (TstPFlagFrom(packet))
+        pfrom = &(packet->header.fromuid);
+    else
+        pfrom = NULL;
 
     if (!pfrom) return 0;
 
-    if (argc < 7) return 0;
+    if (PArgc(packet) < 7) return 0;
+
+    argc = packet->header.payload_argc;
+    len = packet->header.payload_length;
+    p = packet->payload;
 
     mess.type = T_BO;
 
@@ -404,33 +588,55 @@ int s_bo(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
     mess.length = sizeof submess;
     mess.args = &submess;
 
-    submess.wcoord.x = atoi(argv[0]);
-    submess.wcoord.y = atoi(argv[1]);
-    submess.wcoord.z = atoi(argv[2]);
-    submess.bcoord.x = atoi(argv[3]);
-    submess.bcoord.y = atoi(argv[4]);
-    submess.bcoord.z = atoi(argv[5]);
-    submess.id = atoi(argv[6]);
+    if (!get_wx(&p, &(submess.wcoord.x), &len, &argc)) return 0;
+    if (!get_wy(&p, &(submess.wcoord.y), &len, &argc)) return 0;
+    if (!get_wz(&p, &(submess.wcoord.z), &len, &argc)) return 0;
 
+    if (!get_bx(&p, &(submess.bcoord.x), &len, &argc)) return 0;
+    if (!get_by(&p, &(submess.bcoord.y), &len, &argc)) return 0;
+    if (!get_bz(&p, &(submess.bcoord.z), &len, &argc)) return 0;
+
+    if (!get_boid(&p, &(submess.id), &len, &argc)) return 0;
+
+    //submess.wcoord.x = atoi(argv[0]);
+    //submess.wcoord.y = atoi(argv[1]);
+    //submess.wcoord.z = atoi(argv[2]);
+    //submess.bcoord.x = atoi(argv[3]);
+    //submess.bcoord.y = atoi(argv[4]);
+    //submess.bcoord.z = atoi(argv[5]);
+    //submess.id = atoi(argv[6]);
 
     (*gcallback)(&mess);
-
-    //if (sendto_one(src, "PONG\n")) return 1;
 
     return 0;
 
 }
 
 
-int s_mo(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+int s_mo(struct server_socket *src, lt_packet *packet) {
 
     lattice_message mess;
 
     lattice_mo submess;
 
-    if (!src) return 0;
+    void *p;
+    uint16_t len;
+    uint16_t argc;
 
-    if (argc < 8) return 0;
+    uid_t *pfrom;
+
+    if (!src || !packet) return 0;
+
+    if (TstPFlagFrom(packet))
+        pfrom = &(packet->header.fromuid);
+    else
+        pfrom = NULL;
+
+    if (PArgc(packet) < 8) return 0;
+
+    argc = packet->header.payload_argc;
+    len = packet->header.payload_length;
+    p = packet->payload;
 
     mess.type = T_MO;
 
@@ -445,33 +651,56 @@ int s_mo(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
     mess.length = sizeof submess;
     mess.args = &submess;
 
-    submess.wcoord.x = atoi(argv[0]);
-    submess.wcoord.y = atoi(argv[1]);
-    submess.wcoord.z = atoi(argv[2]);
-    submess.bcoord.x = atoi(argv[3]);
-    submess.bcoord.y = atoi(argv[4]);
-    submess.bcoord.z = atoi(argv[5]);
-    submess.id = atoi(argv[6]);
-    submess.count = atoi(argv[7]);
+    if (!get_wx(&p, &(submess.wcoord.x), &len, &argc)) return 0;
+    if (!get_wy(&p, &(submess.wcoord.y), &len, &argc)) return 0;
+    if (!get_wz(&p, &(submess.wcoord.z), &len, &argc)) return 0;
 
+    if (!get_bx(&p, &(submess.bcoord.x), &len, &argc)) return 0;
+    if (!get_by(&p, &(submess.bcoord.y), &len, &argc)) return 0;
+    if (!get_bz(&p, &(submess.bcoord.z), &len, &argc)) return 0;
+
+    if (!get_moid(&p, &(submess.id), &len, &argc)) return 0;
+    if (!get_mocount(&p, &(submess.count), &len, &argc)) return 0;
+
+    //submess.wcoord.x = atoi(argv[0]);
+    //submess.wcoord.y = atoi(argv[1]);
+    //submess.wcoord.z = atoi(argv[2]);
+    //submess.bcoord.x = atoi(argv[3]);
+    //submess.bcoord.y = atoi(argv[4]);
+    //submess.bcoord.z = atoi(argv[5]);
+    //submess.id = atoi(argv[6]);
+    //submess.count = atoi(argv[7]);
 
     (*gcallback)(&mess);
-
-    //if (sendto_one(src, "PONG\n")) return 1;
 
     return 0;
 
 }
 
-int s_badd(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+int s_badd(struct server_socket *src, lt_packet *packet) {
 
     lattice_message mess;
 
     lattice_badd submess;
 
-    if (!src) return 0;
+    void *p;
+    uint16_t len;
+    uint16_t argc;
 
-    if (argc < 8) return 0;
+    uid_t *pfrom;
+
+    if (!src || !packet) return 0;
+
+    if (TstPFlagFrom(packet))
+        pfrom = &(packet->header.fromuid);
+    else
+        pfrom = NULL;
+
+    if (PArgc(packet) < 7) return 0;
+
+    argc = packet->header.payload_argc;
+    len = packet->header.payload_length;
+    p = packet->payload;
 
     mess.type = T_BADD;
 
@@ -486,35 +715,57 @@ int s_badd(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
     mess.length = sizeof submess;
     mess.args = &submess;
 
-    submess.wcoord.x = atoi(argv[0]);
-    submess.wcoord.y = atoi(argv[1]);
-    submess.wcoord.z = atoi(argv[2]);
-    submess.bcoord.x = atoi(argv[3]);
-    submess.bcoord.y = atoi(argv[4]);
-    submess.bcoord.z = atoi(argv[5]);
-    submess.block.id = atoi(argv[6]);
-    submess.block.bf = atoi(argv[7]);
+    if (!get_wx(&p, &(submess.wcoord.x), &len, &argc)) return 0;
+    if (!get_wy(&p, &(submess.wcoord.y), &len, &argc)) return 0;
+    if (!get_wz(&p, &(submess.wcoord.z), &len, &argc)) return 0;
+
+    if (!get_bx(&p, &(submess.bcoord.x), &len, &argc)) return 0;
+    if (!get_by(&p, &(submess.bcoord.y), &len, &argc)) return 0;
+    if (!get_bz(&p, &(submess.bcoord.z), &len, &argc)) return 0;
+
+    if (!get_block(&p, (uint16_t *)&(submess.block), &len, &argc)) return 0;
+
+    //submess.wcoord.x = atoi(argv[0]);
+    //submess.wcoord.y = atoi(argv[1]);
+    //submess.wcoord.z = atoi(argv[2]);
+    //submess.bcoord.x = atoi(argv[3]);
+    //submess.bcoord.y = atoi(argv[4]);
+    //submess.bcoord.z = atoi(argv[5]);
+    //submess.block.id = atoi(argv[6]);
+    //submess.block.bf = atoi(argv[7]);
 
 
     (*gcallback)(&mess);
-
-    //if (sendto_one(src, "PONG\n")) return 1;
 
     return 0;
 
 }
 
 
-int s_bset(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+int s_bset(struct server_socket *src, lt_packet *packet) {
 
     lattice_message mess;
 
     lattice_bset submess;
 
-    if (!src) return 0;
+    void *p;
+    uint16_t len;
+    uint16_t argc;
 
+    uid_t *pfrom;
 
-    if (argc < 8) return 0;
+    if (!src || !packet) return 0;
+
+    if (TstPFlagFrom(packet))
+        pfrom = &(packet->header.fromuid);
+    else
+        pfrom = NULL;
+
+    if (PArgc(packet) < 7) return 0;
+
+    argc = packet->header.payload_argc;
+    len = packet->header.payload_length;
+    p = packet->payload;
 
     mess.type = T_BSET;
 
@@ -529,34 +780,56 @@ int s_bset(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
     mess.length = sizeof submess;
     mess.args = &submess;
 
-    submess.wcoord.x = atoi(argv[0]);
-    submess.wcoord.y = atoi(argv[1]);
-    submess.wcoord.z = atoi(argv[2]);
-    submess.bcoord.x = atoi(argv[3]);
-    submess.bcoord.y = atoi(argv[4]);
-    submess.bcoord.z = atoi(argv[5]);
-    submess.block.id = atoi(argv[6]);
-    submess.block.bf = atoi(argv[7]);
+    if (!get_wx(&p, &(submess.wcoord.x), &len, &argc)) return 0;
+    if (!get_wy(&p, &(submess.wcoord.y), &len, &argc)) return 0;
+    if (!get_wz(&p, &(submess.wcoord.z), &len, &argc)) return 0;
 
+    if (!get_bx(&p, &(submess.bcoord.x), &len, &argc)) return 0;
+    if (!get_by(&p, &(submess.bcoord.y), &len, &argc)) return 0;
+    if (!get_bz(&p, &(submess.bcoord.z), &len, &argc)) return 0;
+
+    if (!get_block(&p, (uint16_t *)&(submess.block), &len, &argc)) return 0;
+
+    //submess.wcoord.x = atoi(argv[0]);
+    //submess.wcoord.y = atoi(argv[1]);
+    //submess.wcoord.z = atoi(argv[2]);
+    //submess.bcoord.x = atoi(argv[3]);
+    //submess.bcoord.y = atoi(argv[4]);
+    //submess.bcoord.z = atoi(argv[5]);
+    //submess.block.id = atoi(argv[6]);
+    //submess.block.bf = atoi(argv[7]);
 
     (*gcallback)(&mess);
-
-    //if (sendto_one(src, "PONG\n")) return 1;
 
     return 0;
 
 }
 
 
-int s_brem(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+int s_brem(struct server_socket *src, lt_packet *packet) {
 
     lattice_message mess;
 
     lattice_brem submess;
 
-    if (!src) return 0;
+    void *p;
+    uint16_t len;
+    uint16_t argc;
 
-    if (argc < 6) return 0;
+    uid_t *pfrom;
+
+    if (!src || !packet) return 0;
+
+    if (TstPFlagFrom(packet))
+        pfrom = &(packet->header.fromuid);
+    else
+        pfrom = NULL;
+
+    if (PArgc(packet) < 6) return 0;
+
+    argc = packet->header.payload_argc;
+    len = packet->header.payload_length;
+    p = packet->payload;
 
     mess.type = T_BREM;
 
@@ -571,12 +844,20 @@ int s_brem(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
     mess.length = sizeof submess;
     mess.args = &submess;
 
-    submess.wcoord.x = atoi(argv[0]);
-    submess.wcoord.y = atoi(argv[1]);
-    submess.wcoord.z = atoi(argv[2]);
-    submess.bcoord.x = atoi(argv[3]);
-    submess.bcoord.y = atoi(argv[4]);
-    submess.bcoord.z = atoi(argv[5]);
+    if (!get_wx(&p, &(submess.wcoord.x), &len, &argc)) return 0;
+    if (!get_wy(&p, &(submess.wcoord.y), &len, &argc)) return 0;
+    if (!get_wz(&p, &(submess.wcoord.z), &len, &argc)) return 0;
+
+    if (!get_bx(&p, &(submess.bcoord.x), &len, &argc)) return 0;
+    if (!get_by(&p, &(submess.bcoord.y), &len, &argc)) return 0;
+    if (!get_bz(&p, &(submess.bcoord.z), &len, &argc)) return 0;
+
+    //submess.wcoord.x = atoi(argv[0]);
+    //submess.wcoord.y = atoi(argv[1]);
+    //submess.wcoord.z = atoi(argv[2]);
+    //submess.bcoord.x = atoi(argv[3]);
+    //submess.bcoord.y = atoi(argv[4]);
+    //submess.bcoord.z = atoi(argv[5]);
 
     (*gcallback)(&mess);
 
@@ -584,17 +865,34 @@ int s_brem(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
 }
 
-int s_pmine(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+int s_pmine(struct server_socket *src, lt_packet *packet) {
 
     lattice_message mess;
 
     lattice_pmine submess;
 
-    if (!src) return 0;
+    void *p;
+    uint16_t len;
+    uint16_t argc;
+
+    mining_t mining;
+
+    uid_t *pfrom;
+
+    if (!src || !packet) return 0;
+
+    if (TstPFlagFrom(packet))
+        pfrom = &(packet->header.fromuid);
+    else
+        pfrom = NULL;
 
     if (!pfrom) return 0;
 
-    if (argc < 1) return 0;
+    if (PArgc(packet) < 1) return 0;
+
+    argc = packet->header.payload_argc;
+    len = packet->header.payload_length;
+    p = packet->payload;
 
     mess.type = T_PMINE;
 
@@ -605,7 +903,9 @@ int s_pmine(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
     mess.length = sizeof submess;
     mess.args = &submess;
 
-    submess.mining = ((int)atoi(argv[0]) ? 1 : 0);
+    if (!get_mining(&p, &(mining), &len, &argc)) return 0;
+
+    submess.mining = (mining ? 1 : 0);
 
     (*gcallback)(&mess);
 
@@ -613,15 +913,26 @@ int s_pmine(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
 }
 
-int s_schat(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+int s_schat(struct server_socket *src, lt_packet *packet) {
 
     lattice_message mess;
 
     lattice_schat submess;
 
-    if (!src) return 0;
+    void *p;
+    uint16_t len;
+    uint16_t argc;
 
-    if (argc < 3) return 0;
+    char * nickstr;
+    char * chatstr;
+
+    if (!src || !packet) return 0;
+
+    if (PArgc(packet) < 3) return 0;
+
+    argc = packet->header.payload_argc;
+    len = packet->header.payload_length;
+    p = packet->payload;
 
     mess.type = T_SCHAT;
 
@@ -632,10 +943,15 @@ int s_schat(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
     mess.length = sizeof submess;
     mess.args = &submess;
 
-    strncpy(submess.nickname, argv[0] , sizeof(submess.nickname));
+    if (!get_nickname(&p, &(nickstr), &len, &argc)) return 0;
+    strncpy(submess.nickname, nickstr , sizeof(submess.nickname));
     submess.nickname[sizeof(submess.nickname)-1]='\0';
-    submess.color = (uint32_t)atoi(argv[1]);
-    strncpy(submess.schat_text, argv[2] , sizeof(submess.schat_text));
+
+    if (!get_color(&p, &(submess.color), &len, &argc)) return 0;
+    //submess.color = (uint32_t)atoi(argv[1]);
+
+    if (!get_chat(&p, &(chatstr), &len, &argc)) return 0;
+    strncpy(submess.schat_text, chatstr , sizeof(submess.schat_text));
     submess.schat_text[sizeof(submess.schat_text)-1]='\0';
 
     (*gcallback)(&mess);
@@ -644,15 +960,25 @@ int s_schat(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
 }
 
-int s_log(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+int s_log(struct server_socket *src, lt_packet *packet) {
 
     lattice_message mess;
 
     lattice_log submess;
 
-    if (!src) return 0;
+    void *p;
+    uint16_t len;
+    uint16_t argc;
 
-    if (argc < 1) return 0;
+    char * str;
+
+    if (!src || !packet) return 0;
+
+    if (PArgc(packet) < 1) return 0;
+
+    argc = packet->header.payload_argc;
+    len = packet->header.payload_length;
+    p = packet->payload;
 
     mess.type = T_LOG;
 
@@ -663,7 +989,8 @@ int s_log(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
     mess.length = sizeof submess;
     mess.args = &submess;
 
-    strncpy(submess.log_text, argv[0] , sizeof(submess.log_text));
+    if (!get_log(&p, &(str), &len, &argc)) return 0;
+    strncpy(submess.log_text, str , sizeof(submess.log_text));
     submess.log_text[sizeof(submess.log_text)-1]='\0';
 
     (*gcallback)(&mess);
@@ -673,15 +1000,23 @@ int s_log(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 }
 
 
-int s_satstep(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+int s_satstep(struct server_socket *src, lt_packet *packet) {
 
     lattice_message mess;
 
     lattice_satstep submess;
 
-    if (!src) return 0;
+    void *p;
+    uint16_t len;
+    uint16_t argc;
 
-    if (argc < 1) return 0;
+    if (!src || !packet) return 0;
+
+    if (PArgc(packet) < 1) return 0;
+
+    argc = packet->header.payload_argc;
+    len = packet->header.payload_length;
+    p = packet->payload;
 
     mess.type = T_SATSTEP;
 
@@ -692,7 +1027,9 @@ int s_satstep(struct server_socket *src, uint32_t *pfrom, int argc, char **argv)
     mess.length = sizeof submess;
     mess.args = &submess;
 
-    submess.satstep = (uint32_t)atoi(argv[0]);
+    if (!get_satstep(&p, &(submess.satstep), &len, &argc)) return 0;
+
+    //submess.satstep = (uint32_t)atoi(argv[0]);
 
     (*gcallback)(&mess);
 
@@ -700,15 +1037,23 @@ int s_satstep(struct server_socket *src, uint32_t *pfrom, int argc, char **argv)
 
 }
 
-int s_sat(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+int s_sat(struct server_socket *src, lt_packet *packet) {
 
     lattice_message mess;
 
     lattice_sat submess;
 
-    if (!src) return 0;
+    void *p;
+    uint16_t len;
+    uint16_t argc;
 
-    if (argc < 1) return 0;
+    if (!src || !packet) return 0;
+
+    if (PArgc(packet) < 1) return 0;
+
+    argc = packet->header.payload_argc;
+    len = packet->header.payload_length;
+    p = packet->payload;
 
     mess.type = T_SAT;
 
@@ -719,7 +1064,9 @@ int s_sat(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
     mess.length = sizeof submess;
     mess.args = &submess;
 
-    submess.sat = (double)atof(argv[0]);
+    if (!get_sat(&p, &(submess.sat), &len, &argc)) return 0;
+
+    //submess.sat = (double)atof(argv[0]);
 
     (*gcallback)(&mess);
 
@@ -728,17 +1075,24 @@ int s_sat(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 }
 
 
-int s_fade(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+int s_fade(struct server_socket *src, lt_packet *packet) {
 
     lattice_message mess;
 
     uid_link *uidlink;
 
-    if (!src) return 0;
+    uid_t *pfrom;
+
+    if (!src || !packet) return 0;
+
+    if (TstPFlagFrom(packet))
+        pfrom = &(packet->header.fromuid);
+    else
+        pfrom = NULL;
 
     if (!pfrom) return 0;
 
-    if (argc < 0) return 0;
+    if (PArgc(packet) < 0) return 0;
 
     mess.type = T_FADE;
 
@@ -760,20 +1114,38 @@ int s_fade(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
 }
 
-int s_user(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+int s_user(struct server_socket *src, lt_packet *packet) {
 
     lattice_message mess;
     lattice_user submess;
 
+    void *p;
+    uint16_t len;
+    uint16_t argc;
+
+    mining_t mining;
+
     //uid_link *uidlink;
     int standing;
 
+    char *str;
 
-    if (!src) return 0;
+    uid_t *pfrom;
+
+    if (!src || !packet) return 0;
+
+    if (TstPFlagFrom(packet))
+        pfrom = &(packet->header.fromuid);
+    else
+        pfrom = NULL;
 
     if (!pfrom) return 0;
 
-    if (argc < 15) return 0;
+    if (PArgc(packet) < 15) return 0;
+
+    argc = packet->header.payload_argc;
+    len = packet->header.payload_length;
+    p = packet->payload;
 
     mess.type = T_USER;
 
@@ -784,29 +1156,45 @@ int s_user(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
     mess.length = sizeof submess;
     mess.args = &submess;
 
-    submess.model = (uint16_t) atoi(argv[0]);
-    submess.color = (uint32_t) atoi(argv[1]);
+    if (!get_model(&p, &(submess.model), &len, &argc)) return 0;
+    //submess.model = (uint16_t) atoi(argv[0]);
+    if (!get_color(&p, &(submess.color), &len, &argc)) return 0;
+    //submess.color = (uint32_t) atoi(argv[1]);
 
-    strncpy(submess.nickname, argv[2] , sizeof(submess.nickname));
+    if (!get_nickname(&p, &(str), &len, &argc)) return 0;
+    strncpy(submess.nickname, str , sizeof(submess.nickname));
     submess.nickname[sizeof(submess.nickname)-1]='\0';
 
-    submess.wpos.x = atoi(argv[3]);
-    submess.wpos.y = atoi(argv[4]);
-    submess.wpos.z = atoi(argv[5]);
+    if (!get_wx(&p, &(submess.wpos.x), &len, &argc)) return 0;
+    if (!get_wy(&p, &(submess.wpos.y), &len, &argc)) return 0;
+    if (!get_wz(&p, &(submess.wpos.z), &len, &argc)) return 0;
+    //submess.wpos.x = atoi(argv[3]);
+    //submess.wpos.y = atoi(argv[4]);
+    //submess.wpos.z = atoi(argv[5]);
 
-    submess.bpos.x = atoi(argv[6]);
-    submess.bpos.y = atoi(argv[7]);
-    submess.bpos.z = atoi(argv[8]);
+    if (!get_bx(&p, &(submess.bpos.x), &len, &argc)) return 0;
+    if (!get_by(&p, &(submess.bpos.y), &len, &argc)) return 0;
+    if (!get_bz(&p, &(submess.bpos.z), &len, &argc)) return 0;
+    //submess.bpos.x = atoi(argv[6]);
+    //submess.bpos.y = atoi(argv[7]);
+    //submess.bpos.z = atoi(argv[8]);
 
-    submess.hrot.xrot = atoi(argv[9]);
-    submess.hrot.yrot = atoi(argv[10]);
+    if (!get_xrot(&p, &(submess.hrot.xrot), &len, &argc)) return 0;
+    if (!get_yrot(&p, &(submess.hrot.yrot), &len, &argc)) return 0;
+    //submess.hrot.xrot = atoi(argv[9]);
+    //submess.hrot.yrot = atoi(argv[10]);
 
-    submess.hhold.item_id = atoi(argv[11]);
-    submess.hhold.item_type = atoi(argv[12]);
+    if (!get_item_id(&p, &(submess.hhold.item_id), &len, &argc)) return 0;
+    if (!get_item_type(&p, &(submess.hhold.item_type), &len, &argc)) return 0;
+    //submess.hhold.item_id = atoi(argv[11]);
+    //submess.hhold.item_type = atoi(argv[12]);
 
-    submess.mining = atoi(argv[13]);
+    if (!get_mining(&p, &(mining), &len, &argc)) return 0;
+    submess.mining = mining;
+    //submess.mining = atoi(argv[13]);
 
-    submess.usercolor = (uint32_t) atoi(argv[14]);
+    if (!get_usercolor(&p, &(submess.usercolor), &len, &argc)) return 0;
+    //submess.usercolor = (uint32_t) atoi(argv[14]);
 
     standing = ncoord_is_equal(src->coord, wcoord_to_ncoord(submess.wpos));
 
@@ -820,17 +1208,28 @@ int s_user(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
 
 }
 
-int s_server(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+int s_server(struct server_socket *src, lt_packet *packet) {
 
     lattice_message mess;
 
     lattice_server submess;
 
-    server_socket *p;
+    void *p;
+    uint16_t len;
+    uint16_t argc;
+    lt_packet out_packet;
 
-    if (!src) return 0;
+    char *str;
 
-    if (argc < 5) return 0;
+    server_socket *dst;
+
+    if (!src || !packet) return 0;
+
+    if (PArgc(packet) < 5) return 0;
+
+    argc = packet->header.payload_argc;
+    len = packet->header.payload_length;
+    p = packet->payload;
 
     if (!ncoord_is_equal(src->coord, lattice_player.centeredon)) return 0;
 
@@ -843,55 +1242,101 @@ int s_server(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) 
     mess.length = sizeof submess;
     mess.args = &submess;
 
-    submess.ncoord.x = atoi(argv[0]);
-    submess.ncoord.y = atoi(argv[1]);
-    submess.ncoord.z = atoi(argv[2]);
-    submess.ip.s_addr = inet_addr(argv[3]);
-    submess.port = atoi(argv[4]);
+    if (!get_nx(&p, &(submess.ncoord.x), &len, &argc)) return 0;
+    if (!get_ny(&p, &(submess.ncoord.y), &len, &argc)) return 0;
+    if (!get_nz(&p, &(submess.ncoord.z), &len, &argc)) return 0;
+    //submess.ncoord.x = atoi(argv[0]);
+    //submess.ncoord.y = atoi(argv[1]);
+    //submess.ncoord.z = atoi(argv[2]);
+    if (!get_string(&p, &(str), &len, &argc)) return 0;
+    submess.ip.s_addr = inet_addr(str);
+    if (!get_uint16(&p, &(submess.port), &len, &argc)) return 0;
+    //submess.port = atoi(argv[4]);
 
-    p = connect_server(submess.ncoord, submess.ip, submess.port, NULL);
+    dst = connect_server(submess.ncoord, submess.ip, submess.port, NULL);
 
-    if (!p) return 0;
+    if (!dst) return 0;
 
-    add_neighbor(submess.ncoord, p);
+    add_neighbor(submess.ncoord, dst);
 
     //(*gcallback)(&mess);
 
     if (user_is_within_outer_border(lattice_player.wpos, submess.ncoord)) {
         // close enogh to be tracked...
-        if (sendto_one(p, "SIDEDINTRO %lu %d %u %s %d %u %u %u %u %u %u %d %d %d %d %d %d %d %d %u\n",
-                       lattice_player.userid,
-                       lattice_player.model,
-                       lattice_player.color,
-                       lattice_player.nickname,
-                       lattice_player.burstdist,
-                       lattice_player.centeredon.x,
-                       lattice_player.centeredon.y,
-                       lattice_player.centeredon.z,
-                       lattice_player.wpos.x,
-                       lattice_player.wpos.y,
-                       lattice_player.wpos.z,
-                       lattice_player.bpos.x,
-                       lattice_player.bpos.y,
-                       lattice_player.bpos.z,
-                       lattice_player.hrot.xrot,
-                       lattice_player.hrot.yrot,
-                       lattice_player.hhold.item_id,
-                       lattice_player.hhold.item_type,
-                       lattice_player.mining,
-                       lattice_player.usercolor)) return 1;
+        makepacket(&out_packet, T_SIDEDINTRO);
+        p = &out_packet.payload;
+
+        if (!put_uid(&p, lattice_player.userid, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+        if (!put_model(&p, lattice_player.model, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+        if (!put_color(&p, lattice_player.color, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+        if (!put_nickname(&p, lattice_player.nickname, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+        if (!put_burstdist(&p, lattice_player.burstdist, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+        if (!put_nx(&p, lattice_player.centeredon.x, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+        if (!put_ny(&p, lattice_player.centeredon.y, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+        if (!put_nz(&p, lattice_player.centeredon.z, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+        if (!put_wx(&p, lattice_player.wpos.x, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+        if (!put_wy(&p, lattice_player.wpos.y, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+        if (!put_wz(&p, lattice_player.wpos.z, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+        if (!put_bx(&p, lattice_player.bpos.x, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+        if (!put_by(&p, lattice_player.bpos.y, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+        if (!put_bz(&p, lattice_player.bpos.z, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+        if (!put_xrot(&p, lattice_player.hrot.xrot, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+        if (!put_yrot(&p, lattice_player.hrot.yrot, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+        if (!put_item_id(&p, lattice_player.hhold.item_id, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+        if (!put_item_type(&p, lattice_player.hhold.item_type, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+        if (!put_mining(&p, lattice_player.mining, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+        if (!put_usercolor(&p, lattice_player.usercolor, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+
+        if (sendpacket(dst, &out_packet)) return 1;
+
+        //if (sendto_one(dst, "SIDEDINTRO %lu %d %u %s %d %u %u %u %u %u %u %d %d %d %d %d %d %d %d %u\n",
+        //               lattice_player.userid,
+        //               lattice_player.model,
+        //               lattice_player.color,
+        //               lattice_player.nickname,
+        //               lattice_player.burstdist,
+        //               lattice_player.centeredon.x,
+        //               lattice_player.centeredon.y,
+        //               lattice_player.centeredon.z,
+        //               lattice_player.wpos.x,
+        //               lattice_player.wpos.y,
+        //               lattice_player.wpos.z,
+        //               lattice_player.bpos.x,
+        //               lattice_player.bpos.y,
+        //               lattice_player.bpos.z,
+        //               lattice_player.hrot.xrot,
+        //               lattice_player.hrot.yrot,
+        //               lattice_player.hhold.item_id,
+        //               lattice_player.hhold.item_type,
+        //               lattice_player.mining,
+        //               lattice_player.usercolor)) return 1;
 
     } else {
         // too far to be tracked... just the basics....
-        if (sendto_one(p, "SIDEDINTRO %lu %d %u %s %d %u %u %u\n",
-                       lattice_player.userid,
-                       lattice_player.model,
-                       lattice_player.color,
-                       lattice_player.nickname,
-                       lattice_player.burstdist,
-                       lattice_player.centeredon.x,
-                       lattice_player.centeredon.y,
-                       lattice_player.centeredon.z)) return 1;
+
+        makepacket(&out_packet, T_SIDEDINTRO);
+        p = &out_packet.payload;
+
+        if (!put_uid(&p, lattice_player.userid, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+        if (!put_model(&p, lattice_player.model, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+        if (!put_color(&p, lattice_player.color, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+        if (!put_nickname(&p, lattice_player.nickname, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+        if (!put_burstdist(&p, lattice_player.burstdist, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+        if (!put_nx(&p, lattice_player.centeredon.x, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+        if (!put_ny(&p, lattice_player.centeredon.y, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+        if (!put_nz(&p, lattice_player.centeredon.z, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+
+        if (sendpacket(dst, &out_packet)) return 1;
+
+        //if (sendto_one(dst, "SIDEDINTRO %lu %d %u %s %d %u %u %u\n",
+        //               lattice_player.userid,
+        //               lattice_player.model,
+        //               lattice_player.color,
+        //               lattice_player.nickname,
+        //               lattice_player.burstdist,
+        //               lattice_player.centeredon.x,
+        //               lattice_player.centeredon.y,
+        //               lattice_player.centeredon.z)) return 1;
     }
 
     return 0;
@@ -899,33 +1344,45 @@ int s_server(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) 
 }
 
 
-int s_delserver(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+int s_delserver(struct server_socket *src, lt_packet *packet) {
 
-    server_socket *p;
+    server_socket *dst;
+
+    void *p;
+    uint16_t len;
+    uint16_t argc;
 
     n_coord coord;
 
-    if (!src) return 0;
+    if (!src || !packet) return 0;
 
-    if (argc < 3) return 0;
+    if (PArgc(packet) < 3) return 0;
+
+    argc = packet->header.payload_argc;
+    len = packet->header.payload_length;
+    p = packet->payload;
 
     if (!ncoord_is_equal(src->coord, lattice_player.centeredon)) return 0;
 
-    coord.x = atoi(argv[0]);
-    coord.y = atoi(argv[1]);
-    coord.z = atoi(argv[2]);
+    if (!get_nx(&p, &(coord.x), &len, &argc)) return 0;
+    if (!get_ny(&p, &(coord.y), &len, &argc)) return 0;
+    if (!get_nz(&p, &(coord.z), &len, &argc)) return 0;
 
-    p = find_neighbor(coord);
+    //coord.x = atoi(argv[0]);
+    //coord.y = atoi(argv[1]);
+    //coord.z = atoi(argv[2]);
 
-    if (!p) return 0;
+    dst = find_neighbor(coord);
 
-    closesock(p);
+    if (!dst) return 0;
+
+    closesock(dst);
 
     return 0;
 
 }
 
-int s_moveto(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+int s_moveto(struct server_socket *src, lt_packet *packet) {
 
     uid_link *uidlink;
     n_coord coord;
@@ -935,18 +1392,39 @@ int s_moveto(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) 
 
     lattice_user usubmess;
 
+    void *p;
+    uint16_t len;
+    uint16_t argc;
+
+    char *str;
+
+    mining_t mining;
+
+    uid_t *pfrom;
 
     struct server_socket *dst;
 
-    if (!src) return 0;
+    if (!src || !packet) return 0;
+
+    if (TstPFlagFrom(packet))
+        pfrom = &(packet->header.fromuid);
+    else
+        pfrom = NULL;
 
     if (!pfrom) return 0;
 
-    if (argc < 18) return 0;
+    if (PArgc(packet) < 18) return 0;
 
-    coord.x = atoi(argv[0]);
-    coord.y = atoi(argv[1]);
-    coord.z = atoi(argv[2]);
+    argc = packet->header.payload_argc;
+    len = packet->header.payload_length;
+    p = packet->payload;
+
+    if (!get_nx(&p, &(coord.x), &len, &argc)) return 0;
+    if (!get_ny(&p, &(coord.y), &len, &argc)) return 0;
+    if (!get_nz(&p, &(coord.z), &len, &argc)) return 0;
+    //coord.x = atoi(argv[0]);
+    //coord.y = atoi(argv[1]);
+    //coord.z = atoi(argv[2]);
 
     uidlink = uid_link_find(src, *pfrom);
 
@@ -966,29 +1444,44 @@ int s_moveto(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) 
             mess.length = sizeof usubmess;
             mess.args = &usubmess;
 
-            usubmess.model = (uint16_t) atoi(argv[3]);
-            usubmess.color = (uint32_t) atoi(argv[4]);
+            if (!get_model(&p, &(usubmess.model), &len, &argc)) return 0;
+            //usubmess.model = (uint16_t) atoi(argv[3]);
+            if (!get_color(&p, &(usubmess.color), &len, &argc)) return 0;
+            //usubmess.color = (uint32_t) atoi(argv[4]);
 
-            strncpy(usubmess.nickname, argv[5] , sizeof(usubmess.nickname));
+            if (!get_nickname(&p, &(str), &len, &argc)) return 0;
+            strncpy(usubmess.nickname, str , sizeof(usubmess.nickname));
             usubmess.nickname[sizeof(usubmess.nickname)-1]='\0';
 
-            usubmess.wpos.x = atoi(argv[6]);
-            usubmess.wpos.y = atoi(argv[7]);
-            usubmess.wpos.z = atoi(argv[8]);
+            if (!get_wx(&p, &(usubmess.wpos.x), &len, &argc)) return 0;
+            if (!get_wy(&p, &(usubmess.wpos.y), &len, &argc)) return 0;
+            if (!get_wz(&p, &(usubmess.wpos.z), &len, &argc)) return 0;
+            //usubmess.wpos.x = atoi(argv[6]);
+            //usubmess.wpos.y = atoi(argv[7]);
+            //usubmess.wpos.z = atoi(argv[8]);
 
-            usubmess.bpos.x = atoi(argv[9]);
-            usubmess.bpos.y = atoi(argv[10]);
-            usubmess.bpos.z = atoi(argv[11]);
+            if (!get_bx(&p, &(usubmess.bpos.x), &len, &argc)) return 0;
+            if (!get_by(&p, &(usubmess.bpos.y), &len, &argc)) return 0;
+            if (!get_bz(&p, &(usubmess.bpos.z), &len, &argc)) return 0;
+            //usubmess.bpos.x = atoi(argv[9]);
+            //usubmess.bpos.y = atoi(argv[10]);
+            //usubmess.bpos.z = atoi(argv[11]);
 
-            usubmess.hrot.xrot = atoi(argv[12]);
-            usubmess.hrot.yrot = atoi(argv[13]);
+            if (!get_xrot(&p, &(usubmess.hrot.xrot), &len, &argc)) return 0;
+            if (!get_yrot(&p, &(usubmess.hrot.yrot), &len, &argc)) return 0;
+            //usubmess.hrot.xrot = atoi(argv[12]);
+            //usubmess.hrot.yrot = atoi(argv[13]);
 
-            usubmess.hhold.item_id = atoi(argv[14]);
-            usubmess.hhold.item_type = atoi(argv[15]);
+            if (!get_item_id(&p, &(usubmess.hhold.item_id), &len, &argc)) return 0;
+            if (!get_item_type(&p, &(usubmess.hhold.item_type), &len, &argc)) return 0;
+            //usubmess.hhold.item_id = atoi(argv[14]);
+            //usubmess.hhold.item_type = atoi(argv[15]);
 
-            usubmess.mining = atoi(argv[16]);
+            if (!get_mining(&p, &(mining), &len, &argc)) return 0;
+            usubmess.mining = mining;
 
-            usubmess.usercolor = (uint32_t) atoi(argv[17]);
+            if (!get_usercolor(&p, &(usubmess.usercolor), &len, &argc)) return 0;
+            //usubmess.usercolor = (uint32_t) atoi(argv[17]);
 
             (*gcallback)(&mess);
         }
@@ -1021,25 +1514,47 @@ int s_moveto(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) 
 }
 
 
-int s_movefrom(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+int s_movefrom(struct server_socket *src, lt_packet *packet) {
 
     uid_link *uidlink;
     n_coord coord;
+
+    void *p;
+    uint16_t len;
+    uint16_t argc;
+
+    char *str;
+
+    mining_t mining;
+
+    uid_t *pfrom;
 
     struct server_socket *from;
 
     lattice_message mess;
     lattice_user submess;
 
-    if (!src) return 0;
+    if (!src || !packet) return 0;
+
+    if (TstPFlagFrom(packet))
+        pfrom = &(packet->header.fromuid);
+    else
+        pfrom = NULL;
 
     if (!pfrom) return 0;
 
-    if (argc < 18) return 0;
+    if (PArgc(packet) < 18) return 0;
 
-    coord.x = atoi(argv[0]);
-    coord.y = atoi(argv[1]);
-    coord.z = atoi(argv[2]);
+    argc = packet->header.payload_argc;
+    len = packet->header.payload_length;
+    p = packet->payload;
+
+    if (!get_nx(&p, &(coord.x), &len, &argc)) return 0;
+    if (!get_ny(&p, &(coord.y), &len, &argc)) return 0;
+    if (!get_nz(&p, &(coord.z), &len, &argc)) return 0;
+    //coord.x = atoi(argv[0]);
+    //coord.y = atoi(argv[1]);
+    //coord.z = atoi(argv[2]);
 
     from = find_neighbor(coord);
 
@@ -1056,29 +1571,44 @@ int s_movefrom(struct server_socket *src, uint32_t *pfrom, int argc, char **argv
                 mess.length = sizeof submess;
                 mess.args = &submess;
 
-                submess.model = (uint16_t) atoi(argv[3]);
-                submess.color = (uint32_t) atoi(argv[4]);
+                if (!get_model(&p, &(submess.model), &len, &argc)) return 0;
+                //submess.model = (uint16_t) atoi(argv[3]);
+                if (!get_color(&p, &(submess.color), &len, &argc)) return 0;
+                //submess.color = (uint32_t) atoi(argv[4]);
 
-                strncpy(submess.nickname, argv[5] , sizeof(submess.nickname));
+                if (!get_nickname(&p, &(str), &len, &argc)) return 0;
+                strncpy(submess.nickname, str , sizeof(submess.nickname));
                 submess.nickname[sizeof(submess.nickname)-1]='\0';
 
-                submess.wpos.x = atoi(argv[6]);
-                submess.wpos.y = atoi(argv[7]);
-                submess.wpos.z = atoi(argv[8]);
+                if (!get_wx(&p, &(submess.wpos.x), &len, &argc)) return 0;
+                if (!get_wy(&p, &(submess.wpos.y), &len, &argc)) return 0;
+                if (!get_wz(&p, &(submess.wpos.z), &len, &argc)) return 0;
+                //submess.wpos.x = atoi(argv[6]);
+                //submess.wpos.y = atoi(argv[7]);
+                //submess.wpos.z = atoi(argv[8]);
 
-                submess.bpos.x = atoi(argv[9]);
-                submess.bpos.y = atoi(argv[10]);
-                submess.bpos.z = atoi(argv[11]);
+                if (!get_bx(&p, &(submess.bpos.x), &len, &argc)) return 0;
+                if (!get_by(&p, &(submess.bpos.y), &len, &argc)) return 0;
+                if (!get_bz(&p, &(submess.bpos.z), &len, &argc)) return 0;
+                //submess.bpos.x = atoi(argv[9]);
+                //submess.bpos.y = atoi(argv[10]);
+                //submess.bpos.z = atoi(argv[11]);
 
-                submess.hrot.xrot = atoi(argv[12]);
-                submess.hrot.yrot = atoi(argv[13]);
+                if (!get_xrot(&p, &(submess.hrot.xrot), &len, &argc)) return 0;
+                if (!get_yrot(&p, &(submess.hrot.yrot), &len, &argc)) return 0;
+                //submess.hrot.xrot = atoi(argv[12]);
+                //submess.hrot.yrot = atoi(argv[13]);
 
-                submess.hhold.item_id = atoi(argv[14]);
-                submess.hhold.item_type = atoi(argv[15]);
+                if (!get_item_id(&p, &(submess.hhold.item_id), &len, &argc)) return 0;
+                if (!get_item_type(&p, &(submess.hhold.item_type), &len, &argc)) return 0;
+                //submess.hhold.item_id = atoi(argv[14]);
+                //submess.hhold.item_type = atoi(argv[15]);
 
-                submess.mining = atoi(argv[16]);
+                if (!get_mining(&p, &(mining), &len, &argc)) return 0;
+                submess.mining = mining;
 
-                submess.usercolor = (uint32_t) atoi(argv[17]);
+                if (!get_usercolor(&p, &(submess.usercolor), &len, &argc)) return 0;
+                //submess.usercolor = (uint32_t) atoi(argv[17]);
 
                 (*gcallback)(&mess);
             }
@@ -1092,29 +1622,45 @@ int s_movefrom(struct server_socket *src, uint32_t *pfrom, int argc, char **argv
         mess.length = sizeof submess;
         mess.args = &submess;
 
-        submess.model = (uint16_t) atoi(argv[3]);
-        submess.color = (uint32_t) atoi(argv[4]);
+        if (!get_model(&p, &(submess.model), &len, &argc)) return 0;
+        //submess.model = (uint16_t) atoi(argv[3]);
 
-        strncpy(submess.nickname, argv[5] , sizeof(submess.nickname));
+        if (!get_color(&p, &(submess.color), &len, &argc)) return 0;
+        //submess.color = (uint32_t) atoi(argv[4]);
+
+        if (!get_nickname(&p, &(str), &len, &argc)) return 0;
+        strncpy(submess.nickname, str , sizeof(submess.nickname));
         submess.nickname[sizeof(submess.nickname)-1]='\0';
 
-        submess.wpos.x = atoi(argv[6]);
-        submess.wpos.y = atoi(argv[7]);
-        submess.wpos.z = atoi(argv[8]);
+        if (!get_wx(&p, &(submess.wpos.x), &len, &argc)) return 0;
+        if (!get_wy(&p, &(submess.wpos.y), &len, &argc)) return 0;
+        if (!get_wz(&p, &(submess.wpos.z), &len, &argc)) return 0;
+        //submess.wpos.x = atoi(argv[6]);
+        //submess.wpos.y = atoi(argv[7]);
+        //submess.wpos.z = atoi(argv[8]);
 
-        submess.bpos.x = atoi(argv[9]);
-        submess.bpos.y = atoi(argv[10]);
-        submess.bpos.z = atoi(argv[11]);
+        if (!get_bx(&p, &(submess.bpos.x), &len, &argc)) return 0;
+        if (!get_by(&p, &(submess.bpos.y), &len, &argc)) return 0;
+        if (!get_bz(&p, &(submess.bpos.z), &len, &argc)) return 0;
+        //submess.bpos.x = atoi(argv[9]);
+        //submess.bpos.y = atoi(argv[10]);
+        //submess.bpos.z = atoi(argv[11]);
 
-        submess.hrot.xrot = atoi(argv[12]);
-        submess.hrot.yrot = atoi(argv[13]);
+        if (!get_xrot(&p, &(submess.hrot.xrot), &len, &argc)) return 0;
+        if (!get_yrot(&p, &(submess.hrot.yrot), &len, &argc)) return 0;
+        //submess.hrot.xrot = atoi(argv[12]);
+        //submess.hrot.yrot = atoi(argv[13]);
 
-        submess.hhold.item_id = atoi(argv[14]);
-        submess.hhold.item_type = atoi(argv[15]);
+        if (!get_item_id(&p, &(submess.hhold.item_id), &len, &argc)) return 0;
+        if (!get_item_type(&p, &(submess.hhold.item_type), &len, &argc)) return 0;
+        //submess.hhold.item_id = atoi(argv[14]);
+        //submess.hhold.item_type = atoi(argv[15]);
 
-        submess.mining = atoi(argv[16]);
+        if (!get_mining(&p, &(mining), &len, &argc)) return 0;
+        submess.mining = mining;
 
-        submess.usercolor = (uint32_t) atoi(argv[17]);
+        if (!get_usercolor(&p, &(submess.usercolor), &len, &argc)) return 0;
+        //submess.usercolor = (uint32_t) atoi(argv[17]);
 
         (*gcallback)(&mess);
 
@@ -1128,13 +1674,15 @@ int s_movefrom(struct server_socket *src, uint32_t *pfrom, int argc, char **argv
 
 }
 
-int s_trackerfailure(struct server_socket *src, int argc, char **argv) {
+int s_trackerfailure(struct server_socket *src, lt_packet *packet) {
     server_socket *s;
     int x;
     int y;
     int z;
 
-    if (!src) return 0;
+    lt_packet out_packet;
+
+    if (!src || !packet) return 0;
 
     if (ncoord_is_equal(src->coord, lattice_player.centeredon)) {
         // this is a centered server
@@ -1143,7 +1691,9 @@ int s_trackerfailure(struct server_socket *src, int argc, char **argv) {
             for (x=0;x<3;x++) for (y=0;y<3;y++) for (z=0;z<3;z++) {
                 if ((s=neighbor_table[x][y][z])) {
                     if (s != src) {
-                        sendto_one(s, "SLIDEOVER\n");
+                        makepacket(&out_packet, T_SLIDEOVER);
+                        sendpacket(s, &out_packet);
+                        //sendto_one(s, "SLIDEOVER\n");
                         neighbor_table[x][y][z] = NULL;
                     }
                 }
@@ -1154,7 +1704,9 @@ int s_trackerfailure(struct server_socket *src, int argc, char **argv) {
             for (x=0;x<3;x++) for (y=0;y<3;y++) for (z=0;z<3;z++) {
                 if ((s=neighbor_table[x][y][z])) {
                     if (s == src) {
-                        sendto_one(s, "SLIDEOVER\n");
+                        makepacket(&out_packet, T_SLIDEOVER);
+                        sendpacket(s, &out_packet);
+                        //sendto_one(s, "SLIDEOVER\n");
                         neighbor_table[x][y][z] = NULL;
                     }
                 }
@@ -1168,7 +1720,9 @@ int s_trackerfailure(struct server_socket *src, int argc, char **argv) {
             for (x=0;x<3;x++) for (y=0;y<3;y++) for (z=0;z<3;z++) {
                 if ((s=neighbor_table[x][y][z])) {
                     if (s != src) {
-                        sendto_one(s, "SLIDEOVER\n");
+                        makepacket(&out_packet, T_SLIDEOVER);
+                        sendpacket(s, &out_packet);
+                        //sendto_one(s, "SLIDEOVER\n");
                         neighbor_table[x][y][z] = NULL;
                     }
                 }
@@ -1179,7 +1733,9 @@ int s_trackerfailure(struct server_socket *src, int argc, char **argv) {
             for (x=0;x<3;x++) for (y=0;y<3;y++) for (z=0;z<3;z++) {
                 if ((s=neighbor_table[x][y][z])) {
                     if (s == src) {
-                        sendto_one(s, "SLIDEOVER\n");
+                        makepacket(&out_packet, T_SLIDEOVER);
+                        sendpacket(s, &out_packet);
+                        //sendto_one(s, "SLIDEOVER\n");
                         neighbor_table[x][y][z] = NULL;
                     }
                 }
@@ -1194,17 +1750,27 @@ int s_trackerfailure(struct server_socket *src, int argc, char **argv) {
 
 }
 
-int s_closing(struct server_socket *src, uint32_t *pfrom, int argc, char **argv) {
+int s_closing(struct server_socket *src, lt_packet *packet) {
 
     lattice_message mess;
     lattice_closing submess;
 
+    void *p;
+    uint16_t len;
+    uint16_t argc;
+
+    char *str;
+
     n_coord server_coord;
     n_coord newcenter;
 
-    if (!src) return 0;
+    if (!src || !packet) return 0;
 
-    if (argc < 2) return 0;
+    if (PArgc(packet) < 2) return 0;
+
+    argc = packet->header.payload_argc;
+    len = packet->header.payload_length;
+    p = packet->payload;
 
     server_coord.x = src->coord.x;
     server_coord.y = src->coord.y;
@@ -1219,8 +1785,11 @@ int s_closing(struct server_socket *src, uint32_t *pfrom, int argc, char **argv)
             mess.fromuid = 0;
             mess.length = sizeof submess;
             mess.args = &submess;
-            submess.numeric = atoi(argv[0]);
-            strncpy(submess.desc, argv[1] , sizeof(submess.desc));
+
+            if (!get_numeric(&p, &(submess.numeric), &len, &argc)) return 0;
+            //submess.numeric = atoi(argv[0]);
+            if (!get_closingreason(&p, &(str), &len, &argc)) return 0;
+            strncpy(submess.desc, str, sizeof(submess.desc));
             submess.desc[sizeof(submess.desc)-1]='\0';
 
             (*gcallback)(&mess);
@@ -1249,8 +1818,11 @@ int s_closing(struct server_socket *src, uint32_t *pfrom, int argc, char **argv)
             mess.length = sizeof submess;
             mess.args = &submess;
 
-            submess.numeric = atoi(argv[0]);
-            strncpy(submess.desc, argv[1] , sizeof(submess.desc));
+            if (!get_numeric(&p, &(submess.numeric), &len, &argc)) return 0;
+            //submess.numeric = atoi(argv[0]);
+
+            if (!get_closingreason(&p, &(str), &len, &argc)) return 0;
+            strncpy(submess.desc, str, sizeof(submess.desc));
             submess.desc[sizeof(submess.desc)-1]='\0';
 
             (*gcallback)(&mess);

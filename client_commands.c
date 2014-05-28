@@ -76,13 +76,13 @@ int c_p(w_coord wcoord, b_coord bcoord) {
                     if (!put_bx(&p, bcoord.x, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
                     if (!put_by(&p, bcoord.y, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
                     if (!put_bz(&p, bcoord.z, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
-                    sendpacket(src, &out_packet);
+                    sendpacket(s, &out_packet);
                     //sendto_one(s, "P %d %d %d %d %d %d\n", wcoord.x, wcoord.y, wcoord.z, bcoord.x, bcoord.y, bcoord.z);
                 } else {
                     // need to ENDP if we are walking away
                     if (user_is_within_outer_border(oldwcoord, s->coord)) {
                         makepacket(&out_packet, T_ENDP);
-                        sendpacket(src, &out_packet);
+                        sendpacket(s, &out_packet);
                         //sendto_one(s, "ENDP\n");
                     }
                 }
@@ -108,7 +108,7 @@ int c_quit(char *reason) {
     makepacket(&out_packet, T_QUIT);
 
     if (reason)
-        put_quitreson(&p, reason, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+        put_quitreason(&p, reason, &PLength(&out_packet), &PArgc(&out_packet));
 
     return sendpacket(neighbor_table[1][1][1], &out_packet);
 
@@ -176,7 +176,7 @@ int c_chat(char *chat_text) {
     makepacket(&out_packet, T_CHAT);
 
     if (chat_text)
-        put_chat(&p, chat_text, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+        put_chat(&p, chat_text, &PLength(&out_packet), &PArgc(&out_packet));
 
     return sendpacket(neighbor_table[1][1][1], &out_packet);
 
@@ -192,7 +192,7 @@ int c_pchat(uint32_t uid, char *chat_text) {
     if (!put_uid(&p, uid, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
 
     if (chat_text)
-        put_chat(&p, chat_text, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+        put_chat(&p, chat_text, &PLength(&out_packet), &PArgc(&out_packet));
 
     return sendpacket(neighbor_table[1][1][1], &out_packet);
 
@@ -207,7 +207,7 @@ int c_action(char *action_text) {
     makepacket(&out_packet, T_ACTION);
 
     if (action_text)
-        put_action(&p, action_text, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+        put_action(&p, action_text, &PLength(&out_packet), &PArgc(&out_packet));
 
     return sendpacket(neighbor_table[1][1][1], &out_packet);
 
@@ -380,7 +380,7 @@ int c_schat(char *schat_text) {
     makepacket(&out_packet, T_SCHAT);
 
     if (schat_text)
-        put_chat(&p, schat_text, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+        put_chat(&p, schat_text, &PLength(&out_packet), &PArgc(&out_packet));
 
     return sendpacket(neighbor_table[1][1][1], &out_packet);
 
@@ -388,7 +388,6 @@ int c_schat(char *schat_text) {
 
 int c_lusers() {
 
-    void *p;
     lt_packet out_packet;
 
     makepacket(&out_packet, T_LUSERS);
