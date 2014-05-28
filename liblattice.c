@@ -621,6 +621,7 @@ int lattice_connect(char *ipstr, uint16_t port) {
     (*gcallback)(&mess);
 
     makepacket(&out_packet, T_CENTEREDINTRO);
+    p = &out_packet.payload;
 
     if (!put_uid(&p, lattice_player.userid, &PLength(&out_packet), &PArgc(&out_packet))) return -13;
     if (!put_model(&p, lattice_player.model, &PLength(&out_packet), &PArgc(&out_packet))) return -14;
