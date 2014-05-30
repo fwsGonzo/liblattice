@@ -328,6 +328,10 @@ void lattice_process(void) {
 
                     packet_ntoh(&packet->header);
 
+                } else {
+
+                    packet = (lt_packet *)s->rmsg;
+
                 }
 
                 // at this point we know we have a header in host order

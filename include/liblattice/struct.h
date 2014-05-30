@@ -6,8 +6,8 @@
 #include "coordinates.h"
 
 typedef struct block_t {
-    unsigned short id : 10;
-    unsigned short bf : 6;
+    uint16_t id : 10;
+    uint16_t bf : 6;
 } block_t;
 
 #define HAND_TYPE uint16_t
