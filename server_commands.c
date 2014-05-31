@@ -1029,6 +1029,7 @@ int s_satstep(struct server_socket *src, lt_packet *packet) {
     mess.args = &submess;
 
     if (!get_satstep(&p, &(submess.satstep), &len, &argc)) return 0;
+    if (!get_sat(&p, &(submess.sat), &len, &argc)) return 0;
 
     //submess.satstep = (uint32_t)atoi(argv[0]);
 

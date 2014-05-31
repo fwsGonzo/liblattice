@@ -264,6 +264,7 @@ typedef struct lattice_log {
 typedef struct lattice_satstep {
 
     uint32_t satstep;
+    double sat;
 
 } lattice_satstep;
 
