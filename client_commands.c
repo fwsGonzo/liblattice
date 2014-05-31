@@ -106,6 +106,7 @@ int c_quit(char *reason) {
     lt_packet out_packet;
 
     makepacket(&out_packet, T_QUIT);
+    p = &out_packet.payload;
 
     if (reason)
         put_quitreason(&p, reason, &PLength(&out_packet), &PArgc(&out_packet));
@@ -132,6 +133,7 @@ int c_pc(uint32_t color) {
     lattice_player.usercolor = color;
 
     makepacket(&out_packet, T_PC);
+    p = &out_packet.payload;
     if (!put_usercolor(&p, color, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
 
     return (sendpacket(neighbor_table[1][1][1], &out_packet));
@@ -146,6 +148,7 @@ int c_pr(head_rot rot) {
     lattice_player.hrot = rot;
 
     makepacket(&out_packet, T_PR);
+    p = &out_packet.payload;
     if (!put_xrot(&p, rot.xrot, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
     if (!put_yrot(&p, rot.yrot, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
 
@@ -161,6 +164,7 @@ int c_ph(hand_hold hand) {
     lattice_player.hhold = hand;
 
     makepacket(&out_packet, T_PH);
+    p = &out_packet.payload;
     if (!put_item_id(&p, hand.item_id, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
     if (!put_item_type(&p, hand.item_type, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
 
@@ -174,6 +178,7 @@ int c_chat(char *chat_text) {
     lt_packet out_packet;
 
     makepacket(&out_packet, T_CHAT);
+    p = &out_packet.payload;
 
     if (chat_text)
         put_chat(&p, chat_text, &PLength(&out_packet), &PArgc(&out_packet));
@@ -188,6 +193,7 @@ int c_pchat(uint32_t uid, char *chat_text) {
     lt_packet out_packet;
 
     makepacket(&out_packet, T_PCHAT);
+    p = &out_packet.payload;
 
     if (!put_uid(&p, uid, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
 
@@ -205,6 +211,7 @@ int c_action(char *action_text) {
     lt_packet out_packet;
 
     makepacket(&out_packet, T_ACTION);
+    p = &out_packet.payload;
 
     if (action_text)
         put_action(&p, action_text, &PLength(&out_packet), &PArgc(&out_packet));
@@ -219,6 +226,8 @@ int c_s(int32_t mid, int32_t sid) {
     lt_packet out_packet;
 
     makepacket(&out_packet, T_S);
+    p = &out_packet.payload;
+
     if (!put_mid(&p, mid, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
     if (!put_sid(&p, sid, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
 
@@ -232,6 +241,8 @@ int c_sc(int32_t csid) {
     lt_packet out_packet;
 
     makepacket(&out_packet, T_SC);
+    p = &out_packet.payload;
+
     if (!put_csid(&p, csid, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
 
     return (sendpacket(neighbor_table[1][1][1], &out_packet));
@@ -244,6 +255,8 @@ int c_bo(w_coord wcoord, b_coord bcoord, int32_t id) {
     lt_packet out_packet;
 
     makepacket(&out_packet, T_BO);
+    p = &out_packet.payload;
+
     if (!put_wx(&p, wcoord.x, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
     if (!put_wy(&p, wcoord.y, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
     if (!put_wz(&p, wcoord.z, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
@@ -262,6 +275,8 @@ int c_mo(w_coord wcoord, b_coord bcoord, int32_t id, int32_t count) {
     lt_packet out_packet;
 
     makepacket(&out_packet, T_MO);
+    p = &out_packet.payload;
+
     if (!put_wx(&p, wcoord.x, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
     if (!put_wy(&p, wcoord.y, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
     if (!put_wz(&p, wcoord.z, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
@@ -291,6 +306,8 @@ int c_badd(w_coord wcoord, b_coord bcoord, block_t block) {
     if (!dst) return 0;
 
     makepacket(&out_packet, T_BADD);
+    p = &out_packet.payload;
+
     if (!put_wx(&p, wcoord.x, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
     if (!put_wy(&p, wcoord.y, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
     if (!put_wz(&p, wcoord.z, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
@@ -319,6 +336,8 @@ int c_bset(w_coord wcoord, b_coord bcoord, block_t block) {
     if (!dst) return 0;
 
     makepacket(&out_packet, T_BSET);
+    p = &out_packet.payload;
+
     if (!put_wx(&p, wcoord.x, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
     if (!put_wy(&p, wcoord.y, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
     if (!put_wz(&p, wcoord.z, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
@@ -347,6 +366,8 @@ int c_brem(w_coord wcoord, b_coord bcoord) {
     if (!dst) return 0;
 
     makepacket(&out_packet, T_BREM);
+    p = &out_packet.payload;
+
     if (!put_wx(&p, wcoord.x, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
     if (!put_wy(&p, wcoord.y, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
     if (!put_wz(&p, wcoord.z, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
@@ -367,6 +388,8 @@ int c_pmine(int mining) {
     lattice_player.mining = mining ? 1 : 0;
 
     makepacket(&out_packet, T_PMINE);
+    p = &out_packet.payload;
+
     if (!put_mining(&p, mining ? 1 : 0, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
     return (sendpacket(neighbor_table[1][1][1], &out_packet));
 
@@ -378,6 +401,7 @@ int c_schat(char *schat_text) {
     lt_packet out_packet;
 
     makepacket(&out_packet, T_SCHAT);
+    p = &out_packet.payload;
 
     if (schat_text)
         put_chat(&p, schat_text, &PLength(&out_packet), &PArgc(&out_packet));
