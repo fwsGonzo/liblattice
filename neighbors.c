@@ -710,6 +710,7 @@ void packet_recenter_neighbors(n_coord newcenter) {
             if (s == neighbor_table[1][1][1]) {
                 // this is a new center
                 makepacket(&out_packet, T_CENTEREDMOVE);
+                p = &out_packet.payload;
                 put_nx(&p, lattice_player.centeredon.x, &PLength(&out_packet), &PArgc(&out_packet));
                 put_ny(&p, lattice_player.centeredon.y, &PLength(&out_packet), &PArgc(&out_packet));
                 put_nz(&p, lattice_player.centeredon.z, &PLength(&out_packet), &PArgc(&out_packet));
@@ -750,6 +751,7 @@ void packet_recenter_neighbors(n_coord newcenter) {
                 if (user_is_within_outer_border(lattice_player.wpos, s->coord)) {
 
                     makepacket(&out_packet, T_SIDEDMOVE);
+                    p = &out_packet.payload;
                     put_nx(&p, newcenter.x, &PLength(&out_packet), &PArgc(&out_packet));
                     put_ny(&p, newcenter.y, &PLength(&out_packet), &PArgc(&out_packet));
                     put_nz(&p, newcenter.z, &PLength(&out_packet), &PArgc(&out_packet));
@@ -788,6 +790,7 @@ void packet_recenter_neighbors(n_coord newcenter) {
 
                 } else {
                     makepacket(&out_packet, T_SIDEDMOVE);
+                    p = &out_packet.payload;
                     put_nx(&p, newcenter.x, &PLength(&out_packet), &PArgc(&out_packet));
                     put_ny(&p, newcenter.y, &PLength(&out_packet), &PArgc(&out_packet));
                     put_nz(&p, newcenter.z, &PLength(&out_packet), &PArgc(&out_packet));
