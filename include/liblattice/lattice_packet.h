@@ -57,6 +57,6 @@
 
   extern int put_float(void **dst, float src, uint16_t *len, uint16_t *argc);
   extern int put_double(void **dst, double src, uint16_t *len, uint16_t *argc);
-  extern int put_string(void **dst, char *src, uint16_t *len, uint16_t *argc);
+  extern int put_string(void **dst, const char *src, uint16_t *len, uint16_t *argc);
 
 #endif

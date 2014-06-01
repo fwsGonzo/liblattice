@@ -100,7 +100,7 @@ int c_p(w_coord wcoord, b_coord bcoord) {
 }
 
 
-int c_quit(char *reason) {
+int c_quit(const char *reason) {
 
     void *p;
     lt_packet out_packet;
@@ -172,7 +172,7 @@ int c_ph(hand_hold hand) {
 
 }
 
-int c_chat(char *chat_text) {
+int c_chat(const char *chat_text) {
 
     void *p;
     lt_packet out_packet;
@@ -187,7 +187,7 @@ int c_chat(char *chat_text) {
 
 }
 
-int c_pchat(uint32_t uid, char *chat_text) {
+int c_pchat(uint32_t uid, const char *chat_text) {
 
     void *p;
     lt_packet out_packet;
@@ -205,7 +205,7 @@ int c_pchat(uint32_t uid, char *chat_text) {
 
 }
 
-int c_action(char *action_text) {
+int c_action(const char *action_text) {
 
     void *p;
     lt_packet out_packet;
@@ -395,7 +395,7 @@ int c_pmine(int mining) {
 
 }
 
-int c_schat(char *schat_text) {
+int c_schat(const char *schat_text) {
 
     void *p;
     lt_packet out_packet;
