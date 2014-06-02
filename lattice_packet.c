@@ -22,8 +22,15 @@
 */
 
 #include <string.h>
-#include <netinet/in.h>
 #include <stdint.h>
+
+#ifdef __linux__
+#include <netinet/in.h>
+#else
+#include <winsock2.h>
+#include <windows.h>
+#include <ws2tcpip.h>
+#endif
 
 #include "lattice_config.h"
 #include "serversocket.h"
