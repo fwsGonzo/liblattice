@@ -61,15 +61,17 @@
 # if BYTE_ORDER == LITTLE_ENDIAN
 
 #ifndef BSWAP64
-#define BSWAP64(x) \
-(((uint64_t)(x) << 56) | \
-(((uint64_t)(x) << 40) & 0X00FF000000000000ULL) | \
-(((uint64_t)(x) << 24) & 0X0000FF0000000000ULL) | \
-(((uint64_t)(x) << 8) & 0X000000FF00000000ULL) | \
-(((uint64_t)(x) >> 8) & 0X00000000FF000000ULL) | \
-(((uint64_t)(x) >> 24) & 0X0000000000FF0000ULL) | \
-(((uint64_t)(x) >> 40) & 0X000000000000FF00ULL) | \
-((uint64_t)(x) >> 56))
+#define BSWAP64(x)                                    \
+  (                                                   \
+     ((uint64_t)(x) << 56)                          | \
+    (((uint64_t)(x) << 40) & 0X00FF000000000000ULL) | \
+    (((uint64_t)(x) << 24) & 0X0000FF0000000000ULL) | \
+    (((uint64_t)(x) <<  8) & 0X000000FF00000000ULL) | \
+    (((uint64_t)(x) >>  8) & 0X00000000FF000000ULL) | \
+    (((uint64_t)(x) >> 24) & 0X0000000000FF0000ULL) | \
+    (((uint64_t)(x) >> 40) & 0X000000000000FF00ULL) | \
+     ((uint64_t)(x) >> 56)                            \
+  )
 #endif
 
 /*
