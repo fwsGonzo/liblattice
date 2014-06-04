@@ -1,5 +1,5 @@
 
-// Public domain portability header by Mathias Panzenböck
+// Public domain portability header by Mathias Panzenböck + tweaks
 
 #ifndef PORTABLE_ENDIAN_H__
 #define PORTABLE_ENDIAN_H__
@@ -59,6 +59,8 @@
 # include <sys/param.h>
 
 # if BYTE_ORDER == LITTLE_ENDIAN
+
+// good enough. we dont use a lot of 64's
 
 #ifndef BSWAP64
 #define BSWAP64(x)                                    \
