@@ -60,7 +60,6 @@
 
 # if BYTE_ORDER == LITTLE_ENDIAN
 
-/*
 #ifndef BSWAP64
 #define BSWAP64(x) \
 (((uint64_t)(x) << 56) | \
@@ -72,8 +71,8 @@
 (((uint64_t)(x) >> 40) & 0X000000000000FF00ULL) | \
 ((uint64_t)(x) >> 56))
 #endif
-*/
 
+/*
 __inline DWORDLONG bswap64(DWORDLONG x)
 {
   __asm {
@@ -83,6 +82,7 @@ __inline DWORDLONG bswap64(DWORDLONG x)
     bswap eax
   }
 }
+*/
 
 # define htobe16 htons
 # define htole16(x) (x)
@@ -92,9 +92,9 @@ __inline DWORDLONG bswap64(DWORDLONG x)
 # define htole32(x) (x)
 # define be32toh ntohl
 # define le32toh(x) (x)
-# define htobe64 bswap64
+# define htobe64 BSWAP64
 # define htole64(x) (x)
-# define be64toh bswap64
+# define be64toh BSWAP64
 # define le64toh(x) (x)
 
 # elif BYTE_ORDER == BIG_ENDIAN
