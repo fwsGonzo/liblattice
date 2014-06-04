@@ -74,18 +74,6 @@
   )
 #endif
 
-/*
-__inline DWORDLONG bswap64(DWORDLONG x)
-{
-  __asm {
-    mov edx, [ebp+8]
-    mov eax, [ebp+12]
-    bswap edx
-    bswap eax
-  }
-}
-*/
-
 # define htobe16 htons
 # define htole16(x) (x)
 # define be16toh ntohs
