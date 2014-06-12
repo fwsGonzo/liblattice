@@ -581,7 +581,7 @@ int lattice_send(lattice_message *msg) {
 }
 
 
-int lattice_connect(char *ipstr, uint16_t port) {
+int lattice_connect(const char *ipstr, uint16_t port) {
 
     struct in_addr ip;
     struct hostent *he;
