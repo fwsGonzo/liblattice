@@ -45,6 +45,7 @@
   LIBLATTICE_API void lattice_flush(void);
   LIBLATTICE_API int lattice_connect(const char *ipstr, uint16_t port);
   LIBLATTICE_API int lattice_setplayer(lattice_player_t *player);
+  LIBLATTICE_API int lattice_getplayer(lattice_player_t *player);
 
   #include "client_commands.h"
 

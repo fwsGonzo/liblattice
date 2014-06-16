@@ -716,3 +716,44 @@ int lattice_setplayer(lattice_player_t *player) {
 
 }
 
+
+int lattice_getplayer(lattice_player_t *player) {
+
+    if (!player) return -1;
+
+    player->userid = lattice_player.userid;
+    player->flags = lattice_player.flags;
+    player->model = lattice_player.model;
+    player->color = lattice_player.color;
+    player->wpos.x = lattice_player.wpos.x;
+    player->wpos.y = lattice_player.wpos.y;
+    player->wpos.z = lattice_player.wpos.z;
+    player->bpos.x = lattice_player.bpos.x;
+    player->bpos.y = lattice_player.bpos.y;
+    player->bpos.z = lattice_player.bpos.z;
+    player->hrot.xrot = lattice_player.hrot.xrot;
+    player->hrot.yrot = lattice_player.hrot.yrot;
+    player->hhold.item_id = lattice_player.hhold.item_id;
+    player->hhold.item_type = lattice_player.hhold.item_type;
+    player->usercolor = lattice_player.usercolor;
+    player->burstdist = lattice_player.burstdist;
+    player->mining = lattice_player.mining;
+
+    if (player->nickname) free(player->nickname);
+
+    player->nickname = strdup(lattice_player.nickname);
+
+    player->centeredon.x = player->wpos.x >> 8;
+    player->centeredon.y = player->wpos.y >> 8;
+    player->centeredon.z = player->wpos.z >> 8;
+    player->my_min_wcoord.x = player->centeredon.x << 8;
+    player->my_min_wcoord.y = player->centeredon.y << 8;
+    player->my_min_wcoord.z = player->centeredon.z << 8;
+    player->my_max_wcoord.x = (player->centeredon.x << 8) | 0x000000FF;
+    player->my_max_wcoord.y = (player->centeredon.y << 8) | 0x000000FF;
+    player->my_max_wcoord.z = (player->centeredon.z << 8) | 0x000000FF;
+
+    return 0;
+
+}
+
