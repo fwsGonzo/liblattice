@@ -605,9 +605,11 @@ int lattice_connect(const char *ipstr, uint16_t port) {
         if (*he->h_addr_list)
             memcpy((char *) &ip, *he->h_addr_list, sizeof(ip));
         else
-            ip.s_addr = inet_addr(ipstr);
+            return -30;
+            //ip.s_addr = inet_addr(ipstr);
     } else {
-        ip.s_addr = inet_addr(ipstr);
+        return -31;
+        //ip.s_addr = inet_addr(ipstr);
     }
 
     dst = connect_server(lattice_player.centeredon, ip, port, &error);
