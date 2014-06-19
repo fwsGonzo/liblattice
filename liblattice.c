@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include <ctype.h>
+#include <stdio.h>
 
 #ifdef __linux__
 #include <sys/time.h>
@@ -18,7 +19,7 @@
     #include <winsock2.h>
     #include <windows.h>
     #include <ws2tcpip.h>
-    #include <stdio.h>
+    //#include <stdio.h>
     #ifndef __MINGW32__
         #define strcasecmp(a, b) _stricmp((a), (b))
         #include "forwin.h"
@@ -789,6 +790,144 @@ int lattice_getplayer(lattice_player_t *player) {
     player->my_max_wcoord.x = (player->centeredon.x << 8) | 0x000000FF;
     player->my_max_wcoord.y = (player->centeredon.y << 8) | 0x000000FF;
     player->my_max_wcoord.z = (player->centeredon.z << 8) | 0x000000FF;
+
+    return 0;
+
+}
+
+// --------------------------------------------------
+
+#define MESS_SIZE 1024
+
+int authserver_login(const char *username, const char *password, const char *hostname, uint16_t port, uint16_t burstdist) {
+
+    struct in_addr ip;
+    struct hostent *he;
+    int sockfd;
+    struct sockaddr_in  serv_addr;
+    FILE *fp;
+
+    char *nickname;
+
+    lattice_player_t player;
+
+    uint16_t seed_port;
+
+    int ret;
+
+    char mess[MESS_SIZE];
+
+    if (!username || !*username) return -1;
+    if (!password || !*password) return -2;
+    if (!hostname || !*hostname) return -3;
+
+    if (!lattice_initialized) return -20;
+    if (lattice_connected) return -21;
+
+    he = gethostbyname (hostname);
+
+    if (he) {
+        if (*he->h_addr_list)
+            memcpy((char *) &ip, *he->h_addr_list, sizeof(ip));
+        else
+            //ip.s_addr = inet_addr(hostname);
+            return -4;
+    } else {
+        //ip.s_addr = inet_addr(hostname);
+        return -5;
+    }
+
+    sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+
+    if (sockfd < 0) {
+        return -6;
+    }
+
+    memset(&serv_addr, 0, sizeof serv_addr);
+
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(port);
+    serv_addr.sin_addr.s_addr = ip.s_addr;
+
+    if (connect(sockfd, (struct sockaddr *) &serv_addr, sizeof serv_addr) < 0) {
+        #ifdef __linux__
+                close(sockfd);
+        #else
+                closesocket(sockfd);
+        #endif
+        return -7;
+    }
+
+    fp = fdopen(sockfd, "w+");
+    if (fp == NULL) return -8;
+
+    if(!feof(fp)) {
+        if (fgets(mess,sizeof(mess),fp)) {
+            strtoargv(mess);
+            if (arg_c < 1) return -9;
+            if (strcasecmp(arg_v[0], "AUTHSERVER")) return -10;
+        } else {
+            return -11;
+        }
+    } else {
+        return -12;
+    }
+
+    if(!feof(fp)) {
+        if (fprintf(fp, "LOGIN %s %s\n", username, password) < 0)
+            return -13;
+    } else {
+        return -14;
+    }
+
+    if(!feof(fp)) {
+        if (fgets(mess,sizeof(mess),fp)) {
+            strtoargv(mess);
+            if (arg_c < 17) return -15;
+            if (strcasecmp(arg_v[0], "AUTHOK")) return -16;
+        } else {
+            return -17;
+        }
+    } else {
+        return -18;
+    }
+
+    fclose(fp);
+
+    //AUTHOK username uid model color wx wy wz bx by bz hrot_x hrot_y hhold_id hhold_type host port
+
+    nickname = strdup(arg_v[1]);
+    if (!nickname) return -19;
+    player.nickname = nickname;
+
+    player.userid = (uint32_t)atoi(arg_v[2]);
+    player.model = (uint16_t)atoi(arg_v[3]);
+    player.color = (uint32_t)atoi(arg_v[4]);
+    player.wpos.x = (int32_t)atoi(arg_v[5]);
+    player.wpos.y = (int32_t)atoi(arg_v[6]);
+    player.wpos.z = (int32_t)atoi(arg_v[7]);
+    player.bpos.x = (int32_t)atoi(arg_v[8]);
+    player.bpos.y = (int32_t)atoi(arg_v[9]);
+    player.bpos.z = (int32_t)atoi(arg_v[10]);
+    player.hrot.xrot = (int16_t)atoi(arg_v[11]);
+    player.hrot.yrot = (int16_t)atoi(arg_v[12]);
+    player.hhold.item_id = (uint16_t)atoi(arg_v[13]);
+    player.hhold.item_type = (uint16_t)atoi(arg_v[14]);
+    player.usercolor = 0;
+    player.mining = 0;
+    player.burstdist = burstdist;
+
+    lattice_setplayer(&player);
+
+    free (nickname);
+
+    seed_port = (uint16_t)atoi(arg_v[16]);
+
+    ret=lattice_connect(arg_v[15], seed_port);
+
+    if (ret < 0) return -22;
+
+    lattice_flush();
 
     return 0;
 

@@ -48,6 +48,8 @@
   LIBLATTICE_API  int lattice_setplayer(lattice_player_t *player);
   LIBLATTICE_API  int lattice_getplayer(lattice_player_t *player);
 
+  LIBLATTICE_API  int authserver_login(const char *username, const char *password, const char *hostname, uint16_t port, uint16_t burstdist);
+
   #include "client_commands.h"
 
 #endif
