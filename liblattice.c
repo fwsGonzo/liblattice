@@ -177,6 +177,7 @@ int lattice_init(int in_sock, void (*callback)(lattice_message *mp)) {
         return -1;
 
     if (lattice_initialized) return -1;
+    if (lattice_connected) return -1;
 
     gcallback = callback;
 
@@ -221,6 +222,7 @@ int lattice_select(struct timeval *pt) { // pointer to timeout
     struct timeval *pd = NULL; // pointer to final delay
 
     if (!lattice_initialized) return -1;
+    if (!lattice_connected) return -1;
 
     memcpy(&rready_set, &rtest_set, sizeof (rtest_set));
     memcpy(&wready_set, &wtest_set, sizeof (wtest_set));
@@ -252,6 +254,7 @@ int lattice_select(struct timeval *pt) { // pointer to timeout
 
 void lattice_flush(void) {
     if (!lattice_initialized) return;
+    if (!lattice_connected) return;
     flushall_write();
     return;
 }
@@ -277,6 +280,8 @@ void lattice_process(void) {
     lt_packet *packet;
 
     if (!lattice_initialized) return;
+
+    if (!lattice_connected) return;
 
     gettimeofday(&now, NULL);
 
@@ -488,6 +493,8 @@ int lattice_send(lattice_message *msg) {
 
     if (!lattice_initialized) return -1;
 
+    if (!lattice_connected) return -1;
+
     switch (msg->type) {
 
         case T_P:
@@ -612,6 +619,8 @@ int lattice_connect(const char *ipstr, uint16_t port) {
 
     if (!lattice_initialized) return -32;
 
+    if (lattice_connected) return -33;
+
     he = gethostbyname (ipstr);
 
     if (he) {
@@ -662,6 +671,8 @@ int lattice_connect(const char *ipstr, uint16_t port) {
 
     if (sendpacket(neighbor_table[1][1][1], &out_packet)) return -12;
 
+    lattice_connected = 1;
+
     //if(sendto_one(neighbor_table[1][1][1],
     //                   //                              wx  wy  wz bx by bz  HEAD  HAND
     //                   "CENTEREDINTRO %lu %d %u %s %d %u %u %u %d %d %d %d %d %d %d %d %u\n",
@@ -695,6 +706,7 @@ int lattice_setplayer(lattice_player_t *player) {
     if (!player->nickname) return -2;
     if (!*player->nickname) return -3;
     if (!lattice_initialized) return -4;
+    if (lattice_connected) return -5;
 
     lattice_player.userid = player->userid;
     lattice_player.flags = player->flags;
@@ -737,6 +749,7 @@ int lattice_getplayer(lattice_player_t *player) {
 
     if (!player) return -1;
     if (!lattice_initialized) return -2;
+    if (!lattice_connected) return -3;
 
     player->userid = lattice_player.userid;
     player->flags = lattice_player.flags;

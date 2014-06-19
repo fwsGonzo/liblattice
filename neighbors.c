@@ -467,6 +467,8 @@ void disconnect_servers(void) {
 
     (*gcallback)(&mess);
 
+    lattice_connected = 0;
+
     return;
 
 }

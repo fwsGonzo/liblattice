@@ -27,6 +27,7 @@
 
 #define client_func_checks() do {         \
     if (!lattice_initialized) return 0;   \
+    if (!lattice_connected) return 0;     \
 } while(0)
 
 
