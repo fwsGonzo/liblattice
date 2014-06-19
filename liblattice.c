@@ -259,6 +259,13 @@ void lattice_flush(void) {
     return;
 }
 
+void lattice_disconnect(void) {
+    if (!lattice_initialized) return;
+    if (!lattice_connected) return;
+    disconnect_servers();
+    return;
+}
+
 void lattice_process(void) {
 
     server_socket *s;

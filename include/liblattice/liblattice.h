@@ -38,14 +38,15 @@
   #include "struct.h"
   #include "globals.h"
 
-  LIBLATTICE_API int lattice_init(int in_sock, void (*callback)(lattice_message *mp));
-  LIBLATTICE_API int lattice_select(struct timeval *ptimeout);
+  LIBLATTICE_API  int lattice_init(int in_sock, void (*callback)(lattice_message *mp));
+  LIBLATTICE_API  int lattice_select(struct timeval *ptimeout);
   LIBLATTICE_API void lattice_process(void);
-  LIBLATTICE_API int lattice_send(lattice_message *msg);
+  LIBLATTICE_API  int lattice_send(lattice_message *msg);
   LIBLATTICE_API void lattice_flush(void);
-  LIBLATTICE_API int lattice_connect(const char *ipstr, uint16_t port);
-  LIBLATTICE_API int lattice_setplayer(lattice_player_t *player);
-  LIBLATTICE_API int lattice_getplayer(lattice_player_t *player);
+  LIBLATTICE_API  int lattice_connect(const char *ipstr, uint16_t port);
+  LIBLATTICE_API void lattice_disconnect(void);
+  LIBLATTICE_API  int lattice_setplayer(lattice_player_t *player);
+  LIBLATTICE_API  int lattice_getplayer(lattice_player_t *player);
 
   #include "client_commands.h"
 
