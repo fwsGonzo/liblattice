@@ -39,3 +39,4 @@ void (*gcallback)(lattice_message *mp);
 
 sched_header sched;
 
+int lattice_initialized = 0;

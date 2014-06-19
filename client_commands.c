@@ -25,6 +25,11 @@
   #include "client_commands.h"
 #endif
 
+#define client_func_checks() do {         \
+    if (!lattice_initialized) return 0;   \
+} while(0)
+
+
 int c_p(w_coord wcoord, b_coord bcoord) {
 
     server_socket *s;
@@ -38,6 +43,8 @@ int c_p(w_coord wcoord, b_coord bcoord) {
 
     lattice_message mess;
     lattice_bump submess;
+
+    client_func_checks();
 
     oldwcoord = lattice_player.wpos;
 
@@ -105,6 +112,8 @@ int c_quit(const char *reason) {
     void *p;
     lt_packet out_packet;
 
+    client_func_checks();
+
     makepacket(&out_packet, T_QUIT);
     p = &out_packet.payload;
 
@@ -119,6 +128,8 @@ int c_p_empty(void) {
 
     lt_packet out_packet;
 
+    client_func_checks();
+
     makepacket(&out_packet, T_P);
 
     return (sendpacket(neighbor_table[1][1][1], &out_packet));
@@ -129,6 +140,8 @@ int c_pc(uint32_t color) {
 
     void *p;
     lt_packet out_packet;
+
+    client_func_checks();
 
     lattice_player.usercolor = color;
 
@@ -144,6 +157,8 @@ int c_pr(head_rot rot) {
 
     void *p;
     lt_packet out_packet;
+
+    client_func_checks();
 
     lattice_player.hrot = rot;
 
@@ -161,6 +176,8 @@ int c_ph(hand_hold hand) {
     void *p;
     lt_packet out_packet;
 
+    client_func_checks();
+
     lattice_player.hhold = hand;
 
     makepacket(&out_packet, T_PH);
@@ -177,6 +194,8 @@ int c_chat(const char *chat_text) {
     void *p;
     lt_packet out_packet;
 
+    client_func_checks();
+
     makepacket(&out_packet, T_CHAT);
     p = &out_packet.payload;
 
@@ -191,6 +210,8 @@ int c_pchat(uint32_t uid, const char *chat_text) {
 
     void *p;
     lt_packet out_packet;
+
+    client_func_checks();
 
     makepacket(&out_packet, T_PCHAT);
     p = &out_packet.payload;
@@ -210,6 +231,8 @@ int c_action(const char *action_text) {
     void *p;
     lt_packet out_packet;
 
+    client_func_checks();
+
     makepacket(&out_packet, T_ACTION);
     p = &out_packet.payload;
 
@@ -224,6 +247,8 @@ int c_s(int32_t mid, int32_t sid) {
 
     void *p;
     lt_packet out_packet;
+
+    client_func_checks();
 
     makepacket(&out_packet, T_S);
     p = &out_packet.payload;
@@ -240,6 +265,8 @@ int c_sc(int32_t csid) {
     void *p;
     lt_packet out_packet;
 
+    client_func_checks();
+
     makepacket(&out_packet, T_SC);
     p = &out_packet.payload;
 
@@ -253,6 +280,8 @@ int c_bo(w_coord wcoord, b_coord bcoord, int32_t id) {
 
     void *p;
     lt_packet out_packet;
+
+    client_func_checks();
 
     makepacket(&out_packet, T_BO);
     p = &out_packet.payload;
@@ -273,6 +302,8 @@ int c_mo(w_coord wcoord, b_coord bcoord, int32_t id, int32_t count) {
 
     void *p;
     lt_packet out_packet;
+
+    client_func_checks();
 
     makepacket(&out_packet, T_MO);
     p = &out_packet.payload;
@@ -298,6 +329,8 @@ int c_badd(w_coord wcoord, b_coord bcoord, block_t block) {
 
     void *p;
     lt_packet out_packet;
+
+    client_func_checks();
 
     ncoord = wcoord_to_ncoord(wcoord);
 
@@ -329,6 +362,8 @@ int c_bset(w_coord wcoord, b_coord bcoord, block_t block) {
     void *p;
     lt_packet out_packet;
 
+    client_func_checks();
+
     ncoord = wcoord_to_ncoord(wcoord);
 
     dst = find_neighbor(ncoord);
@@ -359,6 +394,8 @@ int c_brem(w_coord wcoord, b_coord bcoord) {
     void *p;
     lt_packet out_packet;
 
+    client_func_checks();
+
     ncoord = wcoord_to_ncoord(wcoord);
 
     dst = find_neighbor(ncoord);
@@ -385,6 +422,8 @@ int c_pmine(int mining) {
     void *p;
     lt_packet out_packet;
 
+    client_func_checks();
+
     lattice_player.mining = mining ? 1 : 0;
 
     makepacket(&out_packet, T_PMINE);
@@ -400,6 +439,8 @@ int c_schat(const char *schat_text) {
     void *p;
     lt_packet out_packet;
 
+    client_func_checks();
+
     makepacket(&out_packet, T_SCHAT);
     p = &out_packet.payload;
 
@@ -413,6 +454,8 @@ int c_schat(const char *schat_text) {
 int c_lusers() {
 
     lt_packet out_packet;
+
+    client_func_checks();
 
     makepacket(&out_packet, T_LUSERS);
     return (sendpacket(neighbor_table[1][1][1], &out_packet));
