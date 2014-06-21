@@ -862,7 +862,12 @@ int authserver_login(const char *username, const char *password, const char *hos
         return -7;
     }
 
-    fp = fdopen(sockfd, "w+");
+    #if defined(_WIN32)
+        fp = _fdopen(sockfd, "w+");
+    #else
+        fp = fdopen(sockfd, "w+");
+    #endif
+
     if (fp == NULL) return -8;
 
     if(!feof(fp)) {
