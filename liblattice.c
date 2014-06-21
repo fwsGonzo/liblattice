@@ -734,9 +734,11 @@ int lattice_setplayer(lattice_player_t *player) {
     lattice_player.burstdist = player->burstdist;
     lattice_player.mining = player->mining;
 
-    if (lattice_player.nickname) free(lattice_player.nickname);
+    //if (lattice_player.nickname) free(lattice_player.nickname);
 
-    lattice_player.nickname = strdup(player->nickname);
+    //lattice_player.nickname = strdup(player->nickname);
+    strncpy(lattice_player.nickname, player->nickname, sizeof(lattice_player.nickname));
+    lattice_player.nickname[sizeof(lattice_player.nickname)-1]='\0';
 
     lattice_player.centeredon.x = lattice_player.wpos.x >> 8;
     lattice_player.centeredon.y = lattice_player.wpos.y >> 8;
@@ -777,9 +779,11 @@ int lattice_getplayer(lattice_player_t *player) {
     player->burstdist = lattice_player.burstdist;
     player->mining = lattice_player.mining;
 
-    if (player->nickname) free(player->nickname);
+    //if (player->nickname) free(player->nickname);
 
-    player->nickname = strdup(lattice_player.nickname);
+    //player->nickname = strdup(lattice_player.nickname);
+    strncpy(player->nickname, lattice_player.nickname, sizeof(player->nickname));
+    player->nickname[sizeof(player->nickname)-1]='\0';
 
     player->centeredon.x = player->wpos.x >> 8;
     player->centeredon.y = player->wpos.y >> 8;
@@ -807,7 +811,7 @@ int authserver_login(const char *username, const char *password, const char *hos
     struct sockaddr_in  serv_addr;
     FILE *fp;
 
-    char *nickname;
+    //char *nickname;
 
     lattice_player_t player;
 
@@ -896,9 +900,11 @@ int authserver_login(const char *username, const char *password, const char *hos
 
     //AUTHOK username uid model color wx wy wz bx by bz hrot_x hrot_y hhold_id hhold_type host port
 
-    nickname = strdup(arg_v[1]);
-    if (!nickname) return -19;
-    player.nickname = nickname;
+    //nickname = strdup(arg_v[1]);
+    //if (!nickname) return -19;
+    //player.nickname = nickname;
+    strncpy(player.nickname, arg_v[1], sizeof(player.nickname));
+    player.nickname[sizeof(player.nickname)-1]='\0';
 
     player.userid = (uint32_t)atoi(arg_v[2]);
     player.model = (uint16_t)atoi(arg_v[3]);
@@ -919,7 +925,7 @@ int authserver_login(const char *username, const char *password, const char *hos
 
     lattice_setplayer(&player);
 
-    free (nickname);
+    //free (nickname);
 
     seed_port = (uint16_t)atoi(arg_v[16]);
 
