@@ -6,6 +6,7 @@
 #include "coordinates.h"
 
 #define LATTICE_NICKLEN 32
+#define LATTICE_STRLEN 512
 
 typedef struct block_t {
     uint16_t id : 10;
@@ -142,14 +143,14 @@ typedef struct lattice_p {
 typedef struct lattice_quit {
 
     uint32_t numeric;
-    char desc[MTU];
+    char desc[LATTICE_STRLEN];
 
 } lattice_quit;
 
 typedef struct lattice_closing {
 
     uint32_t numeric;
-    char desc[MTU];
+    char desc[LATTICE_STRLEN];
 
 } lattice_closing;
 
@@ -173,20 +174,20 @@ typedef struct lattice_ph {
 
 typedef struct lattice_chat {
 
-    char chat_text[MTU];
+    char chat_text[LATTICE_STRLEN];
 
 } lattice_chat;
 
 typedef struct lattice_pchat {
 
     uint32_t uid;
-    char pchat_text[MTU];
+    char pchat_text[LATTICE_STRLEN];
 
 } lattice_pchat;
 
 typedef struct lattice_action {
 
-    char action_text[MTU];
+    char action_text[LATTICE_STRLEN];
 
 } lattice_action;
 
@@ -253,13 +254,13 @@ typedef struct lattice_schat {
 
     char nickname[LATTICE_NICKLEN];
     uint32_t color;
-    char schat_text[MTU];
+    char schat_text[LATTICE_STRLEN];
 
 } lattice_schat;
 
 typedef struct lattice_log {
 
-    char log_text[MTU];
+    char log_text[LATTICE_STRLEN];
 
 } lattice_log;
 
