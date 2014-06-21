@@ -801,7 +801,72 @@ int lattice_getplayer(lattice_player_t *player) {
 
 // --------------------------------------------------
 
-#define MESS_SIZE 1024
+inline int authserver_end(int sockfd, int returnValue)
+{
+	// close socket
+	#ifdef __linux__
+		close(sockfd);
+	#else
+		closesocket(sockfd);
+	#endif
+	return returnValue;
+}
+
+const char* authserver_errorstring(int error)
+{
+	switch (error)
+	{
+	case 0:
+		return "No error";
+	case -1:
+		return "Missing username";
+	case -2:
+		return "Missing password";
+	case -3:
+		return "Missing hostname";
+	case -4:
+	case -5:
+		return "Hostname unresolved";
+		
+	case -6:
+		return "Could not create socket";
+	case -7:
+		return "Could not connect to auth server";
+	case -8:
+		return "Could not read from socket";
+	case -9:
+		return "Authserver closed connection early";
+		
+	case -10:
+		return "Missing arguments from auth server";
+	case -11:
+		return "Received incorrect command token";
+	case -12:
+		return "Could not send data to authserver";
+		
+	case -13:
+		return "Authentication failed";
+	case -14:
+		return "Could not connect to lattice server";
+		
+	case -20:
+		return "LibLattice not initialized";
+	case -21:
+		return "Already connected to lattice";
+	}
+	char buf[64];
+	sprintf(buf, "Unknown error: %d", error); // puts string into buffer	
+	return strdup(buf);
+}
+
+void authserver_printerror(const char* baseString)
+{
+	#ifdef _WIN32
+		printf(baseString, WSAGetLastError());
+	#else
+		printf(baseString, strerror(errno));
+	#endif
+}
 
 int authserver_login(const char *username, const char *password, const char *hostname, uint16_t port, uint16_t burstdist) {
 
@@ -809,18 +874,10 @@ int authserver_login(const char *username, const char *password, const char *hos
     struct hostent *he;
     int sockfd;
     struct sockaddr_in  serv_addr;
-    FILE *fp;
-
-    //char *nickname;
-
+	
     lattice_player_t player;
-
-    uint16_t seed_port;
-
-    int ret;
-
-    char mess[MESS_SIZE];
-
+	uint16_t seed_port;
+	
     if (!username || !*username) return -1;
     if (!password || !*password) return -2;
     if (!hostname || !*hostname) return -3;
@@ -829,7 +886,7 @@ int authserver_login(const char *username, const char *password, const char *hos
     if (lattice_connected) return -21;
 
     he = gethostbyname (hostname);
-
+	
     if (he) {
         if (*he->h_addr_list)
             memcpy((char *) &ip, *he->h_addr_list, sizeof(ip));
@@ -852,57 +909,73 @@ int authserver_login(const char *username, const char *password, const char *hos
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(port);
     serv_addr.sin_addr.s_addr = ip.s_addr;
-
-    if (connect(sockfd, (struct sockaddr *) &serv_addr, sizeof serv_addr) < 0) {
-        #ifdef __linux__
-                close(sockfd);
-        #else
-                closesocket(sockfd);
-        #endif
-        return -7;
+	
+    if (connect(sockfd, (struct sockaddr *) &serv_addr, sizeof serv_addr) < 0)
+	{
+		return authserver_end(sockfd, -7);
     }
-
-    #if defined(_WIN32)
-        fp = _fdopen(sockfd, "w+");
-    #else
-        fp = fdopen(sockfd, "w+");
-    #endif
-
-    if (fp == NULL) return -8;
-
-    if(!feof(fp)) {
-        if (fgets(mess,sizeof(mess),fp)) {
-            strtoargv(mess);
-            if (arg_c < 1) return -9;
-            if (strcasecmp(arg_v[0], "AUTHSERVER")) return -10;
-        } else {
-            return -11;
-        }
-    } else {
-        return -12;
+	
+	// peek for data
+	#define READ_BUFLEN 1024
+	char readBuffer[READ_BUFLEN];
+	int bytesRead = recv(sockfd, readBuffer, READ_BUFLEN, 0);
+	
+	if (bytesRead == SOCKET_ERROR)
+	{
+		// something bad happened
+		authserver_printerror("read failed: %d\n");
+		return authserver_end(sockfd, -8);
+	}
+	else if (bytesRead == 0)
+	{
+		// connection closed early?
+		return authserver_end(sockfd, -9);
+	}
+	
+    strtoargv(readBuffer);
+	// missing arguments
+	if (arg_c < 1) return authserver_end(sockfd, -10);
+	// not correct command token
+	if (strcasecmp(arg_v[0], "AUTHSERVER")) return authserver_end(sockfd, -11);
+	
+	// send response
+	snprintf(readBuffer, READ_BUFLEN, "LOGIN %s %s\n", username, password);
+	
+	int sendBytes = send(sockfd, readBuffer, (int) strlen(readBuffer), 0);
+    if (sendBytes == SOCKET_ERROR)
+	{
+        authserver_printerror("send failed: %d\n");
+        return authserver_end(sockfd, -12);
     }
-
-    if(!feof(fp)) {
-        if (fprintf(fp, "LOGIN %s %s\n", username, password) < 0)
-            return -13;
-    } else {
-        return -14;
-    }
-
-    if(!feof(fp)) {
-        if (fgets(mess,sizeof(mess),fp)) {
-            strtoargv(mess);
-            if (arg_c < 17) return -15;
-            if (strcasecmp(arg_v[0], "AUTHOK")) return -16;
-        } else {
-            return -17;
-        }
-    } else {
-        return -18;
-    }
-
-    fclose(fp);
-
+	else if (sendBytes == 0)
+	{
+		// ?? what now ??
+	}
+	
+	// we no longer need to send data
+	shutdown(sockfd, SD_SEND);
+	
+	// wait for response
+	bytesRead = recv(sockfd, readBuffer, READ_BUFLEN, 0);
+	
+	if (bytesRead == SOCKET_ERROR)
+	{
+		// something bad happened
+		authserver_printerror("read failed: %d\n");
+		return authserver_end(sockfd, -8);
+	}
+	else if (bytesRead == 0)
+	{
+		// connection closed early?
+		return authserver_end(sockfd, -9);
+	}
+	
+    strtoargv(readBuffer);
+	// missing arguments
+    if (arg_c < 17) return -10;
+	// authentication failed
+	if (strcasecmp(arg_v[0], "AUTHOK")) return -13;
+	
     //AUTHOK username uid model color wx wy wz bx by bz hrot_x hrot_y hhold_id hhold_type host port
 
     //nickname = strdup(arg_v[1]);
@@ -927,20 +1000,18 @@ int authserver_login(const char *username, const char *password, const char *hos
     player.usercolor = 0;
     player.mining = 0;
     player.burstdist = burstdist;
-
+	
     lattice_setplayer(&player);
-
+	
     //free (nickname);
-
+	
     seed_port = (uint16_t)atoi(arg_v[16]);
-
-    ret=lattice_connect(arg_v[15], seed_port);
-
-    if (ret < 0) return -22;
-
+	
+    int ret = lattice_connect(arg_v[15], seed_port);
+	if (ret < 0) return -14;
+	
     lattice_flush();
-
-    return 0;
-
+	
+    return authserver_end(sockfd, 0);
 }
 
