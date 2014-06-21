@@ -15,6 +15,8 @@
     #include <errno.h>
     #include <sys/resource.h>
     #include <netdb.h>
+#define SOCKET_ERROR -1
+#define SD_SEND SHUT_RDWR
 #else
     #include <winsock2.h>
     #include <windows.h>
