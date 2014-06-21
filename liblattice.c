@@ -817,7 +817,7 @@ const char* authserver_errorstring(int error)
 	switch (error)
 	{
 	case 0:
-		return "No error";
+		return "Success";
 	case -1:
 		return "Missing username";
 	case -2:
@@ -854,7 +854,7 @@ const char* authserver_errorstring(int error)
 	case -21:
 		return "Already connected to lattice";
 	}
-	char buf[64];
+	char buf[32];
 	sprintf(buf, "Unknown error: %d", error); // puts string into buffer	
 	return strdup(buf);
 }
