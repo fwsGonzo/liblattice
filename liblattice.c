@@ -855,6 +855,10 @@ const char* authserver_errorstring(int error)
 		return "LibLattice not initialized";
 	case -21:
 		return "Already connected to lattice";
+        case -22:
+                return "Failed to get AUTHSERVER handshake";
+        case -23:
+                return "Failed to get AUTHOK";
 	}
 	char buf[32];
 	sprintf(buf, "Unknown error: %d", error); // puts string into buffer	
@@ -912,8 +916,7 @@ int authserver_login(const char *username, const char *password, const char *hos
     serv_addr.sin_port = htons(port);
     serv_addr.sin_addr.s_addr = ip.s_addr;
 	
-    if (connect(sockfd, (struct sockaddr *) &serv_addr, sizeof serv_addr) < 0)
-	{
+    if (connect(sockfd, (struct sockaddr *) &serv_addr, sizeof serv_addr) < 0) {
 		return authserver_end(sockfd, -7);
     }
 	
@@ -933,8 +936,9 @@ int authserver_login(const char *username, const char *password, const char *hos
 		// connection closed early?
 		return authserver_end(sockfd, -9);
 	}
-	
-    strtoargv(readBuffer);
+
+        if (!memchr(readBuffer, '\n', bytesRead)) return authserver_end(sockfd, -22);
+        strtoargv(readBuffer);
 	// missing arguments
 	if (arg_c < 1) return authserver_end(sockfd, -10);
 	// not correct command token
@@ -972,6 +976,7 @@ int authserver_login(const char *username, const char *password, const char *hos
 		return authserver_end(sockfd, -9);
 	}
 	
+        if (!memchr(readBuffer, '\n', bytesRead)) return authserver_end(sockfd, -23);
     strtoargv(readBuffer);
 	// missing arguments
     if (arg_c < 17) return -10;
