@@ -987,10 +987,12 @@ int authserver_login(const char *username, const char *password, const char *hos
 
         if (!memchr(readBuffer, '\n', bytesRead)) return authserver_end(sockfd, -23);
     strtoargv(readBuffer);
-	// missing arguments
-    if (arg_c < 17) return -10;
+	// missing command
+    if (arg_c < 1) return -10;
 	// authentication failed
 	if (strcasecmp(arg_v[0], "AUTHOK")) return -13;
+	// missing arguments
+    if (arg_c < 17) return -10;
 
     //AUTHOK username uid model color wx wy wz bx by bz hrot_x hrot_y hhold_id hhold_type host port
 
