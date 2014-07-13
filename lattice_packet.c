@@ -64,7 +64,7 @@ void packet_hton(lt_packet_h *h) {
 
 }
 
-double htond(double d) {
+double lattice_htond(double d) {
     int64_t i64;
     int64_t o64;
     i64 = (*(int64_t *)(&d));
@@ -72,7 +72,7 @@ double htond(double d) {
     return *((double *)(&o64));
 }
 
-double ntohd(double d) {
+double lattice_ntohd(double d) {
     int64_t i64;
     int64_t o64;
     i64 = (*(int64_t *)(&d));
@@ -80,7 +80,7 @@ double ntohd(double d) {
     return *((double *)(&o64));
 }
 
-float htonf(float f) {
+float lattice_htonf(float f) {
     int32_t i32;
     int32_t o32;
     i32 = (*(int32_t *)(&f));
@@ -88,7 +88,7 @@ float htonf(float f) {
     return *((float *)(&o32));
 }
 
-float ntohf(float f) {
+float lattice_ntohf(float f) {
     int32_t i32;
     int32_t o32;
     i32 = (*(int32_t *)(&f));
@@ -211,7 +211,7 @@ int get_float(void **src, float *dst, uint16_t *len, uint16_t *argc) {
     if(!src || !*src || !dst || !len || !argc) return(0);
     if(*len < sizeof(float)) return(0);
     if(!*argc) return(0);
-    *dst = ntohf(**(float **)src);
+    *dst = lattice_ntohf(**(float **)src);
     (*(float **)src)++;
     *len -= sizeof(float);
     (*argc)--;
@@ -224,7 +224,7 @@ int get_double(void **src, double *dst, uint16_t *len, uint16_t *argc) {
     if(!src || !*src || !dst || !len || !argc) return(0);
     if(*len < sizeof(double)) return(0);
     if(!*argc) return(0);
-    *dst = ntohd(**(double **)src);
+    *dst = lattice_ntohd(**(double **)src);
     (*(double **)src)++;
     *len -= sizeof(double);
     (*argc)--;
@@ -357,7 +357,7 @@ int put_float(void **dst, float src, uint16_t *len, uint16_t *argc) {
 
     if(!dst || !*dst || !len || !argc) return(0);
     if((*len + sizeof(float)) > PAYLOAD_MTU) return(0);
-    ** (float **)dst = htonf(src);
+    ** (float **)dst = lattice_htonf(src);
     (* (float **)dst)++;
     *len += sizeof(float);
     (*argc)++;
@@ -369,7 +369,7 @@ int put_double(void **dst, double src, uint16_t *len, uint16_t *argc) {
 
     if(!dst || !*dst || !len || !argc) return(0);
     if((*len + sizeof(double)) > PAYLOAD_MTU) return(0);
-    ** (double **)dst = htond(src);
+    ** (double **)dst = lattice_htond(src);
     (* (double **)dst)++;
     *len += sizeof(double);
     (*argc)++;
