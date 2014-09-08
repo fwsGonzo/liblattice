@@ -68,9 +68,9 @@ n_coord wcoord_to_ncoord(w_coord wcoord) {
 
     n_coord ncoord;
 
-    ncoord.x = wcoord.x >> 8;
-    ncoord.y = wcoord.y >> 8;
-    ncoord.z = wcoord.z >> 8;
+    ncoord.x = wcoord.x >> SECTOR_PER_SERVER_WIDTH_X;
+    ncoord.y = wcoord.y >> SECTOR_PER_SERVER_WIDTH_Y;
+    ncoord.z = wcoord.z >> SECTOR_PER_SERVER_WIDTH_Z;
 
     return ncoord;
 
@@ -79,13 +79,13 @@ n_coord wcoord_to_ncoord(w_coord wcoord) {
 
 int serv_in_range_of_serv(n_coord center, n_coord side) {
 
-    if (center.x < 0 || center.x > LATTICE_XMAX) return 0;
-    if (center.y < 0 || center.y > LATTICE_YMAX) return 0;
-    if (center.z < 0 || center.z > LATTICE_ZMAX) return 0;
+    if (center.x < LATTICE_NXMIN || center.x > LATTICE_NXMAX) return 0;
+    if (center.y < LATTICE_NYMIN || center.y > LATTICE_NYMAX) return 0;
+    if (center.z < LATTICE_NZMIN || center.z > LATTICE_NZMAX) return 0;
 
-    if (side.x < 0 || side.x > LATTICE_XMAX) return 0;
-    if (side.y < 0 || side.y > LATTICE_YMAX) return 0;
-    if (side.z < 0 || side.z > LATTICE_ZMAX) return 0;
+    if (side.x < LATTICE_NXMIN || side.x > LATTICE_NXMAX) return 0;
+    if (side.y < LATTICE_NYMIN || side.y > LATTICE_NYMAX) return 0;
+    if (side.z < LATTICE_NZMIN || side.z > LATTICE_NZMAX) return 0;
 
     if ((side.x < center.x - reach) ||
         (side.x > center.x + reach)) return 0;
@@ -118,12 +118,12 @@ int user_is_within_server_border(w_coord wcoord, n_coord ncoord) {
     w_coord min_wcoord;
     w_coord max_wcoord;
 
-    min_wcoord.x = ncoord.x << 8;
-    min_wcoord.y = ncoord.y << 8;
-    min_wcoord.z = ncoord.z << 8;
-    max_wcoord.x = (ncoord.x << 8) | 0x000000FF;
-    max_wcoord.y = (ncoord.y << 8) | 0x000000FF;
-    max_wcoord.z = (ncoord.z << 8) | 0x000000FF;
+    min_wcoord.x = ncoord.x << SECTOR_PER_SERVER_WIDTH_X;
+    min_wcoord.y = ncoord.y << SECTOR_PER_SERVER_WIDTH_Y;
+    min_wcoord.z = ncoord.z << SECTOR_PER_SERVER_WIDTH_Z;
+    max_wcoord.x = (ncoord.x << SECTOR_PER_SERVER_WIDTH_X) | SECTOR_PER_SERVER_MASK_X;
+    max_wcoord.y = (ncoord.y << SECTOR_PER_SERVER_WIDTH_Y) | SECTOR_PER_SERVER_MASK_Y;
+    max_wcoord.z = (ncoord.z << SECTOR_PER_SERVER_WIDTH_Z) | SECTOR_PER_SERVER_MASK_Z;
 
     if (wcoord.x < min_wcoord.x || wcoord.x > max_wcoord.x) return 0;
     if (wcoord.y < min_wcoord.y || wcoord.y > max_wcoord.y) return 0;
@@ -147,12 +147,12 @@ int user_is_within_outer_border(w_coord wcoord, n_coord ncoord) {
     w_coord min_wcoord;
     w_coord max_wcoord;
 
-    min_wcoord.x = ncoord.x << 8;
-    min_wcoord.y = ncoord.y << 8;
-    min_wcoord.z = ncoord.z << 8;
-    max_wcoord.x = (ncoord.x << 8) | 0x000000FF;
-    max_wcoord.y = (ncoord.y << 8) | 0x000000FF;
-    max_wcoord.z = (ncoord.z << 8) | 0x000000FF;
+    min_wcoord.x = ncoord.x << SECTOR_PER_SERVER_WIDTH_X;
+    min_wcoord.y = ncoord.y << SECTOR_PER_SERVER_WIDTH_Y;
+    min_wcoord.z = ncoord.z << SECTOR_PER_SERVER_WIDTH_Z;
+    max_wcoord.x = (ncoord.x << SECTOR_PER_SERVER_WIDTH_X) | SECTOR_PER_SERVER_MASK_X;
+    max_wcoord.y = (ncoord.y << SECTOR_PER_SERVER_WIDTH_Y) | SECTOR_PER_SERVER_MASK_Y;
+    max_wcoord.z = (ncoord.z << SECTOR_PER_SERVER_WIDTH_Z) | SECTOR_PER_SERVER_MASK_Z;
 
     if (wcoord.x < min_wcoord.x - VISUAL_UNIT || wcoord.x > max_wcoord.x + VISUAL_UNIT) return 0;
     if (wcoord.y < min_wcoord.y - VISUAL_UNIT || wcoord.y > max_wcoord.y + VISUAL_UNIT) return 0;
@@ -167,12 +167,12 @@ int user_is_within_inner_border(w_coord wcoord, n_coord ncoord) {
     w_coord min_wcoord;
     w_coord max_wcoord;
 
-    min_wcoord.x = ncoord.x << 8;
-    min_wcoord.y = ncoord.y << 8;
-    min_wcoord.z = ncoord.z << 8;
-    max_wcoord.x = (ncoord.x << 8) | 0x000000FF;
-    max_wcoord.y = (ncoord.y << 8) | 0x000000FF;
-    max_wcoord.z = (ncoord.z << 8) | 0x000000FF;
+    min_wcoord.x = ncoord.x << SECTOR_PER_SERVER_WIDTH_X;
+    min_wcoord.y = ncoord.y << SECTOR_PER_SERVER_WIDTH_Y;
+    min_wcoord.z = ncoord.z << SECTOR_PER_SERVER_WIDTH_Z;
+    max_wcoord.x = (ncoord.x << SECTOR_PER_SERVER_WIDTH_X) | SECTOR_PER_SERVER_MASK_X;
+    max_wcoord.y = (ncoord.y << SECTOR_PER_SERVER_WIDTH_Y) | SECTOR_PER_SERVER_MASK_Y;
+    max_wcoord.z = (ncoord.z << SECTOR_PER_SERVER_WIDTH_Z) | SECTOR_PER_SERVER_MASK_Z;
 
     if (wcoord.x < min_wcoord.x + VISUAL_UNIT || wcoord.x > max_wcoord.x - VISUAL_UNIT) return 0;
     if (wcoord.y < min_wcoord.y + VISUAL_UNIT || wcoord.y > max_wcoord.y - VISUAL_UNIT) return 0;
@@ -449,15 +449,15 @@ void disconnect_servers(void) {
 
     closeallservers();
 
-    lattice_player.centeredon.x = lattice_player.wpos.x >> 8;
-    lattice_player.centeredon.y = lattice_player.wpos.y >> 8;
-    lattice_player.centeredon.z = lattice_player.wpos.z >> 8;
-    lattice_player.my_min_wcoord.x = lattice_player.centeredon.x << 8;
-    lattice_player.my_min_wcoord.y = lattice_player.centeredon.y << 8;
-    lattice_player.my_min_wcoord.z = lattice_player.centeredon.z << 8;
-    lattice_player.my_max_wcoord.x = (lattice_player.centeredon.x << 8) | 0x000000FF;
-    lattice_player.my_max_wcoord.y = (lattice_player.centeredon.y << 8) | 0x000000FF;
-    lattice_player.my_max_wcoord.z = (lattice_player.centeredon.z << 8) | 0x000000FF;
+    lattice_player.centeredon.x = lattice_player.wpos.x >> SECTOR_PER_SERVER_WIDTH_X;
+    lattice_player.centeredon.y = lattice_player.wpos.y >> SECTOR_PER_SERVER_WIDTH_Y;
+    lattice_player.centeredon.z = lattice_player.wpos.z >> SECTOR_PER_SERVER_WIDTH_Z;
+    lattice_player.my_min_wcoord.x = lattice_player.centeredon.x << SECTOR_PER_SERVER_WIDTH_X;
+    lattice_player.my_min_wcoord.y = lattice_player.centeredon.y << SECTOR_PER_SERVER_WIDTH_Y;
+    lattice_player.my_min_wcoord.z = lattice_player.centeredon.z << SECTOR_PER_SERVER_WIDTH_Z;
+    lattice_player.my_max_wcoord.x = (lattice_player.centeredon.x << SECTOR_PER_SERVER_WIDTH_X) | SECTOR_PER_SERVER_MASK_X;
+    lattice_player.my_max_wcoord.y = (lattice_player.centeredon.y << SECTOR_PER_SERVER_WIDTH_Y) | SECTOR_PER_SERVER_MASK_Y;
+    lattice_player.my_max_wcoord.z = (lattice_player.centeredon.z << SECTOR_PER_SERVER_WIDTH_Z) | SECTOR_PER_SERVER_MASK_Z;
 
     mess.type = T_DISCONNECTED;
     ClrFlagFrom(&mess);
@@ -610,12 +610,12 @@ void recenter_neighbors(n_coord newcenter) {
     lattice_player.centeredon.x = neighbor_table[1][1][1]->coord.x;
     lattice_player.centeredon.y = neighbor_table[1][1][1]->coord.y;
     lattice_player.centeredon.z = neighbor_table[1][1][1]->coord.z;
-    lattice_player.my_min_wcoord.x = lattice_player.centeredon.x << 8;
-    lattice_player.my_min_wcoord.y = lattice_player.centeredon.y << 8;
-    lattice_player.my_min_wcoord.z = lattice_player.centeredon.z << 8;
-    lattice_player.my_max_wcoord.x = (lattice_player.centeredon.x << 8) | 0x000000FF;
-    lattice_player.my_max_wcoord.y = (lattice_player.centeredon.y << 8) | 0x000000FF;
-    lattice_player.my_max_wcoord.z = (lattice_player.centeredon.z << 8) | 0x000000FF;
+    lattice_player.my_min_wcoord.x = lattice_player.centeredon.x << SECTOR_PER_SERVER_WIDTH_X;
+    lattice_player.my_min_wcoord.y = lattice_player.centeredon.y << SECTOR_PER_SERVER_WIDTH_Y;
+    lattice_player.my_min_wcoord.z = lattice_player.centeredon.z << SECTOR_PER_SERVER_WIDTH_Z;
+    lattice_player.my_max_wcoord.x = (lattice_player.centeredon.x << SECTOR_PER_SERVER_WIDTH_X) | SECTOR_PER_SERVER_MASK_X;
+    lattice_player.my_max_wcoord.y = (lattice_player.centeredon.y << SECTOR_PER_SERVER_WIDTH_Y) | SECTOR_PER_SERVER_MASK_Y;
+    lattice_player.my_max_wcoord.z = (lattice_player.centeredon.z << SECTOR_PER_SERVER_WIDTH_Z) | SECTOR_PER_SERVER_MASK_Z;
 
     return;
 
@@ -812,12 +812,12 @@ void packet_recenter_neighbors(n_coord newcenter) {
     lattice_player.centeredon.x = neighbor_table[1][1][1]->coord.x;
     lattice_player.centeredon.y = neighbor_table[1][1][1]->coord.y;
     lattice_player.centeredon.z = neighbor_table[1][1][1]->coord.z;
-    lattice_player.my_min_wcoord.x = lattice_player.centeredon.x << 8;
-    lattice_player.my_min_wcoord.y = lattice_player.centeredon.y << 8;
-    lattice_player.my_min_wcoord.z = lattice_player.centeredon.z << 8;
-    lattice_player.my_max_wcoord.x = (lattice_player.centeredon.x << 8) | 0x000000FF;
-    lattice_player.my_max_wcoord.y = (lattice_player.centeredon.y << 8) | 0x000000FF;
-    lattice_player.my_max_wcoord.z = (lattice_player.centeredon.z << 8) | 0x000000FF;
+    lattice_player.my_min_wcoord.x = lattice_player.centeredon.x << SECTOR_PER_SERVER_WIDTH_X;
+    lattice_player.my_min_wcoord.y = lattice_player.centeredon.y << SECTOR_PER_SERVER_WIDTH_Y;
+    lattice_player.my_min_wcoord.z = lattice_player.centeredon.z << SECTOR_PER_SERVER_WIDTH_Z;
+    lattice_player.my_max_wcoord.x = (lattice_player.centeredon.x << SECTOR_PER_SERVER_WIDTH_X) | SECTOR_PER_SERVER_MASK_X;
+    lattice_player.my_max_wcoord.y = (lattice_player.centeredon.y << SECTOR_PER_SERVER_WIDTH_Y) | SECTOR_PER_SERVER_MASK_Y;
+    lattice_player.my_max_wcoord.z = (lattice_player.centeredon.z << SECTOR_PER_SERVER_WIDTH_Z) | SECTOR_PER_SERVER_MASK_Z;
 
     return;
 

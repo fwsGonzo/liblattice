@@ -743,15 +743,15 @@ int lattice_setplayer(lattice_player_t *player) {
     strncpy(lattice_player.nickname, player->nickname, sizeof(lattice_player.nickname));
     lattice_player.nickname[sizeof(lattice_player.nickname)-1]='\0';
 
-    lattice_player.centeredon.x = lattice_player.wpos.x >> 8;
-    lattice_player.centeredon.y = lattice_player.wpos.y >> 8;
-    lattice_player.centeredon.z = lattice_player.wpos.z >> 8;
-    lattice_player.my_min_wcoord.x = lattice_player.centeredon.x << 8;
-    lattice_player.my_min_wcoord.y = lattice_player.centeredon.y << 8;
-    lattice_player.my_min_wcoord.z = lattice_player.centeredon.z << 8;
-    lattice_player.my_max_wcoord.x = (lattice_player.centeredon.x << 8) | 0x000000FF;
-    lattice_player.my_max_wcoord.y = (lattice_player.centeredon.y << 8) | 0x000000FF;
-    lattice_player.my_max_wcoord.z = (lattice_player.centeredon.z << 8) | 0x000000FF;
+    lattice_player.centeredon.x = lattice_player.wpos.x >> SECTOR_PER_SERVER_WIDTH_X;
+    lattice_player.centeredon.y = lattice_player.wpos.y >> SECTOR_PER_SERVER_WIDTH_Y;
+    lattice_player.centeredon.z = lattice_player.wpos.z >> SECTOR_PER_SERVER_WIDTH_Z;
+    lattice_player.my_min_wcoord.x = lattice_player.centeredon.x << SECTOR_PER_SERVER_WIDTH_X;
+    lattice_player.my_min_wcoord.y = lattice_player.centeredon.y << SECTOR_PER_SERVER_WIDTH_Y;
+    lattice_player.my_min_wcoord.z = lattice_player.centeredon.z << SECTOR_PER_SERVER_WIDTH_Z;
+    lattice_player.my_max_wcoord.x = (lattice_player.centeredon.x << SECTOR_PER_SERVER_WIDTH_X) | SECTOR_PER_SERVER_MASK_X;
+    lattice_player.my_max_wcoord.y = (lattice_player.centeredon.y << SECTOR_PER_SERVER_WIDTH_Y) | SECTOR_PER_SERVER_MASK_Y;
+    lattice_player.my_max_wcoord.z = (lattice_player.centeredon.z << SECTOR_PER_SERVER_WIDTH_Z) | SECTOR_PER_SERVER_MASK_Z;
 
     return 0;
 
@@ -788,15 +788,15 @@ int lattice_getplayer(lattice_player_t *player) {
     strncpy(player->nickname, lattice_player.nickname, sizeof(player->nickname));
     player->nickname[sizeof(player->nickname)-1]='\0';
 
-    player->centeredon.x = player->wpos.x >> 8;
-    player->centeredon.y = player->wpos.y >> 8;
-    player->centeredon.z = player->wpos.z >> 8;
-    player->my_min_wcoord.x = player->centeredon.x << 8;
-    player->my_min_wcoord.y = player->centeredon.y << 8;
-    player->my_min_wcoord.z = player->centeredon.z << 8;
-    player->my_max_wcoord.x = (player->centeredon.x << 8) | 0x000000FF;
-    player->my_max_wcoord.y = (player->centeredon.y << 8) | 0x000000FF;
-    player->my_max_wcoord.z = (player->centeredon.z << 8) | 0x000000FF;
+    player->centeredon.x = player->wpos.x >> SECTOR_PER_SERVER_WIDTH_X;
+    player->centeredon.y = player->wpos.y >> SECTOR_PER_SERVER_WIDTH_Y;
+    player->centeredon.z = player->wpos.z >> SECTOR_PER_SERVER_WIDTH_Z;
+    player->my_min_wcoord.x = player->centeredon.x << SECTOR_PER_SERVER_WIDTH_X;
+    player->my_min_wcoord.y = player->centeredon.y << SECTOR_PER_SERVER_WIDTH_Y;
+    player->my_min_wcoord.z = player->centeredon.z << SECTOR_PER_SERVER_WIDTH_Z;
+    player->my_max_wcoord.x = (player->centeredon.x << SECTOR_PER_SERVER_WIDTH_X) | SECTOR_PER_SERVER_MASK_X;
+    player->my_max_wcoord.y = (player->centeredon.y << SECTOR_PER_SERVER_WIDTH_Y) | SECTOR_PER_SERVER_MASK_Y;
+    player->my_max_wcoord.z = (player->centeredon.z << SECTOR_PER_SERVER_WIDTH_Z) | SECTOR_PER_SERVER_MASK_Z;
 
     return 0;
 
