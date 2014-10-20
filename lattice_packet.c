@@ -41,12 +41,12 @@
 void packet_ntoh(lt_packet_h *h) {
 
     if(!h) return;
-    h->marker = be32toh(h->marker);
-    h->fromuid = be32toh(h->fromuid);
-    h->flags = be16toh(h->flags);
-    h->payload_argc = be16toh(h->payload_argc);
-    h->payload_type = be16toh(h->payload_type);
-    h->payload_length = be16toh(h->payload_length);
+    h->marker = le32toh(h->marker);
+    h->fromuid = le32toh(h->fromuid);
+    h->flags = le16toh(h->flags);
+    h->payload_argc = le16toh(h->payload_argc);
+    h->payload_type = le16toh(h->payload_type);
+    h->payload_length = le16toh(h->payload_length);
     return;
 
 }
@@ -54,12 +54,12 @@ void packet_ntoh(lt_packet_h *h) {
 void packet_hton(lt_packet_h *h) {
 
     if(!h) return;
-    h->marker = htobe32(h->marker);
-    h->fromuid = htobe32(h->fromuid);
-    h->flags = htobe16(h->flags);
-    h->payload_argc = htobe16(h->payload_argc);
-    h->payload_type = htobe16(h->payload_type);
-    h->payload_length = htobe16(h->payload_length);
+    h->marker = htole32(h->marker);
+    h->fromuid = htole32(h->fromuid);
+    h->flags = htole16(h->flags);
+    h->payload_argc = htole16(h->payload_argc);
+    h->payload_type = htole16(h->payload_type);
+    h->payload_length = htole16(h->payload_length);
     return;
 
 }
@@ -68,7 +68,7 @@ double lattice_htond(double d) {
     int64_t i64;
     int64_t o64;
     i64 = (*(int64_t *)(&d));
-    o64 = htobe64(i64);
+    o64 = htole64(i64);
     return *((double *)(&o64));
 }
 
@@ -76,7 +76,7 @@ double lattice_ntohd(double d) {
     int64_t i64;
     int64_t o64;
     i64 = (*(int64_t *)(&d));
-    o64 = be64toh(i64);
+    o64 = le64toh(i64);
     return *((double *)(&o64));
 }
 
@@ -84,7 +84,7 @@ float lattice_htonf(float f) {
     int32_t i32;
     int32_t o32;
     i32 = (*(int32_t *)(&f));
-    o32 = htobe32(i32);
+    o32 = htole32(i32);
     return *((float *)(&o32));
 }
 
@@ -92,7 +92,7 @@ float lattice_ntohf(float f) {
     int32_t i32;
     int32_t o32;
     i32 = (*(int32_t *)(&f));
-    o32 = be32toh(i32);
+    o32 = le32toh(i32);
     return *((float *)(&o32));
 }
 
@@ -120,7 +120,7 @@ int get_int16(void **src, int16_t *dst, uint16_t *len, uint16_t *argc) {
     if(!src || !*src || !dst || !len || !argc) return(0);
     if(*len < sizeof(int16_t)) return(0);
     if(!*argc) return(0);
-    *dst = be16toh(**(int16_t **)src);
+    *dst = le16toh(**(int16_t **)src);
     (*(int16_t **)src)++;
     *len -= sizeof(int16_t);
     (*argc)--;
@@ -133,7 +133,7 @@ int get_int32(void **src, int32_t *dst, uint16_t *len, uint16_t *argc) {
     if(!src || !*src || !dst || !len || !argc) return(0);
     if(*len < sizeof(int32_t)) return(0);
     if(!*argc) return(0);
-    *dst = be32toh(**(int32_t **)src);
+    *dst = le32toh(**(int32_t **)src);
     (*(int32_t **)src)++;
     *len -= sizeof(int32_t);
     (*argc)--;
@@ -146,7 +146,7 @@ int get_int64(void **src, int64_t *dst, uint16_t *len, uint16_t *argc) {
     if(!src || !*src || !dst || !len || !argc) return(0);
     if(*len < sizeof(int64_t)) return(0);
     if(!*argc) return(0);
-    *dst = be64toh(**(int64_t **)src);
+    *dst = le64toh(**(int64_t **)src);
     (*(int64_t **)src)++;
     *len -= sizeof(int64_t);
     (*argc)--;
@@ -172,7 +172,7 @@ int get_uint16(void **src, uint16_t *dst, uint16_t *len, uint16_t *argc) {
     if(!src || !*src || !dst || !len || !argc) return(0);
     if(*len < sizeof(uint16_t)) return(0);
     if(!*argc) return(0);
-    *dst = be16toh(**(uint16_t **)src);
+    *dst = le16toh(**(uint16_t **)src);
     (*(uint16_t **)src)++;
     *len -= sizeof(uint16_t);
     (*argc)--;
@@ -185,7 +185,7 @@ int get_uint32(void **src, uint32_t *dst, uint16_t *len, uint16_t *argc) {
     if(!src || !*src || !dst || !len || !argc) return(0);
     if(*len < sizeof(uint32_t)) return(0);
     if(!*argc) return(0);
-    *dst = be32toh(**(uint32_t **)src);
+    *dst = le32toh(**(uint32_t **)src);
     (*(uint32_t **)src)++;
     *len -= sizeof(uint32_t);
     (*argc)--;
@@ -198,7 +198,7 @@ int get_uint64(void **src, uint64_t *dst, uint16_t *len, uint16_t *argc) {
     if(!src || !*src || !dst || !len || !argc) return(0);
     if(*len < sizeof(uint64_t)) return(0);
     if(!*argc) return(0);
-    *dst = be32toh(**(uint64_t **)src);
+    *dst = le32toh(**(uint64_t **)src);
     (*(uint64_t **)src)++;
     *len -= sizeof(uint64_t);
     (*argc)--;
@@ -273,7 +273,7 @@ int put_int16(void **dst, int16_t src, uint16_t *len, uint16_t *argc) {
 
     if(!dst || !*dst || !len || !argc) return(0);
     if((*len + sizeof(int16_t)) > PAYLOAD_MTU) return(0);
-    ** (int16_t **)dst = htobe16(src);
+    ** (int16_t **)dst = htole16(src);
     (* (int16_t **)dst)++;
     *len += sizeof(int16_t);
     (*argc)++;
@@ -285,7 +285,7 @@ int put_int32(void **dst, int32_t src, uint16_t *len, uint16_t *argc) {
 
     if(!dst || !*dst || !len || !argc) return(0);
     if((*len + sizeof(int32_t)) > PAYLOAD_MTU) return(0);
-    ** (int32_t **)dst = htobe32(src);
+    ** (int32_t **)dst = htole32(src);
     (* (int32_t **)dst)++;
     *len += sizeof(int32_t);
     (*argc)++;
@@ -297,7 +297,7 @@ int put_int64(void **dst, int64_t src, uint16_t *len, uint16_t *argc) {
 
     if(!dst || !*dst || !len || !argc) return(0);
     if((*len + sizeof(int64_t)) > PAYLOAD_MTU) return(0);
-    ** (int64_t **)dst = htobe64(src);
+    ** (int64_t **)dst = htole64(src);
     (* (int64_t **)dst)++;
     *len += sizeof(int64_t);
     (*argc)++;
@@ -321,7 +321,7 @@ int put_uint16(void **dst, uint16_t src, uint16_t *len, uint16_t *argc) {
 
     if(!dst || !*dst || !len || !argc) return(0);
     if((*len + sizeof(uint16_t)) > PAYLOAD_MTU) return(0);
-    ** (uint16_t **)dst = htobe16(src);
+    ** (uint16_t **)dst = htole16(src);
     (* (uint16_t **)dst)++;
     *len += sizeof(uint16_t);
     (*argc)++;
@@ -333,7 +333,7 @@ int put_uint32(void **dst, uint32_t src, uint16_t *len, uint16_t *argc) {
 
     if(!dst || !*dst || !len || !argc) return(0);
     if((*len + sizeof(uint32_t)) > PAYLOAD_MTU) return(0);
-    ** (uint32_t **)dst = htobe32(src);
+    ** (uint32_t **)dst = htole32(src);
     (* (uint32_t **)dst)++;
     *len += sizeof(uint32_t);
     (*argc)++;
@@ -345,7 +345,7 @@ int put_uint64(void **dst, uint64_t src, uint16_t *len, uint16_t *argc) {
 
     if(!dst || !*dst || !len || !argc) return(0);
     if((*len + sizeof(uint64_t)) > PAYLOAD_MTU) return(0);
-    ** (uint64_t **)dst = htobe64(src);
+    ** (uint64_t **)dst = htole64(src);
     (* (uint64_t **)dst)++;
     *len += sizeof(uint64_t);
     (*argc)++;
