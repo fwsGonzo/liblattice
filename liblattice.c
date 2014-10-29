@@ -78,6 +78,8 @@ struct message s_mestab[] = {
     { T_MOVEFROM, s_movefrom, FLAG_REG },
     { T_TRACKERFAILURE, s_trackerfailure, FLAG_REG },
     { T_CLOSING, s_closing, FLAG_REG },
+    { T_EMPTYSECTOR, s_emptysector, FLAG_REG },
+    { T_SECTOR, s_sector, FLAG_REG },
     { 0, (int (*)()) NULL, 0 }
 };
 

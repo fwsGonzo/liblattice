@@ -724,7 +724,7 @@ int s_badd(struct server_socket *src, lt_packet *packet) {
     if (!get_by(&p, &(submess.bcoord.y), &len, &argc)) return 0;
     if (!get_bz(&p, &(submess.bcoord.z), &len, &argc)) return 0;
 
-    if (!get_block(&p, (uint16_t *)&(submess.block), &len, &argc)) return 0;
+    if (!get_block(&p, &(submess.block), &len, &argc)) return 0;
 
     //submess.wcoord.x = atoi(argv[0]);
     //submess.wcoord.y = atoi(argv[1]);
@@ -789,7 +789,7 @@ int s_bset(struct server_socket *src, lt_packet *packet) {
     if (!get_by(&p, &(submess.bcoord.y), &len, &argc)) return 0;
     if (!get_bz(&p, &(submess.bcoord.z), &len, &argc)) return 0;
 
-    if (!get_block(&p, (uint16_t *)&(submess.block), &len, &argc)) return 0;
+    if (!get_block(&p, &(submess.block), &len, &argc)) return 0;
 
     //submess.wcoord.x = atoi(argv[0]);
     //submess.wcoord.y = atoi(argv[1]);
@@ -1842,3 +1842,130 @@ int s_closing(struct server_socket *src, lt_packet *packet) {
     return 0;
 
 }
+
+
+int s_emptysector(struct server_socket *src, lt_packet *packet) {
+
+    lattice_message mess;
+    lattice_emptysector submess;
+
+    void *p;
+    uint16_t len;
+    uint16_t argc;
+
+    if (!src || !packet) return 0;
+
+    if (PArgc(packet) < 3) return 0;
+
+    argc = packet->header.payload_argc;
+    len = packet->header.payload_length;
+    p = packet->payload;
+
+    mess.type = T_EMPTYSECTOR;
+
+    ClrFlagFrom(&mess);
+
+    mess.fromuid = 0;
+
+    mess.length = sizeof submess;
+    mess.args = &submess;
+
+    if (!get_wx(&p, &(submess.wcoord.x), &len, &argc)) return 0;
+    if (!get_wy(&p, &(submess.wcoord.y), &len, &argc)) return 0;
+    if (!get_wz(&p, &(submess.wcoord.z), &len, &argc)) return 0;
+
+    (*gcallback)(&mess);
+
+    return 0;
+
+}
+
+
+int s_sector(struct server_socket *src, lt_packet *packet) {
+
+    lattice_message mess;
+    lattice_sector submess;
+
+    void *p;
+    uint16_t len;
+    uint16_t argc;
+
+    int bx;
+    int by;
+    int bz;
+
+    block_t id;
+    block_t* b;
+
+    if (!src || !packet) return 0;
+
+    if (PArgc(packet) < 2051) return 0; // wx wy wz + b[2048]
+
+    argc = packet->header.payload_argc;
+    len = packet->header.payload_length;
+    p = packet->payload;
+
+    mess.type = T_SECTOR;
+
+    ClrFlagFrom(&mess);
+
+    mess.fromuid = 0;
+
+    mess.length = sizeof submess;
+    mess.args = &submess;
+
+    if (!get_wx(&p, &(submess.wcoord.x), &len, &argc)) return 0;
+    if (!get_wy(&p, &(submess.wcoord.y), &len, &argc)) return 0;
+    if (!get_wz(&p, &(submess.wcoord.z), &len, &argc)) return 0;
+
+    submess.blocks = 0;
+    submess.torchlight = 0;
+    submess.hardsolid = BLOCKSDB_MAX_HARDSOLID;
+
+    b = submess.b;
+
+    for (bx = 0; bx < BLOCKSDB_COUNT_BX; bx++)
+    for (bz = 0; bz < BLOCKSDB_COUNT_BZ; bz++)
+    for (by = 0; by < BLOCKSDB_COUNT_BY; by++) {
+
+        if (!get_block(&p, b, &len, &argc)) return 0;
+
+        id = blockid(*b);
+
+        // check if block isn't solid
+        if (id == BLOCKSDB_AIR || id >= BLOCKSDB_HALFBLOCK_START) {
+            // remove solid value from potential edge
+            if (bz == 0)
+                submess.hardsolid &= (63-32);
+            else if (bz == BLOCKSDB_COUNT_BZ-1)
+                submess.hardsolid &= (63-16);
+
+            if (by == 0)
+                submess.hardsolid &= (63-8);
+            else if (by == BLOCKSDB_COUNT_BY-1)
+                submess.hardsolid &= (63-4);
+
+            if (bx == 0)
+                submess.hardsolid &= (63-2);
+            else if (bx == BLOCKSDB_COUNT_BX-1)
+                submess.hardsolid &= (63-1);
+        } // non-solid block
+
+        if (id != BLOCKSDB_AIR)
+        {
+            // increase light count if isLight()
+            if (islight(id)) submess.torchlight++;
+            // increase non-air block count
+            submess.blocks++;
+        }
+
+        b++; // next block
+
+    }
+
+    (*gcallback)(&mess);
+
+    return 0;
+
+}
+

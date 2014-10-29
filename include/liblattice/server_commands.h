@@ -31,5 +31,7 @@
   extern int s_movefrom(struct server_socket *src, lt_packet *packet);
   extern int s_trackerfailure(struct server_socket *src, lt_packet *packet);
   extern int s_closing(struct server_socket *src, lt_packet *packet);
+  extern int s_emptysector(struct server_socket *src, lt_packet *packet);
+  extern int s_sector(struct server_socket *src, lt_packet *packet);
 
 #endif

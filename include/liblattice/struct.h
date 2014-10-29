@@ -18,13 +18,23 @@ typedef struct block_t {
 
 typedef uint16_t block_t;
 
+#define blockid(x) ( (x) & 1023 )
+#define islight(id) (  (id) == BLOCKSDB_TORCH        || \
+                       (id) == BLOCKSDB_MOLTENSTONE  || \
+                       (id) == BLOCKSDB_LAVABLOCK    || \
+                       (id) == BLOCKSDB_REDSTONE     || \
+                       (id) == BLOCKSDB_GREENSTONE   || \
+                       (id) == BLOCKSDB_FIRE         || \
+                       (id) == BLOCKSDB_LANTERN  )
+
 // number of colors in flatland data
-#define TERRAIN_COLORS 8
+#define FLATLAND_TERRAIN_COLORS 8
 // the terrain color datatype
-typedef uint32_t color_t;
+
+typedef uint32_t flatland_color_t;
 
 typedef struct flatdata_t {
-    color_t color[TERRAIN_COLORS];
+    flatland_color_t color[FLATLAND_TERRAIN_COLORS];
     uint8_t terrain;
     uint8_t skylevel;
     uint8_t groundlevel;
