@@ -369,7 +369,7 @@ server_socket *connect_server(n_coord coord, struct in_addr ip, port_t port, int
     }
 
     if (!socket_table[sockfd].rmsg)
-        socket_table[sockfd].rmsg = malloc(MTU + 1);
+        socket_table[sockfd].rmsg = malloc(PACKET_MTU + 1);
 
     if (!socket_table[sockfd].rmsg) {
         if (socket_table[sockfd].writebuf) {

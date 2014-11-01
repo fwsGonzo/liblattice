@@ -64,7 +64,7 @@
 
 // binary stuff
 
-#define PACKET_MTU 512  // match this to MTU
+#define PACKET_MTU 10240  // match this to MTU
 #define PAYLOAD_MTU          (PACKET_MTU - sizeof(lt_packet_h))
 
 #define SYNCH_MARKER  0xFFFFFFFF
