@@ -1924,9 +1924,9 @@ int s_sector(struct server_socket *src, lt_packet *packet) {
 
     b = submess.b;
 
-    for (by = 0; by < BLOCKSDB_COUNT_BY; by++)
     for (bx = 0; bx < BLOCKSDB_COUNT_BX; bx++)
-    for (bz = 0; bz < BLOCKSDB_COUNT_BZ; bz++) {
+    for (bz = 0; bz < BLOCKSDB_COUNT_BZ; bz++)
+    for (by = 0; by < BLOCKSDB_COUNT_BY; by++) {
 
         if (!get_block(&p, b, &len, &argc)) return 0;
 
