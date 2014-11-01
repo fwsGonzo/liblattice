@@ -59,7 +59,7 @@
 #define WRITE_LENGTH 65536
 #define READ_LENGTH 65536
 
-#define MTU 512 // message size max (including (\r)\n\0)
+#define MTU 10240 // message size max (including (\r)\n\0)
 #define MAX_ARGS MTU
 
 // binary stuff
