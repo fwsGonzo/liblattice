@@ -80,6 +80,7 @@ struct message s_mestab[] = {
     { T_CLOSING, s_closing, FLAG_REG },
     { T_EMPTYSECTOR, s_emptysector, FLAG_REG },
     { T_SECTOR, s_sector, FLAG_REG },
+    { T_FLATLAND, s_flatland, FLAG_REG },
     { 0, (int (*)()) NULL, 0 }
 };
 
