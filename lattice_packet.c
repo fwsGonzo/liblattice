@@ -251,6 +251,32 @@ int get_string(void **src, char **dst, uint16_t *len, uint16_t *argc) {
 
 }
 
+int get_sector(void **src, block_t **dst, uint16_t *len, uint16_t *argc) {
+
+#if BYTE_ORDER != LITTLE_ENDIAN
+    int i;
+#endif
+
+    if(!src || !*src || !dst || !len || !argc) return(0);
+    if(*len < (sizeof(block_t) * BLOCKSDB_BLOCKS_COUNT)) return(0);
+    if((*argc) < BLOCKSDB_BLOCKS_COUNT) return(0);
+
+    memcpy(*dst, *src, (sizeof(block_t) * BLOCKSDB_BLOCKS_COUNT));
+
+#if BYTE_ORDER != LITTLE_ENDIAN
+    for(i = 0; i < BLOCKSDB_BLOCKS_COUNT; i++)
+        (*dst)[i] = le16toh((*dst)[i]);
+#endif
+
+    (*(block_t **)src) += BLOCKSDB_BLOCKS_COUNT;
+
+    *len -= (sizeof(block_t) * BLOCKSDB_BLOCKS_COUNT);
+    *argc -= BLOCKSDB_BLOCKS_COUNT;
+    return(1);
+
+}
+
+
 // dst points to a movable pointer to the payload of the packet
 // src is the var we are pulling from
 // len and argc increments as we read through the payload
@@ -396,3 +422,26 @@ int put_string(void **dst, const char *src, uint16_t *len, uint16_t *argc) {
 
 }
 
+int put_sector(void **dst, block_t *src, uint16_t *len, uint16_t *argc) {
+
+#if BYTE_ORDER != LITTLE_ENDIAN
+    int i;
+#endif
+
+    if(!dst || !*dst || !src || !len || !argc) return(0);
+    if((*len + (sizeof(block_t) * BLOCKSDB_BLOCKS_COUNT)) > PAYLOAD_MTU) return(0);
+
+    memcpy(*dst, src, (sizeof(block_t) * BLOCKSDB_BLOCKS_COUNT));
+
+#if BYTE_ORDER != LITTLE_ENDIAN
+    for(i = 0; i < BLOCKSDB_BLOCKS_COUNT; i++)
+        (*dst)[i] = htole16((*dst)[i]);
+#endif
+
+    (*(block_t **)dst) += BLOCKSDB_BLOCKS_COUNT;
+
+    *len += (sizeof(block_t) * BLOCKSDB_BLOCKS_COUNT);
+    *argc += BLOCKSDB_BLOCKS_COUNT;
+    return(1);
+
+}

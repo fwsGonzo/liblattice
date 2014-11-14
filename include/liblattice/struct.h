@@ -9,13 +9,6 @@
 #define LATTICE_NICKLEN 32
 #define LATTICE_STRLEN 512
 
-/*
-typedef struct block_t {
-    uint16_t id : 10;
-    uint16_t bf : 6;
-} block_t;
-*/
-
 typedef uint16_t block_t;
 
 #define blockid(x) ( (x) & 1023 )

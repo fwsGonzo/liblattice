@@ -24,6 +24,8 @@
 #ifndef LATTICE_PACKET_H
 #define LATTICE_PACKET_H
 
+  #include "struct.h"
+
   extern void packet_ntoh(lt_packet_h *h);
   extern void packet_hton(lt_packet_h *h);
 
@@ -43,6 +45,9 @@
   extern int get_double(void **src, double *dst, uint16_t *len, uint16_t *argc);
   extern int get_string(void **src, char **dst, uint16_t *len, uint16_t *argc);
 
+  extern int get_sector(void **src, block_t **dst, uint16_t *len, uint16_t *argc);
+
+
   // --------------------
 
   extern int put_int8(void **dst, int8_t src, uint16_t *len, uint16_t *argc);
@@ -58,5 +63,8 @@
   extern int put_float(void **dst, float src, uint16_t *len, uint16_t *argc);
   extern int put_double(void **dst, double src, uint16_t *len, uint16_t *argc);
   extern int put_string(void **dst, const char *src, uint16_t *len, uint16_t *argc);
+
+  extern int put_sector(void **dst, block_t *src, uint16_t *len, uint16_t *argc);
+
 
 #endif
