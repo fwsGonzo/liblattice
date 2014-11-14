@@ -251,7 +251,7 @@ int get_string(void **src, char **dst, uint16_t *len, uint16_t *argc) {
 
 }
 
-int get_sector(void **src, block_t **dst, uint16_t *len, uint16_t *argc) {
+int get_sector(void **src, block_t *dst, uint16_t *len, uint16_t *argc) {
 
 #if BYTE_ORDER != LITTLE_ENDIAN
     int i;
@@ -261,11 +261,11 @@ int get_sector(void **src, block_t **dst, uint16_t *len, uint16_t *argc) {
     if(*len < (sizeof(block_t) * BLOCKSDB_BLOCKS_COUNT)) return(0);
     if((*argc) < BLOCKSDB_BLOCKS_COUNT) return(0);
 
-    memcpy(*dst, *src, (sizeof(block_t) * BLOCKSDB_BLOCKS_COUNT));
+    memcpy(dst, *src, (sizeof(block_t) * BLOCKSDB_BLOCKS_COUNT));
 
 #if BYTE_ORDER != LITTLE_ENDIAN
     for(i = 0; i < BLOCKSDB_BLOCKS_COUNT; i++)
-        (*dst)[i] = le16toh((*dst)[i]);
+        dst[i] = le16toh(dst[i]);
 #endif
 
     (*(block_t **)src) += BLOCKSDB_BLOCKS_COUNT;

@@ -45,7 +45,7 @@
   extern int get_double(void **src, double *dst, uint16_t *len, uint16_t *argc);
   extern int get_string(void **src, char **dst, uint16_t *len, uint16_t *argc);
 
-  extern int get_sector(void **src, block_t **dst, uint16_t *len, uint16_t *argc);
+  extern int get_sector(void **src, block_t *dst, uint16_t *len, uint16_t *argc);
 
 
   // --------------------
