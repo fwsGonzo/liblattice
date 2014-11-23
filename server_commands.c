@@ -1899,7 +1899,7 @@ int s_sector(struct server_socket *src, lt_packet *packet) {
 
     if (!src || !packet) return 0;
 
-    if (PArgc(packet) < 2051) return 0; // wx wy wz + b[2048]
+    if (PArgc(packet) < 4) return 0; // wx wy wz + b[2048]
 
     argc = packet->header.payload_argc;
     len = packet->header.payload_length;

@@ -259,7 +259,7 @@ int get_sector(void **src, block_t *dst, uint16_t *len, uint16_t *argc) {
 
     if(!src || !*src || !dst || !len || !argc) return(0);
     if(*len < (sizeof(block_t) * BLOCKSDB_BLOCKS_COUNT)) return(0);
-    if((*argc) < BLOCKSDB_BLOCKS_COUNT) return(0);
+    if((*argc) < 1) return(0);
 
     memcpy(dst, *src, (sizeof(block_t) * BLOCKSDB_BLOCKS_COUNT));
 
@@ -271,7 +271,7 @@ int get_sector(void **src, block_t *dst, uint16_t *len, uint16_t *argc) {
     (*(block_t **)src) += BLOCKSDB_BLOCKS_COUNT;
 
     *len -= (sizeof(block_t) * BLOCKSDB_BLOCKS_COUNT);
-    *argc -= BLOCKSDB_BLOCKS_COUNT;
+    *argc -= 1;
     return(1);
 
 }
@@ -441,7 +441,7 @@ int put_sector(void **dst, block_t *src, uint16_t *len, uint16_t *argc) {
     (*(block_t **)dst) += BLOCKSDB_BLOCKS_COUNT;
 
     *len += (sizeof(block_t) * BLOCKSDB_BLOCKS_COUNT);
-    *argc += BLOCKSDB_BLOCKS_COUNT;
+    *argc += 1;
     return(1);
 
 }
