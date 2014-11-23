@@ -1979,12 +1979,9 @@ int s_flatland(struct server_socket *src, lt_packet *packet) {
     uint16_t len;
     uint16_t argc;
 
-    int i;
-    int c;
-
     if (!src || !packet) return 0;
 
-    if (PArgc(packet) < 3074) return 0; // wx wz + 12[256]
+    if (PArgc(packet) < 3) return 0; // wx wz + flatlands[]
 
     argc = packet->header.payload_argc;
     len = packet->header.payload_length;
@@ -2002,20 +1999,7 @@ int s_flatland(struct server_socket *src, lt_packet *packet) {
     if (!get_wx(&p, &(submess.fcoord.x), &len, &argc)) return 0;
     if (!get_wz(&p, &(submess.fcoord.z), &len, &argc)) return 0;
 
-    for (i = 0; i < BLOCKSDB_FLATLAND_COUNT; i++) {
-
-        for (c = 0; c < FLATLAND_TERRAIN_COLORS; c++) {
-
-            if (!get_color(&p, &(submess.fdata[i].color[c]), &len, &argc)) return 0;
-
-        }
-
-        if (!get_uint8(&p, &(submess.fdata[i].terrain), &len, &argc)) return 0;
-        if (!get_uint8(&p, &(submess.fdata[i].skylevel), &len, &argc)) return 0;
-        if (!get_uint8(&p, &(submess.fdata[i].groundlevel), &len, &argc)) return 0;
-        if (!get_uint8(&p, &(submess.fdata[i].unused1), &len, &argc)) return 0;
-
-    }
+    if (!get_flatsector(&p, submess.fdata, &len, &argc)) return 0;
 
     (*gcallback)(&mess);
 

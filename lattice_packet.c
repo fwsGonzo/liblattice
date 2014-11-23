@@ -276,6 +276,34 @@ int get_sector(void **src, block_t *dst, uint16_t *len, uint16_t *argc) {
 
 }
 
+int get_flatsector(void **src, flatdata_t *dst, uint16_t *len, uint16_t *argc) {
+
+#if BYTE_ORDER != LITTLE_ENDIAN
+    int i;
+    int c;
+#endif
+
+    if(!src || !*src || !dst || !len || !argc) return(0);
+    if(*len < (sizeof(flatdata_t) * BLOCKSDB_FLATLAND_COUNT)) return(0);
+    if((*argc) < 1) return(0);
+
+    memcpy(dst, *src, (sizeof(flatdata_t) * BLOCKSDB_FLATLAND_COUNT));
+
+
+#if BYTE_ORDER != LITTLE_ENDIAN
+    for(i = 0; i < BLOCKSDB_FLATLAND_COUNT; i++)
+        for (c = 0; c < FLATLAND_TERRAIN_COLORS; c++)
+            dst[i].color[c] = le32toh(dst[i].color[c]);
+#endif
+
+    (*(flatdata_t **)src) += BLOCKSDB_FLATLAND_COUNT;
+
+    *len -= (sizeof(flatdata_t) * BLOCKSDB_FLATLAND_COUNT);
+    *argc -= 1;
+    return(1);
+
+}
+
 
 // dst points to a movable pointer to the payload of the packet
 // src is the var we are pulling from
@@ -441,6 +469,32 @@ int put_sector(void **dst, block_t *src, uint16_t *len, uint16_t *argc) {
     (*(block_t **)dst) += BLOCKSDB_BLOCKS_COUNT;
 
     *len += (sizeof(block_t) * BLOCKSDB_BLOCKS_COUNT);
+    *argc += 1;
+    return(1);
+
+}
+
+int put_flatsector(void **dst, flatdata_t *src, uint16_t *len, uint16_t *argc) {
+
+#if BYTE_ORDER != LITTLE_ENDIAN
+    int i;
+    int c;
+#endif
+
+    if(!dst || !*dst || !src || !len || !argc) return(0);
+    if((*len + (sizeof(flatdata_t) * BLOCKSDB_FLATLAND_COUNT)) > PAYLOAD_MTU) return(0);
+
+    memcpy(*dst, src, (sizeof(flatdata_t) * BLOCKSDB_FLATLAND_COUNT));
+
+#if BYTE_ORDER != LITTLE_ENDIAN
+    for(i = 0; i < BLOCKSDB_FLATLAND_COUNT; i++)
+        for (c = 0; c < FLATLAND_TERRAIN_COLORS; c++)
+            (*dst)[i].color[c] = htole32((*dst)[i].color[c]);
+#endif
+
+    (*(flatdata_t **)dst) += BLOCKSDB_FLATLAND_COUNT;
+
+    *len += (sizeof(flatdata_t) * BLOCKSDB_FLATLAND_COUNT);
     *argc += 1;
     return(1);
 

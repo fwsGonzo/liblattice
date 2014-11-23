@@ -46,7 +46,7 @@
   extern int get_string(void **src, char **dst, uint16_t *len, uint16_t *argc);
 
   extern int get_sector(void **src, block_t *dst, uint16_t *len, uint16_t *argc);
-
+  extern int get_flatsector(void **src, flatdata_t *dst, uint16_t *len, uint16_t *argc);
 
   // --------------------
 
@@ -65,6 +65,6 @@
   extern int put_string(void **dst, const char *src, uint16_t *len, uint16_t *argc);
 
   extern int put_sector(void **dst, block_t *src, uint16_t *len, uint16_t *argc);
-
+  extern int put_flatsector(void **dst, flatdata_t *src, uint16_t *len, uint16_t *argc);
 
 #endif
