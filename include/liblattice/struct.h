@@ -12,6 +12,7 @@
 typedef uint16_t block_t;
 
 #define blockid(x) ( (x) & 1023 )
+#define blockbf(x) ( ((x) >> 10) & 63 )
 #define islight(id) (  (id) == BLOCKSDB_TORCH        || \
                        (id) == BLOCKSDB_MOLTENSTONE  || \
                        (id) == BLOCKSDB_LAVABLOCK    || \
