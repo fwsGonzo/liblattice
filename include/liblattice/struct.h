@@ -359,7 +359,7 @@ typedef struct lattice_flatland {
 
     f_coord fcoord;
 
-    flatdata_t fdata[BLOCKSDB_FLATLAND_COUNT]; // bx bz
+    flatdata_t fdata[BLOCKSDB_FLATDATA_COUNT]; // bx bz
 
 } lattice_flatland;
 

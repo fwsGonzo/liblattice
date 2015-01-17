@@ -284,21 +284,20 @@ int get_flatsector(void **src, flatdata_t *dst, uint16_t *len, uint16_t *argc) {
 #endif
 
     if(!src || !*src || !dst || !len || !argc) return(0);
-    if(*len < (sizeof(flatdata_t) * BLOCKSDB_FLATLAND_COUNT)) return(0);
+    if((*len) < (sizeof(flatdata_t) * BLOCKSDB_FLATDATA_COUNT)) return(0);
     if((*argc) < 1) return(0);
 
-    memcpy(dst, *src, (sizeof(flatdata_t) * BLOCKSDB_FLATLAND_COUNT));
-
+    memcpy(dst, *src, (sizeof(flatdata_t) * BLOCKSDB_FLATDATA_COUNT));
 
 #if BYTE_ORDER != LITTLE_ENDIAN
-    for(i = 0; i < BLOCKSDB_FLATLAND_COUNT; i++)
+    for(i = 0; i < BLOCKSDB_FLATDATA_COUNT; i++)
         for (c = 0; c < FLATLAND_TERRAIN_COLORS; c++)
             dst[i].color[c] = le32toh(dst[i].color[c]);
 #endif
 
-    (*(flatdata_t **)src) += BLOCKSDB_FLATLAND_COUNT;
+    (*(flatdata_t **)src) += BLOCKSDB_FLATDATA_COUNT;
 
-    *len -= (sizeof(flatdata_t) * BLOCKSDB_FLATLAND_COUNT);
+    *len -= (sizeof(flatdata_t) * BLOCKSDB_FLATDATA_COUNT);
     *argc -= 1;
     return(1);
 
@@ -482,19 +481,19 @@ int put_flatsector(void **dst, flatdata_t *src, uint16_t *len, uint16_t *argc) {
 #endif
 
     if(!dst || !*dst || !src || !len || !argc) return(0);
-    if((*len + (sizeof(flatdata_t) * BLOCKSDB_FLATLAND_COUNT)) > PAYLOAD_MTU) return(0);
+    if((*len + (sizeof(flatdata_t) * BLOCKSDB_FLATDATA_COUNT)) > PAYLOAD_MTU) return(0);
 
-    memcpy(*dst, src, (sizeof(flatdata_t) * BLOCKSDB_FLATLAND_COUNT));
+    memcpy(*dst, src, (sizeof(flatdata_t) * BLOCKSDB_FLATDATA_COUNT));
 
 #if BYTE_ORDER != LITTLE_ENDIAN
-    for(i = 0; i < BLOCKSDB_FLATLAND_COUNT; i++)
+    for(i = 0; i < BLOCKSDB_FLATDATA_COUNT; i++)
         for (c = 0; c < FLATLAND_TERRAIN_COLORS; c++)
             (*dst)[i].color[c] = htole32((*dst)[i].color[c]);
 #endif
 
-    (*(flatdata_t **)dst) += BLOCKSDB_FLATLAND_COUNT;
+    (*(flatdata_t **)dst) += BLOCKSDB_FLATDATA_COUNT;
 
-    *len += (sizeof(flatdata_t) * BLOCKSDB_FLATLAND_COUNT);
+    *len += (sizeof(flatdata_t) * BLOCKSDB_FLATDATA_COUNT);
     *argc += 1;
     return(1);
 
