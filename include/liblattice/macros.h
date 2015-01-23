@@ -32,6 +32,10 @@
   #define NOSLIDEOVER 0
   #define SLIDEOVER   1
 
+  #define version_t char *
+  #define get_version get_string
+  #define put_version put_string
+
   #define uid_t uint32_t
   #define get_uid get_uint32
   #define put_uid put_uint32

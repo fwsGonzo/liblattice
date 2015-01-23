@@ -682,6 +682,7 @@ int lattice_connect(const char *ipstr, uint16_t port) {
     if (!put_item_type(&p, lattice_player.hhold.item_type, &PLength(&out_packet), &PArgc(&out_packet))) return -27;
     if (!put_mining(&p, lattice_player.mining, &PLength(&out_packet), &PArgc(&out_packet))) return -28;
     if (!put_usercolor(&p, lattice_player.usercolor, &PLength(&out_packet), &PArgc(&out_packet))) return -29;
+    if (!put_version(&p, LIBLATTICE_VERSION, &PLength(&out_packet), &PArgc(&out_packet))) return -34;
 
     if (sendpacket(neighbor_table[1][1][1], &out_packet)) return -12;
 
