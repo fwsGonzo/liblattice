@@ -72,6 +72,16 @@ int s_iamserver(struct server_socket *src, lt_packet *packet) {
 
     struct timeval pingtime;
 
+    void *p;
+    uint16_t len;
+    uint16_t argc;
+
+    n_coord ncoord;
+    char *ipstr;
+    uint16_t port;
+    char *servername;
+    char *version;
+
     if (!src || !packet) return 0;
 
     SetFlagReg(src);
@@ -91,6 +101,25 @@ int s_iamserver(struct server_socket *src, lt_packet *packet) {
 
     }
 
+    argc = packet->header.payload_argc;
+    len = packet->header.payload_length;
+    p = packet->payload;
+
+    if (PArgc(packet) < 7) return 0;
+
+    if (!get_nx(&p, &(ncoord.x), &len, &argc)) return 0;
+    if (!get_ny(&p, &(ncoord.y), &len, &argc)) return 0;
+    if (!get_nz(&p, &(ncoord.z), &len, &argc)) return 0;
+    if (!get_string(&p, &(ipstr), &len, &argc)) return 0;
+    if (!get_uint16(&p, &port, &len, &argc)) return 0;
+    if (!get_string(&p, &(servername), &len, &argc)) return 0;
+    if (!get_string(&p, &(version), &len, &argc)) return 0;
+
+    if (src->servername) free(src->servername);
+    src->servername = strdup(servername);
+
+    if (src->version) free(src->version);
+    src->version = strdup(version);
 
     return 0;
 

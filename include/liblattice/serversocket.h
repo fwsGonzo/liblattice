@@ -68,6 +68,10 @@ typedef struct server_socket {
     struct uid_link *uidlist_head;
     struct uid_link *uidlist_tail;
 
+    char *servername;
+
+    char *version;
+
 } server_socket;
 
 typedef int socket_error_t;

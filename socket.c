@@ -261,6 +261,12 @@ void clearsock(server_socket *s) {
     s->uidlist_head = NULL;
     s->uidlist_tail = NULL;
 
+    if (s->version) free(s->version);
+    s->version = NULL;
+
+    if (s->servername) free(s->servername);
+    s->servername = NULL;
+
 }
 
 void closesock(server_socket *s) {
