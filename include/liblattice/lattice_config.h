@@ -1,7 +1,7 @@
 #ifndef LATTICE_CONFIG_H
 #define LATTICE_CONFIG_H
 
-#define LIBLATTICE_VERSION "0.1"
+#define LIBLATTICE_VERSION "0.2"
 
 // address sizes MUST be the same across the entire network
 

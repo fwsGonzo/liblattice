@@ -348,7 +348,7 @@ typedef struct lattice_emptysector {
 typedef struct lattice_sector {
 
     w_coord wcoord;
-    block_t b[BLOCKSDB_BLOCKS_COUNT]; // by bx bz
+    block_t b[BLOCKSDB_BLOCKS_COUNT]; // bx bz by
     int16_t blocks;
     int16_t torchlight;
     uint8_t hardsolid;

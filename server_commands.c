@@ -1878,7 +1878,7 @@ int s_closing(struct server_socket *src, lt_packet *packet) {
 int s_emptysector(struct server_socket *src, lt_packet *packet) {
 
     lattice_message mess;
-    lattice_emptysector submess;
+    lattice_brem submess;
 
     void *p;
     uint16_t len;
@@ -1892,7 +1892,7 @@ int s_emptysector(struct server_socket *src, lt_packet *packet) {
     len = packet->header.payload_length;
     p = packet->payload;
 
-    mess.type = T_EMPTYSECTOR;
+    mess.type = T_BREM;
 
     ClrFlagFrom(&mess);
 
@@ -1905,12 +1905,138 @@ int s_emptysector(struct server_socket *src, lt_packet *packet) {
     if (!get_wy(&p, &(submess.wcoord.y), &len, &argc)) return 0;
     if (!get_wz(&p, &(submess.wcoord.z), &len, &argc)) return 0;
 
-    (*gcallback)(&mess);
+    for(submess.bcoord.x = 0; submess.bcoord.x < BLOCKSDB_COUNT_BX; submess.bcoord.x++)
+    for(submess.bcoord.z = 0; submess.bcoord.z < BLOCKSDB_COUNT_BZ; submess.bcoord.z++)
+    for(submess.bcoord.y = 0; submess.bcoord.y < BLOCKSDB_COUNT_BY; submess.bcoord.y++)
+        (*gcallback)(&mess);
 
     return 0;
 
 }
 
+
+int s_sector(struct server_socket *src, lt_packet *packet) {
+
+    lattice_message baddmess;
+    lattice_badd baddsubmess;
+
+    lattice_message bsetmess;
+    lattice_bset bsetsubmess;
+
+    lattice_message bremmess;
+    lattice_brem bremsubmess;
+
+    void *p;
+    uint16_t len;
+    uint16_t argc;
+
+    w_coord wcoord;
+
+    int bx;
+    int by;
+    int bz;
+
+    block_t id;
+    block_t* b;
+    block_t s[BLOCKSDB_BLOCKS_COUNT]; // bx bz by
+
+
+    if (!src || !packet) return 0;
+
+    if (PArgc(packet) < 4) return 0; // wx wy wz + b[2048]
+
+    argc = packet->header.payload_argc;
+    len = packet->header.payload_length;
+    p = packet->payload;
+
+    baddmess.type = T_BADD;
+    ClrFlagFrom(&baddmess);
+    baddmess.fromuid = 0;
+    baddmess.length = sizeof baddsubmess;
+    baddmess.args = &baddsubmess;
+
+    bsetmess.type = T_BSET;
+    ClrFlagFrom(&bsetmess);
+    bsetmess.fromuid = 0;
+    bsetmess.length = sizeof bsetsubmess;
+    bsetmess.args = &bsetsubmess;
+
+    bremmess.type = T_BREM;
+    ClrFlagFrom(&bremmess);
+    bremmess.fromuid = 0;
+    bremmess.length = sizeof bremsubmess;
+    bremmess.args = &bremsubmess;
+
+
+    if (!get_wx(&p, &(wcoord.x), &len, &argc)) return 0;
+    if (!get_wy(&p, &(wcoord.y), &len, &argc)) return 0;
+    if (!get_wz(&p, &(wcoord.z), &len, &argc)) return 0;
+
+    baddsubmess.wcoord.x = wcoord.x;
+    baddsubmess.wcoord.y = wcoord.y;
+    baddsubmess.wcoord.z = wcoord.z;
+
+    bsetsubmess.wcoord.x = wcoord.x;
+    bsetsubmess.wcoord.y = wcoord.y;
+    bsetsubmess.wcoord.z = wcoord.z;
+
+    bremsubmess.wcoord.x = wcoord.x;
+    bremsubmess.wcoord.y = wcoord.y;
+    bremsubmess.wcoord.z = wcoord.z;
+
+    b = s;
+
+    if (!get_sector(&p, b, &len, &argc)) return 0;
+
+    for (bx = 0; bx < BLOCKSDB_COUNT_BX; bx++)
+    for (bz = 0; bz < BLOCKSDB_COUNT_BZ; bz++)
+    for (by = 0; by < BLOCKSDB_COUNT_BY; by++) {
+
+        id = blockid(*b);
+
+        if (!id) {
+            bremsubmess.bcoord.x = bx;
+            bremsubmess.bcoord.y = by;
+            bremsubmess.bcoord.z = bz;
+            (*gcallback)(&bremmess);
+        } else {
+            switch(id) {
+                case 43:
+                case 44:
+                case 62:
+                case 99:
+                case 552:
+                case 800:
+                case 820:
+                    baddsubmess.bcoord.x = bx;
+                    baddsubmess.bcoord.y = by;
+                    baddsubmess.bcoord.z = bz;
+                    baddsubmess.block = *b;
+                    (*gcallback)(&baddmess);
+                break;
+                default:
+                    bsetsubmess.bcoord.x = bx;
+                    bsetsubmess.bcoord.y = by;
+                    bsetsubmess.bcoord.z = bz;
+                    bsetsubmess.block = *b;
+                    (*gcallback)(&bsetmess);
+                break;
+            }
+
+        }
+
+
+        b++; // next block
+
+    }
+
+    //(*gcallback)(&mess);
+
+    return 0;
+
+}
+
+/*
 
 int s_sector(struct server_socket *src, lt_packet *packet) {
 
@@ -2000,8 +2126,11 @@ int s_sector(struct server_socket *src, lt_packet *packet) {
 
 }
 
+*/
 
 int s_flatland(struct server_socket *src, lt_packet *packet) {
+
+    /*
 
     lattice_message mess;
     lattice_flatland submess;
@@ -2033,6 +2162,8 @@ int s_flatland(struct server_socket *src, lt_packet *packet) {
     if (!get_flatsector(&p, submess.fdata, &len, &argc)) return 0;
 
     (*gcallback)(&mess);
+
+    */
 
     return 0;
 
