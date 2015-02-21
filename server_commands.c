@@ -1874,6 +1874,7 @@ int s_closing(struct server_socket *src, lt_packet *packet) {
 
 }
 
+#ifdef GONZO_HACK
 
 int s_emptysector(struct server_socket *src, lt_packet *packet) {
 
@@ -1914,6 +1915,47 @@ int s_emptysector(struct server_socket *src, lt_packet *packet) {
 
 }
 
+#else
+
+int s_emptysector(struct server_socket *src, lt_packet *packet) {
+
+    lattice_message mess;
+    lattice_emptysector submess;
+
+    void *p;
+    uint16_t len;
+    uint16_t argc;
+
+    if (!src || !packet) return 0;
+
+    if (PArgc(packet) < 3) return 0;
+
+    argc = packet->header.payload_argc;
+    len = packet->header.payload_length;
+    p = packet->payload;
+
+    mess.type = T_EMPTYSECTOR;
+
+    ClrFlagFrom(&mess);
+
+    mess.fromuid = 0;
+
+    mess.length = sizeof submess;
+    mess.args = &submess;
+
+    if (!get_wx(&p, &(submess.wcoord.x), &len, &argc)) return 0;
+    if (!get_wy(&p, &(submess.wcoord.y), &len, &argc)) return 0;
+    if (!get_wz(&p, &(submess.wcoord.z), &len, &argc)) return 0;
+
+    (*gcallback)(&mess);
+
+    return 0;
+
+}
+
+#endif
+
+#ifdef GONZO_HACK
 
 int s_sector(struct server_socket *src, lt_packet *packet) {
 
@@ -2036,7 +2078,7 @@ int s_sector(struct server_socket *src, lt_packet *packet) {
 
 }
 
-/*
+#else
 
 int s_sector(struct server_socket *src, lt_packet *packet) {
 
@@ -2126,11 +2168,11 @@ int s_sector(struct server_socket *src, lt_packet *packet) {
 
 }
 
-*/
+#endif
 
 int s_flatland(struct server_socket *src, lt_packet *packet) {
 
-    /*
+#ifndef GONZO_HACK
 
     lattice_message mess;
     lattice_flatland submess;
@@ -2163,7 +2205,7 @@ int s_flatland(struct server_socket *src, lt_packet *packet) {
 
     (*gcallback)(&mess);
 
-    */
+#endif
 
     return 0;
 
