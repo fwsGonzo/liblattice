@@ -35,6 +35,16 @@ typedef struct flatdata_t {
     uint8_t unused1;
 } flatdata_t;
 
+typedef struct sectorblock_t {
+    //sectorblock_t() {}
+    block_t  b[BLOCKSDB_COUNT_BX][BLOCKSDB_COUNT_BZ][BLOCKSDB_COUNT_BY];
+    int16_t  blocks;
+    int16_t  lights;
+    uint8_t  hardsolid;
+    uint8_t  special;
+    uint16_t version;
+} sectorblock_t;
+
 
 #define HAND_TYPE uint16_t
 
@@ -348,10 +358,7 @@ typedef struct lattice_emptysector {
 typedef struct lattice_sector {
 
     w_coord wcoord;
-    block_t b[BLOCKSDB_BLOCKS_COUNT]; // bx bz by
-    int16_t blocks;
-    int16_t torchlight;
-    uint8_t hardsolid;
+    sectorblock_t s;
 
 } lattice_sector;
 

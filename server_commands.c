@@ -2117,11 +2117,13 @@ int s_sector(struct server_socket *src, lt_packet *packet) {
     if (!get_wy(&p, &(submess.wcoord.y), &len, &argc)) return 0;
     if (!get_wz(&p, &(submess.wcoord.z), &len, &argc)) return 0;
 
-    submess.blocks = 0;
-    submess.torchlight = 0;
-    submess.hardsolid = BLOCKSDB_MAX_HARDSOLID;
+    submess.s.blocks = 0;
+    submess.s.lights = 0;
+    submess.s.hardsolid = BLOCKSDB_MAX_HARDSOLID;
+    submess.s.special = 0;
+    submess.s.version = 0;
 
-    b = submess.b;
+    b = &submess.s.b[0][0][0];
 
     if (!get_sector(&p, b, &len, &argc)) return 0;
 
@@ -2135,27 +2137,27 @@ int s_sector(struct server_socket *src, lt_packet *packet) {
         if (id == BLOCKSDB_AIR || id >= BLOCKSDB_HALFBLOCK_START) {
             // remove solid value from potential edge
             if (bz == 0)
-                submess.hardsolid &= (63-32);
+                submess.s.hardsolid &= (63-32);
             else if (bz == BLOCKSDB_COUNT_BZ-1)
-                submess.hardsolid &= (63-16);
+                submess.s.hardsolid &= (63-16);
 
             if (by == 0)
-                submess.hardsolid &= (63-8);
+                submess.s.hardsolid &= (63-8);
             else if (by == BLOCKSDB_COUNT_BY-1)
-                submess.hardsolid &= (63-4);
+                submess.s.hardsolid &= (63-4);
 
             if (bx == 0)
-                submess.hardsolid &= (63-2);
+                submess.s.hardsolid &= (63-2);
             else if (bx == BLOCKSDB_COUNT_BX-1)
-                submess.hardsolid &= (63-1);
+                submess.s.hardsolid &= (63-1);
         } // non-solid block
 
         if (id != BLOCKSDB_AIR)
         {
             // increase light count if isLight()
-            if (islight(id)) submess.torchlight++;
+            if (islight(id)) submess.s.lights++;
             // increase non-air block count
-            submess.blocks++;
+            submess.s.blocks++;
         }
 
         b++; // next block
