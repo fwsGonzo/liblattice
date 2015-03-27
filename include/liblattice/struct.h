@@ -45,7 +45,6 @@ typedef struct sectorblock_t {
     uint16_t version;
 } sectorblock_t;
 
-
 #define HAND_TYPE uint16_t
 
 typedef struct hand_hold {
