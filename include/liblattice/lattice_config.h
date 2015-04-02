@@ -81,7 +81,7 @@
 
 #define SENDQ_BLOCK 262144
 
-#define VISUAL_UNIT  48  // sectors
+#define VISUAL_UNIT  32  // sectors
 #define BURST_UNIT_MAX VISUAL_UNIT
 
 #define SERVER_RETRY 120
