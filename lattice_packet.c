@@ -44,9 +44,9 @@ void packet_ntoh(lt_packet_h *h) {
     h->marker = le32toh(h->marker);
     h->fromuid = le32toh(h->fromuid);
     h->flags = le16toh(h->flags);
-    h->payload_argc = le16toh(h->payload_argc);
     h->payload_type = le16toh(h->payload_type);
-    h->payload_length = le16toh(h->payload_length);
+    h->payload_argc = le32toh(h->payload_argc);
+    h->payload_length = le32toh(h->payload_length);
     return;
 
 }
@@ -57,9 +57,9 @@ void packet_hton(lt_packet_h *h) {
     h->marker = htole32(h->marker);
     h->fromuid = htole32(h->fromuid);
     h->flags = htole16(h->flags);
-    h->payload_argc = htole16(h->payload_argc);
     h->payload_type = htole16(h->payload_type);
-    h->payload_length = htole16(h->payload_length);
+    h->payload_argc = htole32(h->payload_argc);
+    h->payload_length = htole32(h->payload_length);
     return;
 
 }
@@ -102,7 +102,7 @@ float lattice_ntohf(float f) {
 
 // 0 on fail
 
-int get_int8(void **src, int8_t *dst, uint16_t *len, uint16_t *argc) {
+int get_int8(void **src, int8_t *dst, uint32_t *len, uint32_t *argc) {
 
     if(!src || !*src || !dst || !len || !argc) return(0);
     if(*len < sizeof(int8_t)) return(0);
@@ -115,7 +115,7 @@ int get_int8(void **src, int8_t *dst, uint16_t *len, uint16_t *argc) {
 
 }
 
-int get_int16(void **src, int16_t *dst, uint16_t *len, uint16_t *argc) {
+int get_int16(void **src, int16_t *dst, uint32_t *len, uint32_t *argc) {
 
     if(!src || !*src || !dst || !len || !argc) return(0);
     if(*len < sizeof(int16_t)) return(0);
@@ -128,7 +128,7 @@ int get_int16(void **src, int16_t *dst, uint16_t *len, uint16_t *argc) {
 
 }
 
-int get_int32(void **src, int32_t *dst, uint16_t *len, uint16_t *argc) {
+int get_int32(void **src, int32_t *dst, uint32_t *len, uint32_t *argc) {
 
     if(!src || !*src || !dst || !len || !argc) return(0);
     if(*len < sizeof(int32_t)) return(0);
@@ -141,7 +141,7 @@ int get_int32(void **src, int32_t *dst, uint16_t *len, uint16_t *argc) {
 
 }
 
-int get_int64(void **src, int64_t *dst, uint16_t *len, uint16_t *argc) {
+int get_int64(void **src, int64_t *dst, uint32_t *len, uint32_t *argc) {
 
     if(!src || !*src || !dst || !len || !argc) return(0);
     if(*len < sizeof(int64_t)) return(0);
@@ -154,7 +154,7 @@ int get_int64(void **src, int64_t *dst, uint16_t *len, uint16_t *argc) {
 
 }
 
-int get_uint8(void **src, uint8_t *dst, uint16_t *len, uint16_t *argc) {
+int get_uint8(void **src, uint8_t *dst, uint32_t *len, uint32_t *argc) {
 
     if(!src || !*src || !dst || !len || !argc) return(0);
     if(*len < sizeof(uint8_t)) return(0);
@@ -167,7 +167,7 @@ int get_uint8(void **src, uint8_t *dst, uint16_t *len, uint16_t *argc) {
 
 }
 
-int get_uint16(void **src, uint16_t *dst, uint16_t *len, uint16_t *argc) {
+int get_uint16(void **src, uint16_t *dst, uint32_t *len, uint32_t *argc) {
 
     if(!src || !*src || !dst || !len || !argc) return(0);
     if(*len < sizeof(uint16_t)) return(0);
@@ -180,7 +180,7 @@ int get_uint16(void **src, uint16_t *dst, uint16_t *len, uint16_t *argc) {
 
 }
 
-int get_uint32(void **src, uint32_t *dst, uint16_t *len, uint16_t *argc) {
+int get_uint32(void **src, uint32_t *dst, uint32_t *len, uint32_t *argc) {
 
     if(!src || !*src || !dst || !len || !argc) return(0);
     if(*len < sizeof(uint32_t)) return(0);
@@ -193,7 +193,7 @@ int get_uint32(void **src, uint32_t *dst, uint16_t *len, uint16_t *argc) {
 
 }
 
-int get_uint64(void **src, uint64_t *dst, uint16_t *len, uint16_t *argc) {
+int get_uint64(void **src, uint64_t *dst, uint32_t *len, uint32_t *argc) {
 
     if(!src || !*src || !dst || !len || !argc) return(0);
     if(*len < sizeof(uint64_t)) return(0);
@@ -206,7 +206,7 @@ int get_uint64(void **src, uint64_t *dst, uint16_t *len, uint16_t *argc) {
 
 }
 
-int get_float(void **src, float *dst, uint16_t *len, uint16_t *argc) {
+int get_float(void **src, float *dst, uint32_t *len, uint32_t *argc) {
 
     if(!src || !*src || !dst || !len || !argc) return(0);
     if(*len < sizeof(float)) return(0);
@@ -219,7 +219,7 @@ int get_float(void **src, float *dst, uint16_t *len, uint16_t *argc) {
 
 }
 
-int get_double(void **src, double *dst, uint16_t *len, uint16_t *argc) {
+int get_double(void **src, double *dst, uint32_t *len, uint32_t *argc) {
 
     if(!src || !*src || !dst || !len || !argc) return(0);
     if(*len < sizeof(double)) return(0);
@@ -232,7 +232,7 @@ int get_double(void **src, double *dst, uint16_t *len, uint16_t *argc) {
 
 }
 
-int get_string(void **src, char **dst, uint16_t *len, uint16_t *argc) {
+int get_string(void **src, char **dst, uint32_t *len, uint32_t *argc) {
 
     int i;
     char *p;
@@ -251,7 +251,7 @@ int get_string(void **src, char **dst, uint16_t *len, uint16_t *argc) {
 
 }
 
-int get_sector(void **src, block_t *dst, uint16_t *len, uint16_t *argc) {
+int get_sector(void **src, block_t *dst, uint32_t *len, uint32_t *argc) {
 
 #if BYTE_ORDER != LITTLE_ENDIAN
     int i;
@@ -276,7 +276,7 @@ int get_sector(void **src, block_t *dst, uint16_t *len, uint16_t *argc) {
 
 }
 
-int get_flatsector(void **src, flatdata_t *dst, uint16_t *len, uint16_t *argc) {
+int get_flatsector(void **src, flatdata_t *dst, uint32_t *len, uint32_t *argc) {
 
 #if BYTE_ORDER != LITTLE_ENDIAN
     int i;
@@ -310,7 +310,7 @@ int get_flatsector(void **src, flatdata_t *dst, uint16_t *len, uint16_t *argc) {
 
 // 0 on fail
 
-int put_int8(void **dst, int8_t src, uint16_t *len, uint16_t *argc) {
+int put_int8(void **dst, int8_t src, uint32_t *len, uint32_t *argc) {
 
     if(!dst || !*dst || !len || !argc) return(0);
     if((*len + sizeof(int8_t)) > PAYLOAD_MTU) return(0);
@@ -322,7 +322,7 @@ int put_int8(void **dst, int8_t src, uint16_t *len, uint16_t *argc) {
 
 }
 
-int put_int16(void **dst, int16_t src, uint16_t *len, uint16_t *argc) {
+int put_int16(void **dst, int16_t src, uint32_t *len, uint32_t *argc) {
 
     if(!dst || !*dst || !len || !argc) return(0);
     if((*len + sizeof(int16_t)) > PAYLOAD_MTU) return(0);
@@ -334,7 +334,7 @@ int put_int16(void **dst, int16_t src, uint16_t *len, uint16_t *argc) {
 
 }
 
-int put_int32(void **dst, int32_t src, uint16_t *len, uint16_t *argc) {
+int put_int32(void **dst, int32_t src, uint32_t *len, uint32_t *argc) {
 
     if(!dst || !*dst || !len || !argc) return(0);
     if((*len + sizeof(int32_t)) > PAYLOAD_MTU) return(0);
@@ -346,7 +346,7 @@ int put_int32(void **dst, int32_t src, uint16_t *len, uint16_t *argc) {
 
 }
 
-int put_int64(void **dst, int64_t src, uint16_t *len, uint16_t *argc) {
+int put_int64(void **dst, int64_t src, uint32_t *len, uint32_t *argc) {
 
     if(!dst || !*dst || !len || !argc) return(0);
     if((*len + sizeof(int64_t)) > PAYLOAD_MTU) return(0);
@@ -358,7 +358,7 @@ int put_int64(void **dst, int64_t src, uint16_t *len, uint16_t *argc) {
 
 }
 
-int put_uint8(void **dst, uint8_t src, uint16_t *len, uint16_t *argc) {
+int put_uint8(void **dst, uint8_t src, uint32_t *len, uint32_t *argc) {
 
     if(!dst || !*dst || !len || !argc) return(0);
     if((*len + sizeof(uint8_t)) > PAYLOAD_MTU) return(0);
@@ -370,7 +370,7 @@ int put_uint8(void **dst, uint8_t src, uint16_t *len, uint16_t *argc) {
 
 }
 
-int put_uint16(void **dst, uint16_t src, uint16_t *len, uint16_t *argc) {
+int put_uint16(void **dst, uint16_t src, uint32_t *len, uint32_t *argc) {
 
     if(!dst || !*dst || !len || !argc) return(0);
     if((*len + sizeof(uint16_t)) > PAYLOAD_MTU) return(0);
@@ -382,7 +382,7 @@ int put_uint16(void **dst, uint16_t src, uint16_t *len, uint16_t *argc) {
 
 }
 
-int put_uint32(void **dst, uint32_t src, uint16_t *len, uint16_t *argc) {
+int put_uint32(void **dst, uint32_t src, uint32_t *len, uint32_t *argc) {
 
     if(!dst || !*dst || !len || !argc) return(0);
     if((*len + sizeof(uint32_t)) > PAYLOAD_MTU) return(0);
@@ -394,7 +394,7 @@ int put_uint32(void **dst, uint32_t src, uint16_t *len, uint16_t *argc) {
 
 }
 
-int put_uint64(void **dst, uint64_t src, uint16_t *len, uint16_t *argc) {
+int put_uint64(void **dst, uint64_t src, uint32_t *len, uint32_t *argc) {
 
     if(!dst || !*dst || !len || !argc) return(0);
     if((*len + sizeof(uint64_t)) > PAYLOAD_MTU) return(0);
@@ -406,7 +406,7 @@ int put_uint64(void **dst, uint64_t src, uint16_t *len, uint16_t *argc) {
 
 }
 
-int put_float(void **dst, float src, uint16_t *len, uint16_t *argc) {
+int put_float(void **dst, float src, uint32_t *len, uint32_t *argc) {
 
     if(!dst || !*dst || !len || !argc) return(0);
     if((*len + sizeof(float)) > PAYLOAD_MTU) return(0);
@@ -418,7 +418,7 @@ int put_float(void **dst, float src, uint16_t *len, uint16_t *argc) {
 
 }
 
-int put_double(void **dst, double src, uint16_t *len, uint16_t *argc) {
+int put_double(void **dst, double src, uint32_t *len, uint32_t *argc) {
 
     if(!dst || !*dst || !len || !argc) return(0);
     if((*len + sizeof(double)) > PAYLOAD_MTU) return(0);
@@ -430,7 +430,7 @@ int put_double(void **dst, double src, uint16_t *len, uint16_t *argc) {
 
 }
 
-int put_string(void **dst, const char *src, uint16_t *len, uint16_t *argc) {
+int put_string(void **dst, const char *src, uint32_t *len, uint32_t *argc) {
 
     int i;
     char *p;
@@ -449,7 +449,7 @@ int put_string(void **dst, const char *src, uint16_t *len, uint16_t *argc) {
 
 }
 
-int put_sector(void **dst, block_t *src, uint16_t *len, uint16_t *argc) {
+int put_sector(void **dst, block_t *src, uint32_t *len, uint32_t *argc) {
 
 #if BYTE_ORDER != LITTLE_ENDIAN
     int i;
@@ -473,7 +473,7 @@ int put_sector(void **dst, block_t *src, uint16_t *len, uint16_t *argc) {
 
 }
 
-int put_flatsector(void **dst, flatdata_t *src, uint16_t *len, uint16_t *argc) {
+int put_flatsector(void **dst, flatdata_t *src, uint32_t *len, uint32_t *argc) {
 
 #if BYTE_ORDER != LITTLE_ENDIAN
     int i;

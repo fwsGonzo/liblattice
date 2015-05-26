@@ -73,8 +73,8 @@ int s_iamserver(struct server_socket *src, lt_packet *packet) {
     struct timeval pingtime;
 
     void *p;
-    uint16_t len;
-    uint16_t argc;
+    uint32_t len;
+    uint32_t argc;
 
     n_coord ncoord;
     char *ipstr;
@@ -131,8 +131,8 @@ int s_p(struct server_socket *src, lt_packet *packet) {
     lattice_p submess;
 
     void *p;
-    uint16_t len;
-    uint16_t argc;
+    uint32_t len;
+    uint32_t argc;
 
     uid_t *pfrom;
 
@@ -198,8 +198,8 @@ int s_quit(struct server_socket *src, lt_packet *packet) {
     lattice_quit submess;
 
     void *p;
-    uint16_t len;
-    uint16_t argc;
+    uint32_t len;
+    uint32_t argc;
 
     char *str;
 
@@ -255,8 +255,8 @@ int s_pc(struct server_socket *src, lt_packet *packet) {
     lattice_pc submess;
 
     void *p;
-    uint16_t len;
-    uint16_t argc;
+    uint32_t len;
+    uint32_t argc;
 
     uid_t *pfrom;
 
@@ -301,8 +301,8 @@ int s_pr(struct server_socket *src, lt_packet *packet) {
     lattice_pr submess;
 
     void *p;
-    uint16_t len;
-    uint16_t argc;
+    uint32_t len;
+    uint32_t argc;
 
     uid_t *pfrom;
 
@@ -349,8 +349,8 @@ int s_ph(struct server_socket *src, lt_packet *packet) {
     lattice_ph submess;
 
     void *p;
-    uint16_t len;
-    uint16_t argc;
+    uint32_t len;
+    uint32_t argc;
 
     uid_t *pfrom;
 
@@ -398,8 +398,8 @@ int s_chat(struct server_socket *src, lt_packet *packet) {
     lattice_chat submess;
 
     void *p;
-    uint16_t len;
-    uint16_t argc;
+    uint32_t len;
+    uint32_t argc;
 
     char *str;
 
@@ -447,8 +447,8 @@ int s_action(struct server_socket *src, lt_packet *packet) {
     lattice_action submess;
 
     void *p;
-    uint16_t len;
-    uint16_t argc;
+    uint32_t len;
+    uint32_t argc;
 
     char *str;
 
@@ -495,8 +495,8 @@ int s_s(struct server_socket *src, lt_packet *packet) {
     lattice_s submess;
 
     void *p;
-    uint16_t len;
-    uint16_t argc;
+    uint32_t len;
+    uint32_t argc;
 
     uid_t *pfrom;
 
@@ -543,8 +543,8 @@ int s_sc(struct server_socket *src, lt_packet *packet) {
     lattice_sc submess;
 
     void *p;
-    uint16_t len;
-    uint16_t argc;
+    uint32_t len;
+    uint32_t argc;
 
     uid_t *pfrom;
 
@@ -589,8 +589,8 @@ int s_bo(struct server_socket *src, lt_packet *packet) {
     lattice_bo submess;
 
     void *p;
-    uint16_t len;
-    uint16_t argc;
+    uint32_t len;
+    uint32_t argc;
 
     uid_t *pfrom;
 
@@ -650,8 +650,8 @@ int s_mo(struct server_socket *src, lt_packet *packet) {
     lattice_mo submess;
 
     void *p;
-    uint16_t len;
-    uint16_t argc;
+    uint32_t len;
+    uint32_t argc;
 
     uid_t *pfrom;
 
@@ -714,8 +714,8 @@ int s_badd(struct server_socket *src, lt_packet *packet) {
     lattice_badd submess;
 
     void *p;
-    uint16_t len;
-    uint16_t argc;
+    uint32_t len;
+    uint32_t argc;
 
     uid_t *pfrom;
 
@@ -779,8 +779,8 @@ int s_bset(struct server_socket *src, lt_packet *packet) {
     lattice_bset submess;
 
     void *p;
-    uint16_t len;
-    uint16_t argc;
+    uint32_t len;
+    uint32_t argc;
 
     uid_t *pfrom;
 
@@ -843,8 +843,8 @@ int s_brem(struct server_socket *src, lt_packet *packet) {
     lattice_brem submess;
 
     void *p;
-    uint16_t len;
-    uint16_t argc;
+    uint32_t len;
+    uint32_t argc;
 
     uid_t *pfrom;
 
@@ -902,8 +902,8 @@ int s_pmine(struct server_socket *src, lt_packet *packet) {
     lattice_pmine submess;
 
     void *p;
-    uint16_t len;
-    uint16_t argc;
+    uint32_t len;
+    uint32_t argc;
 
     mining_t mining;
 
@@ -950,8 +950,8 @@ int s_schat(struct server_socket *src, lt_packet *packet) {
     lattice_schat submess;
 
     void *p;
-    uint16_t len;
-    uint16_t argc;
+    uint32_t len;
+    uint32_t argc;
 
     char * nickstr;
     char * chatstr;
@@ -997,8 +997,8 @@ int s_log(struct server_socket *src, lt_packet *packet) {
     lattice_log submess;
 
     void *p;
-    uint16_t len;
-    uint16_t argc;
+    uint32_t len;
+    uint32_t argc;
 
     char * str;
 
@@ -1037,8 +1037,8 @@ int s_satstep(struct server_socket *src, lt_packet *packet) {
     lattice_satstep submess;
 
     void *p;
-    uint16_t len;
-    uint16_t argc;
+    uint32_t len;
+    uint32_t argc;
 
     if (!src || !packet) return 0;
 
@@ -1075,8 +1075,8 @@ int s_sat(struct server_socket *src, lt_packet *packet) {
     lattice_sat submess;
 
     void *p;
-    uint16_t len;
-    uint16_t argc;
+    uint32_t len;
+    uint32_t argc;
 
     if (!src || !packet) return 0;
 
@@ -1151,8 +1151,8 @@ int s_user(struct server_socket *src, lt_packet *packet) {
     lattice_user submess;
 
     void *p;
-    uint16_t len;
-    uint16_t argc;
+    uint32_t len;
+    uint32_t argc;
 
     mining_t mining;
 
@@ -1246,8 +1246,8 @@ int s_server(struct server_socket *src, lt_packet *packet) {
     lattice_server submess;
 
     void *p;
-    uint16_t len;
-    uint16_t argc;
+    uint32_t len;
+    uint32_t argc;
     lt_packet out_packet;
 
     char *str;
@@ -1382,8 +1382,8 @@ int s_delserver(struct server_socket *src, lt_packet *packet) {
     server_socket *dst;
 
     void *p;
-    uint16_t len;
-    uint16_t argc;
+    uint32_t len;
+    uint32_t argc;
 
     n_coord coord;
 
@@ -1426,8 +1426,8 @@ int s_moveto(struct server_socket *src, lt_packet *packet) {
     lattice_user usubmess;
 
     void *p;
-    uint16_t len;
-    uint16_t argc;
+    uint32_t len;
+    uint32_t argc;
 
     char *str;
 
@@ -1553,8 +1553,8 @@ int s_movefrom(struct server_socket *src, lt_packet *packet) {
     n_coord coord;
 
     void *p;
-    uint16_t len;
-    uint16_t argc;
+    uint32_t len;
+    uint32_t argc;
 
     char *str;
 
@@ -1789,8 +1789,8 @@ int s_closing(struct server_socket *src, lt_packet *packet) {
     lattice_closing submess;
 
     void *p;
-    uint16_t len;
-    uint16_t argc;
+    uint32_t len;
+    uint32_t argc;
 
     char *str;
 
@@ -1882,8 +1882,8 @@ int s_emptysector(struct server_socket *src, lt_packet *packet) {
     lattice_brem submess;
 
     void *p;
-    uint16_t len;
-    uint16_t argc;
+    uint32_t len;
+    uint32_t argc;
 
     if (!src || !packet) return 0;
 
@@ -1923,8 +1923,8 @@ int s_emptysector(struct server_socket *src, lt_packet *packet) {
     lattice_emptysector submess;
 
     void *p;
-    uint16_t len;
-    uint16_t argc;
+    uint32_t len;
+    uint32_t argc;
 
     if (!src || !packet) return 0;
 
@@ -1969,8 +1969,8 @@ int s_sector(struct server_socket *src, lt_packet *packet) {
     lattice_brem bremsubmess;
 
     void *p;
-    uint16_t len;
-    uint16_t argc;
+    uint32_t len;
+    uint32_t argc;
 
     w_coord wcoord;
 
@@ -2086,8 +2086,8 @@ int s_sector(struct server_socket *src, lt_packet *packet) {
     lattice_sector submess;
 
     void *p;
-    uint16_t len;
-    uint16_t argc;
+    uint32_t len;
+    uint32_t argc;
 
     int bx;
     int by;
@@ -2180,8 +2180,8 @@ int s_flatland(struct server_socket *src, lt_packet *packet) {
     lattice_flatland submess;
 
     void *p;
-    uint16_t len;
-    uint16_t argc;
+    uint32_t len;
+    uint32_t argc;
 
     if (!src || !packet) return 0;
 

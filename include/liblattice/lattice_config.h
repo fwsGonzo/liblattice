@@ -1,7 +1,7 @@
 #ifndef LATTICE_CONFIG_H
 #define LATTICE_CONFIG_H
 
-#define LIBLATTICE_VERSION "0.4"
+#define LIBLATTICE_VERSION "0.5"
 
 // address sizes MUST be the same across the entire network
 
@@ -68,18 +68,18 @@
 #define WRITE_LENGTH 65536
 #define READ_LENGTH 65536
 
-#define MTU 10240 // message size max (including (\r)\n\0)
+#define MTU 262144 // message size max (including (\r)\n\0)
 #define MAX_ARGS MTU
 
 // binary stuff
 
-#define PACKET_MTU 10240  // match this to MTU
+#define PACKET_MTU 262144  // match this to MTU
 #define PAYLOAD_MTU          (PACKET_MTU - sizeof(lt_packet_h))
 
 #define SYNCH_MARKER  0xFFFFFFFF
 
 
-#define SENDQ_BLOCK 262144
+#define SENDQ_BLOCK 524288
 
 #define VISUAL_UNIT  32  // sectors
 #define BURST_UNIT_MAX VISUAL_UNIT

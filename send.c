@@ -447,7 +447,7 @@ int sendto_allservers_butone(server_socket *butme, char *format, ...) {
 
 int sendpacket(server_socket *entry, lt_packet *packet) {
 
-    uint16_t packet_length;
+    uint32_t packet_length;
 
     int ret=0;
 
@@ -467,7 +467,7 @@ int sendpacket(server_socket *entry, lt_packet *packet) {
 
 int sendpacketto_allservers(lt_packet *packet) {
 
-    uint16_t packet_length;
+    uint32_t packet_length;
     server_socket *s;
     int x;
     int y;
@@ -494,7 +494,7 @@ int sendpacketto_allservers(lt_packet *packet) {
 
 int sendpacketto_allservers_butone(server_socket *butme, lt_packet *packet) {
 
-    uint16_t packet_length;
+    uint32_t packet_length;
     server_socket *s;
     int x;
     int y;
