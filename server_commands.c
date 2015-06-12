@@ -2250,7 +2250,7 @@ int s_csector(struct server_socket *src, lt_packet *packet) {
     len = packet->header.payload_length;
     p = packet->payload;
 
-    mess.type = T_CSECTOR;
+    mess.type = T_SECTOR;
 
     ClrFlagFrom(&mess);
 
