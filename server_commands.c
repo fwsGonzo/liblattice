@@ -2,6 +2,10 @@
 #include <string.h>
 #include <time.h>
 
+#include <lzo/lzoconf.h>
+#include <lzo/lzo1x.h>
+#include <lzo/lzo2a.h>
+
 #ifdef __linux__
 #include <sys/time.h>
         #include <sys/socket.h>
@@ -2208,6 +2212,116 @@ int s_flatland(struct server_socket *src, lt_packet *packet) {
     (*gcallback)(&mess);
 
 #endif
+
+    return 0;
+
+}
+
+int s_csector(struct server_socket *src, lt_packet *packet) {
+
+    lattice_message mess;
+    lattice_sector submess;
+
+    void *p;
+    uint32_t len;
+    uint32_t argc;
+
+    int bx;
+    int by;
+    int bz;
+
+    block_t id;
+    block_t* b;
+
+    uint16_t size;
+
+    void *compressed_space;
+    void *decompressed_space;
+    lzo_uint compressed_size;
+    lzo_uint decompressed_size;
+    int lzoret;
+
+
+    if (!src || !packet) return 0;
+
+    if (PArgc(packet) < 5) return 0; // wx wy wz size blob
+
+    argc = packet->header.payload_argc;
+    len = packet->header.payload_length;
+    p = packet->payload;
+
+    mess.type = T_CSECTOR;
+
+    ClrFlagFrom(&mess);
+
+    mess.fromuid = 0;
+
+    mess.length = sizeof submess;
+    mess.args = &submess;
+
+    if (!get_wx(&p, &(submess.wcoord.x), &len, &argc)) return 0;
+    if (!get_wy(&p, &(submess.wcoord.y), &len, &argc)) return 0;
+    if (!get_wz(&p, &(submess.wcoord.z), &len, &argc)) return 0;
+    if (!get_uint16(&p, &size, &len, &argc)) return 0;
+    compressed_size = size;
+    if (!get_blob(&p, &compressed_space, size, &len, &argc)) return 0;
+
+    decompressed_space = &submess.s.b;
+
+    lzoret = lzo2a_decompress(compressed_space, compressed_size, decompressed_space, &decompressed_size, NULL);
+
+    if (lzoret != 0) return 0;
+
+    if (decompressed_size < sizeof (submess.s.b)) return 0;
+
+    submess.s.blocks = 0;
+    submess.s.lights = 0;
+    submess.s.hardsolid = BLOCKSDB_MAX_HARDSOLID;
+    submess.s.special = 0;
+    submess.s.version = 0;
+
+    b = &submess.s.b[0][0][0];
+
+    //if (!get_sector(&p, b, &len, &argc)) return 0;
+
+    for (bx = 0; bx < BLOCKSDB_COUNT_BX; bx++)
+    for (bz = 0; bz < BLOCKSDB_COUNT_BZ; bz++)
+    for (by = 0; by < BLOCKSDB_COUNT_BY; by++) {
+
+        id = blockid(*b);
+
+        // check if block isn't solid
+        if (id == BLOCKSDB_AIR || id >= BLOCKSDB_HALFBLOCK_START) {
+            // remove solid value from potential edge
+            if (bz == 0)
+                submess.s.hardsolid &= (63-32);
+            else if (bz == BLOCKSDB_COUNT_BZ-1)
+                submess.s.hardsolid &= (63-16);
+
+            if (by == 0)
+                submess.s.hardsolid &= (63-8);
+            else if (by == BLOCKSDB_COUNT_BY-1)
+                submess.s.hardsolid &= (63-4);
+
+            if (bx == 0)
+                submess.s.hardsolid &= (63-2);
+            else if (bx == BLOCKSDB_COUNT_BX-1)
+                submess.s.hardsolid &= (63-1);
+        } // non-solid block
+
+        if (id != BLOCKSDB_AIR)
+        {
+            // increase light count if isLight()
+            if (islight(id)) submess.s.lights++;
+            // increase non-air block count
+            submess.s.blocks++;
+        }
+
+        b++; // next block
+
+    }
+
+    (*gcallback)(&mess);
 
     return 0;
 

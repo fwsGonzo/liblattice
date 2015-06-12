@@ -148,6 +148,7 @@ struct message {
 #define T_EMPTYSECTOR    43
 #define T_SECTOR         44
 #define T_FLATLAND       45
+#define T_CSECTOR        46
 
 #define MFLAG_FROM      0x00000001         // Is fromuid set
 
