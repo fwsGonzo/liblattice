@@ -251,6 +251,19 @@ int get_string(void **src, char **dst, uint32_t *len, uint32_t *argc) {
 
 }
 
+int get_blob(void **src, void **dst, uint32_t size, uint32_t *len, uint32_t *argc) {
+
+    if(!src || !*src || !dst || !len || !argc) return(0);
+    if (*len < size) return(0);
+    if(!*argc) return(0);
+    *(char **)dst = *(char **)src;
+    *(char **)src += size;
+    *len -= size;
+    (*argc)--;
+    return(1);
+
+}
+
 int get_sector(void **src, block_t *dst, uint32_t *len, uint32_t *argc) {
 
 #if BYTE_ORDER != LITTLE_ENDIAN
@@ -444,6 +457,18 @@ int put_string(void **dst, const char *src, uint32_t *len, uint32_t *argc) {
     memcpy(*(char **)dst, src, i);
     * (char **)dst += i;
     *len += i;
+    (*argc)++;
+    return(1);
+
+}
+
+int put_blob(void **dst, void *src, uint32_t size, uint32_t *len, uint32_t *argc) {
+
+    if(!dst || !*dst || !src || !len || !argc) return(0);
+    if ((*len + size) > PAYLOAD_MTU) return(0);
+    memcpy(*(char **)dst, src, size);
+    * (char **)dst += size;
+    *len += size;
     (*argc)++;
     return(1);
 

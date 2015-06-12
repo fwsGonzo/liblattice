@@ -45,6 +45,8 @@
   extern int get_double(void **src, double *dst, uint32_t *len, uint32_t *argc);
   extern int get_string(void **src, char **dst, uint32_t *len, uint32_t *argc);
 
+  extern int get_blob(void **src, void **dst, uint32_t size, uint32_t *len, uint32_t *argc);
+
   extern int get_sector(void **src, block_t *dst, uint32_t *len, uint32_t *argc);
   extern int get_flatsector(void **src, flatdata_t *dst, uint32_t *len, uint32_t *argc);
 
@@ -63,6 +65,8 @@
   extern int put_float(void **dst, float src, uint32_t *len, uint32_t *argc);
   extern int put_double(void **dst, double src, uint32_t *len, uint32_t *argc);
   extern int put_string(void **dst, const char *src, uint32_t *len, uint32_t *argc);
+
+  extern int put_blob(void **dst, void *src, uint32_t size, uint32_t *len, uint32_t *argc);
 
   extern int put_sector(void **dst, block_t *src, uint32_t *len, uint32_t *argc);
   extern int put_flatsector(void **dst, flatdata_t *src, uint32_t *len, uint32_t *argc);
