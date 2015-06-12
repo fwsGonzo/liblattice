@@ -81,6 +81,7 @@ struct message s_mestab[] = {
     { T_EMPTYSECTOR, s_emptysector, FLAG_REG },
     { T_SECTOR, s_sector, FLAG_REG },
     { T_FLATLAND, s_flatland, FLAG_REG },
+    { T_CSECTOR, s_csector, FLAG_REG },
     { 0, (int (*)()) NULL, 0 }
 };
 
