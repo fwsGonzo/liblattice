@@ -1309,6 +1309,7 @@ int s_server(struct server_socket *src, lt_packet *packet) {
         if (!put_nx(&p, lattice_player.centeredon.x, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
         if (!put_ny(&p, lattice_player.centeredon.y, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
         if (!put_nz(&p, lattice_player.centeredon.z, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+        if (!put_version(&p, LIBLATTICE_VERSION, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
         if (!put_wx(&p, lattice_player.wpos.x, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
         if (!put_wy(&p, lattice_player.wpos.y, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
         if (!put_wz(&p, lattice_player.wpos.z, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
@@ -1321,7 +1322,6 @@ int s_server(struct server_socket *src, lt_packet *packet) {
         if (!put_item_type(&p, lattice_player.hhold.item_type, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
         if (!put_mining(&p, lattice_player.mining, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
         if (!put_usercolor(&p, lattice_player.usercolor, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
-        if (!put_version(&p, LIBLATTICE_VERSION, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
 
         if (sendpacket(dst, &out_packet)) return 1;
 
