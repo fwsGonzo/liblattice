@@ -1296,20 +1296,24 @@ int s_server(struct server_socket *src, lt_packet *packet) {
 
     //(*gcallback)(&mess);
 
+    makepacket(&out_packet, T_SIDEDINTRO);
+    p = &out_packet.payload;
+
+    if (!put_uid(&p, lattice_player.userid, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_model(&p, lattice_player.model, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_color(&p, lattice_player.color, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_nickname(&p, lattice_player.nickname, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_burstdist(&p, lattice_player.burstdist, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_nx(&p, lattice_player.centeredon.x, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_ny(&p, lattice_player.centeredon.y, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_nz(&p, lattice_player.centeredon.z, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+    if (!put_version(&p, LIBLATTICE_VERSION, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
+
+
+
     if (user_is_within_outer_border(lattice_player.wpos, submess.ncoord)) {
         // close enogh to be tracked...
-        makepacket(&out_packet, T_SIDEDINTRO);
-        p = &out_packet.payload;
 
-        if (!put_uid(&p, lattice_player.userid, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
-        if (!put_model(&p, lattice_player.model, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
-        if (!put_color(&p, lattice_player.color, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
-        if (!put_nickname(&p, lattice_player.nickname, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
-        if (!put_burstdist(&p, lattice_player.burstdist, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
-        if (!put_nx(&p, lattice_player.centeredon.x, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
-        if (!put_ny(&p, lattice_player.centeredon.y, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
-        if (!put_nz(&p, lattice_player.centeredon.z, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
-        if (!put_version(&p, LIBLATTICE_VERSION, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
         if (!put_wx(&p, lattice_player.wpos.x, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
         if (!put_wy(&p, lattice_player.wpos.y, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
         if (!put_wz(&p, lattice_player.wpos.z, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
@@ -1322,8 +1326,6 @@ int s_server(struct server_socket *src, lt_packet *packet) {
         if (!put_item_type(&p, lattice_player.hhold.item_type, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
         if (!put_mining(&p, lattice_player.mining, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
         if (!put_usercolor(&p, lattice_player.usercolor, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
-
-        if (sendpacket(dst, &out_packet)) return 1;
 
         //if (sendto_one(dst, "SIDEDINTRO %lu %d %u %s %d %u %u %u %u %u %u %d %d %d %d %d %d %d %d %u\n",
         //               lattice_player.userid,
@@ -1350,21 +1352,6 @@ int s_server(struct server_socket *src, lt_packet *packet) {
     } else {
         // too far to be tracked... just the basics....
 
-        makepacket(&out_packet, T_SIDEDINTRO);
-        p = &out_packet.payload;
-
-        if (!put_uid(&p, lattice_player.userid, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
-        if (!put_model(&p, lattice_player.model, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
-        if (!put_color(&p, lattice_player.color, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
-        if (!put_nickname(&p, lattice_player.nickname, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
-        if (!put_burstdist(&p, lattice_player.burstdist, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
-        if (!put_nx(&p, lattice_player.centeredon.x, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
-        if (!put_ny(&p, lattice_player.centeredon.y, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
-        if (!put_nz(&p, lattice_player.centeredon.z, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
-        if (!put_version(&p, LIBLATTICE_VERSION, &PLength(&out_packet), &PArgc(&out_packet))) return 1;
-
-        if (sendpacket(dst, &out_packet)) return 1;
-
         //if (sendto_one(dst, "SIDEDINTRO %lu %d %u %s %d %u %u %u\n",
         //               lattice_player.userid,
         //               lattice_player.model,
@@ -1375,6 +1362,10 @@ int s_server(struct server_socket *src, lt_packet *packet) {
         //               lattice_player.centeredon.y,
         //               lattice_player.centeredon.z)) return 1;
     }
+
+
+    if (sendpacket(dst, &out_packet)) return 1;
+
 
     return 0;
 
