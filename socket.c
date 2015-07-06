@@ -267,6 +267,10 @@ void clearsock(server_socket *s) {
     if (s->servername) free(s->servername);
     s->servername = NULL;
 
+    s->burstdist = 0;
+
+    return;
+
 }
 
 void closesock(server_socket *s) {

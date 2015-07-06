@@ -85,6 +85,8 @@ int s_iamserver(struct server_socket *src, lt_packet *packet) {
     uint16_t port;
     char *servername;
     char *version;
+    uint16_t minburstdist;
+    uint16_t maxburstdist;
 
     if (!src || !packet) return 0;
 
@@ -109,21 +111,29 @@ int s_iamserver(struct server_socket *src, lt_packet *packet) {
     len = packet->header.payload_length;
     p = packet->payload;
 
-    if (PArgc(packet) < 7) return 0;
+    if (PArgc(packet) < 9) return 0;
 
     if (!get_nx(&p, &(ncoord.x), &len, &argc)) return 0;
     if (!get_ny(&p, &(ncoord.y), &len, &argc)) return 0;
     if (!get_nz(&p, &(ncoord.z), &len, &argc)) return 0;
+
     if (!get_string(&p, &(ipstr), &len, &argc)) return 0;
     if (!get_uint16(&p, &port, &len, &argc)) return 0;
-    if (!get_string(&p, &(servername), &len, &argc)) return 0;
-    if (!get_string(&p, &(version), &len, &argc)) return 0;
 
+    if (!get_string(&p, &(servername), &len, &argc)) return 0;
     if (src->servername) free(src->servername);
     src->servername = strdup(servername);
 
+    if (!get_string(&p, &(version), &len, &argc)) return 0;
     if (src->version) free(src->version);
     src->version = strdup(version);
+
+    if (!get_uint16(&p, &minburstdist, &len, &argc)) return 0;
+    if (!get_uint16(&p, &maxburstdist, &len, &argc)) return 0;
+
+    src->burstdist = lattice_player.burstdist;
+    if (src->burstdist < minburstdist) src->burstdist = minburstdist;
+    if (src->burstdist > minburstdist) src->burstdist = maxburstdist;
 
     return 0;
 

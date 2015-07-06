@@ -72,6 +72,8 @@ typedef struct server_socket {
 
     char *version;
 
+    int burstdist;
+
 } server_socket;
 
 typedef int socket_error_t;
