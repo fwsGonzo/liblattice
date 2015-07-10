@@ -21,3 +21,9 @@
 **
 */
 
+#ifndef BLOCKS_H
+#define BLOCKS_H
+
+    extern void sendclient_emptysector(w_coord wcoord);
+
+#endif

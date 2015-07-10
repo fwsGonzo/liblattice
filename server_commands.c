@@ -33,6 +33,7 @@
 #include "sched.h"
 #include "macros.h"
 #include "lattice_packet.h"
+#include "blocks.h"
 
 int s_ping(struct server_socket *src, lt_packet *packet) {
 
@@ -1924,8 +1925,7 @@ int s_emptysector(struct server_socket *src, lt_packet *packet) {
 
 int s_emptysector(struct server_socket *src, lt_packet *packet) {
 
-    lattice_message mess;
-    lattice_emptysector submess;
+    w_coord wcoord;
 
     void *p;
     uint32_t len;
@@ -1939,20 +1939,11 @@ int s_emptysector(struct server_socket *src, lt_packet *packet) {
     len = packet->header.payload_length;
     p = packet->payload;
 
-    mess.type = T_EMPTYSECTOR;
+    if (!get_wx(&p, &(wcoord.x), &len, &argc)) return 0;
+    if (!get_wy(&p, &(wcoord.y), &len, &argc)) return 0;
+    if (!get_wz(&p, &(wcoord.z), &len, &argc)) return 0;
 
-    ClrFlagFrom(&mess);
-
-    mess.fromuid = 0;
-
-    mess.length = sizeof submess;
-    mess.args = &submess;
-
-    if (!get_wx(&p, &(submess.wcoord.x), &len, &argc)) return 0;
-    if (!get_wy(&p, &(submess.wcoord.y), &len, &argc)) return 0;
-    if (!get_wz(&p, &(submess.wcoord.z), &len, &argc)) return 0;
-
-    (*gcallback)(&mess);
+    sendclient_emptysector(wcoord);
 
     return 0;
 
