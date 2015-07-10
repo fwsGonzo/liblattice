@@ -1,5 +1,5 @@
 # source files
-SOURCE = liblattice.c globals.c socket.c send.c neighbors.c server_commands.c client_commands.c sched.c forwin.c lattice_packet.c
+SOURCE = liblattice.c globals.c socket.c send.c neighbors.c server_commands.c client_commands.c sched.c forwin.c lattice_packet.c blocks.c
 OUTPUT = liblattice.a
 
 CC = gcc
