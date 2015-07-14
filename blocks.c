@@ -74,3 +74,99 @@ void sendclient_emptysector(w_coord wcoord) {
     return;
 
 }
+
+void sendclient_emptycolumn(f_coord fcoord) {
+
+    w_coord wcoord;
+
+    wcoord.x = fcoord.x;
+    wcoord.z = fcoord.z;
+
+    for (wcoord.y = 0; wcoord.y < BLOCKSDB_COUNT_WY; wcoord.y++)
+        sendclient_emptysector(wcoord);
+
+    return;
+
+}
+
+#define can_burst_from(fcoord) (                                                        \
+                                ( ((fcoord).x >= bot.x) && ((fcoord).x <= top.x) ) &&   \
+                                ( ((fcoord).z >= bot.z) && ((fcoord).z <= top.z) )      \
+                               )
+
+void burstclient_emptysectors(n_coord coord, int burstdist, w_coord wcoord) {
+    w_coord min_wcoord;
+    w_coord max_wcoord;
+
+    w_coord bot;
+    w_coord top;
+
+    //w_coord scroll;
+
+    f_coord fcoord;
+
+    int32_t i;
+    int32_t n;
+    int32_t max;
+
+    min_wcoord.x = coord.x << BLOCKSDB_WIDTH_WX;
+    min_wcoord.y = coord.y << BLOCKSDB_WIDTH_WY;
+    min_wcoord.z = coord.z << BLOCKSDB_WIDTH_WX;
+    max_wcoord.x = (coord.x << BLOCKSDB_WIDTH_WX) | BLOCKSDB_MASK_WX;
+    max_wcoord.y = (coord.y << BLOCKSDB_WIDTH_WY) | BLOCKSDB_MASK_WY;
+    max_wcoord.z = (coord.z << BLOCKSDB_WIDTH_WZ) | BLOCKSDB_MASK_WZ;
+
+    if (wcoord.x - burstdist < min_wcoord.x) bot.x = min_wcoord.x; else bot.x = wcoord.x - burstdist;
+    if (wcoord.y - burstdist < min_wcoord.y) bot.y = min_wcoord.y; else bot.y = wcoord.y - burstdist;
+    if (wcoord.z - burstdist < min_wcoord.z) bot.z = min_wcoord.z; else bot.z = wcoord.z - burstdist;
+
+    if (wcoord.x - burstdist < min_wcoord.x) bot.x = min_wcoord.x; else bot.x = wcoord.x - burstdist;
+    if (wcoord.y - burstdist < min_wcoord.y) bot.y = min_wcoord.y; else bot.y = wcoord.y - burstdist;
+    if (wcoord.z - burstdist < min_wcoord.z) bot.z = min_wcoord.z; else bot.z = wcoord.z - burstdist;
+
+    if (wcoord.x + burstdist > max_wcoord.x) top.x = max_wcoord.x; else top.x = wcoord.x + burstdist;
+    if (wcoord.y + burstdist > max_wcoord.y) top.y = max_wcoord.y; else top.y = wcoord.y + burstdist;
+    if (wcoord.z + burstdist > max_wcoord.z) top.z = max_wcoord.z; else top.z = wcoord.z + burstdist;
+
+    max = burstdist;
+
+    fcoord.x = wcoord.x;
+    fcoord.z = wcoord.z;
+
+    if (can_burst_from(fcoord)) {
+        sendclient_emptycolumn(fcoord);
+    }
+
+    for (n = 1; n <= max; n++) {
+
+        for (i = -n; i <= n; i++) {
+            fcoord.x = wcoord.x - n;
+            fcoord.z = wcoord.z + i;
+            if (can_burst_from(fcoord))
+                sendclient_emptycolumn(fcoord);
+        }
+
+        for (i = (-n + 1); i < n; i++) {
+            fcoord.x = wcoord.x + i;
+            fcoord.z = wcoord.z - n;
+            if (can_burst_from(fcoord))
+                sendclient_emptycolumn(fcoord);
+            fcoord.x = wcoord.x + i;
+            fcoord.z = wcoord.z + n;
+            if (can_burst_from(fcoord))
+                sendclient_emptycolumn(fcoord);
+        }
+
+        for (i = -n; i <= n; i++) {
+            fcoord.x = wcoord.x + n;
+            fcoord.z = wcoord.z + i;
+            if (can_burst_from(fcoord))
+                sendclient_emptycolumn(fcoord);
+        }
+
+    }
+
+    return;
+
+}
+

@@ -53,6 +53,8 @@
 #include "neighbors.h"
 #include "send.h"
 #include "macros.h"
+#include "blocks.h"
+
 //#include "numerics.h"
 //#include "users.h"
 //#include "server_log.h"
@@ -277,6 +279,7 @@ void closesock(server_socket *s) {
 
     //server_socket *p;
     n_coord server_coord;
+
     n_coord newcenter;
     if (!s) return;
 
@@ -284,12 +287,15 @@ void closesock(server_socket *s) {
     server_coord.y = s->coord.y;
     server_coord.z = s->coord.z;
 
+    burstclient_emptysectors(s->coord, s->burstdist, lattice_player.wpos);
+
     clearsock(s);
 
     if (ncoord_is_equal(server_coord, lattice_player.centeredon)) {
         // this is my centered server
         if ( ncoord_is_equal(server_coord, wcoord_to_ncoord(lattice_player.wpos)) )  {
             // i am standing on my centered server. i must die.
+            // clear the land and disconnect everything.
             disconnect_servers();
         } else {
             // i am not standing on my centered server. its dieing. i need to recenter.

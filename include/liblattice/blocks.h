@@ -26,4 +26,6 @@
 
     extern void sendclient_emptysector(w_coord wcoord);
 
+    extern void burstclient_emptysectors(n_coord coord, int burstdist, w_coord wcoord);
+
 #endif
