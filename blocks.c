@@ -75,9 +75,36 @@ void sendclient_emptysector(w_coord wcoord) {
 
 }
 
+void sendclient_emptyflatland(f_coord fcoord) {
+
+    lattice_message mess;
+    lattice_flatland submess;
+
+    mess.type = T_FLATLAND;
+
+    ClrFlagFrom(&mess);
+
+    mess.fromuid = 0;
+
+    mess.length = sizeof submess;
+    mess.args = &submess;
+
+    submess.fcoord.x = fcoord.x;
+    submess.fcoord.z = fcoord.z;
+
+    memset(submess.fdata, 0, sizeof submess.fdata);
+
+    (*gcallback)(&mess);
+
+    return;
+
+}
+
 void sendclient_emptycolumn(f_coord fcoord) {
 
     w_coord wcoord;
+
+    sendclient_emptyflatland(fcoord);
 
     wcoord.x = fcoord.x;
     wcoord.z = fcoord.z;

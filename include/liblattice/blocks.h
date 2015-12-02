@@ -25,7 +25,8 @@
 #define BLOCKS_H
 
     extern void sendclient_emptysector(w_coord wcoord);
-
+    extern void sendclient_emptyflatland(f_coord fcoord);
+    extern void sendclient_emptycolumn(f_coord fcoord);
     extern void burstclient_emptysectors(n_coord coord, int burstdist, w_coord wcoord);
 
 #endif
