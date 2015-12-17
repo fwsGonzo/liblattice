@@ -52,19 +52,23 @@ int c_p(w_coord wcoord, b_coord bcoord) {
     newcenter = wcoord_to_ncoord(wcoord);
 
     if (!find_neighbor(newcenter)) {
-        mess.type = T_BUMP;
-        ClrFlagFrom(&mess);
-        mess.fromuid = 0;
-        mess.length = sizeof submess;
-        mess.args = &submess;
-        submess.wcoord = lattice_player.wpos;
-        submess.bcoord = lattice_player.bpos;
-        submess.bad_wcoord = wcoord;
-        submess.bad_bcoord = bcoord;
-        (*gcallback)(&mess);
+        if (!lattice_player.last_p_oob) {
+            mess.type = T_BUMP;
+            ClrFlagFrom(&mess);
+            mess.fromuid = 0;
+            mess.length = sizeof submess;
+            mess.args = &submess;
+            submess.wcoord = lattice_player.wpos;
+            submess.bcoord = lattice_player.bpos;
+            submess.bad_wcoord = wcoord;
+            submess.bad_bcoord = bcoord;
+            (*gcallback)(&mess);
+        }
+        lattice_player.last_p_oob = 1;
         return 0;
     }
 
+    lattice_player.last_p_oob = 0;
     lattice_player.wpos = wcoord;
     lattice_player.bpos = bcoord;
 

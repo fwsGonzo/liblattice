@@ -741,6 +741,7 @@ int lattice_setplayer(lattice_player_t *player) {
     lattice_player.usercolor = player->usercolor;
     lattice_player.burstdist = player->burstdist;
     lattice_player.mining = player->mining;
+    lattice_player.last_p_oob = player->last_p_oob;
 
     //if (lattice_player.nickname) free(lattice_player.nickname);
 
@@ -786,6 +787,7 @@ int lattice_getplayer(lattice_player_t *player) {
     player->usercolor = lattice_player.usercolor;
     player->burstdist = lattice_player.burstdist;
     player->mining = lattice_player.mining;
+    player->last_p_oob = lattice_player.last_p_oob;
 
     //if (player->nickname) free(player->nickname);
 
@@ -1022,6 +1024,7 @@ int authserver_login(const char *username, const char *password, const char *hos
     player.hhold.item_type = (uint16_t)atoi(arg_v[14]);
     player.usercolor = 0;
     player.mining = 0;
+    player.last_p_oob = 0;
     player.burstdist = burstdist;
 
     lattice_setplayer(&player);

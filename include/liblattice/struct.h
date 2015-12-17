@@ -83,6 +83,8 @@ typedef struct lattice_player_t {
 
     int mining;
 
+    int last_p_oob;
+
 } lattice_player_t;
 
 /*
